@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Group Portal{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- main stylesheet for all groups -->
+    <link rel="stylesheet" href="{% static 'groups/groups_style_base.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- ─── NAVBAR (light green) ─── -->
+    <header class="navbar">
+        <h1 class="site-name">{% block site_name %}Group Microservice{% endblock %}</h1>
+        {% block nav_extra %}{% endblock %}
+    </header>
+
+    <!-- ─── MAIN CONTENT (medium green) ─── -->
+    <main class="main-body">
+        {% block content %}
+        <!-- child templates put their page-specific HTML here -->
+        {% endblock %}
+    </main>
+
+    <!-- ─── FOOTER (dark green) ─── -->
+    <footer class="footer">
+        {% block footer %}
+        © {{ year|default:2025 }} — All rights reserved
+        {% endblock %}
+    </footer>
+
+</body>
+</html>

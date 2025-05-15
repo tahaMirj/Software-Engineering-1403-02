@@ -1,0 +1,50 @@
+/* ---------- GLOBAL ----------- */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+
+/* ---------- 3-tone layout ---- */
+.navbar{
+    background:#b8f2c2;          /* light green */
+    color:#103b0f;
+    padding:1rem 2rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.site-name{font-size:1.35rem;font-weight:600}
+
+/* ---------- MAIN CONTENT (medium green) ---------- */
+.main-body{
+    flex:1;                               /* fills the space between navbar & footer */
+    background:#70c779;                   /* medium green */
+    color:#fff;
+
+    /* ▼ NEW ▼ */
+    display:flex;
+    flex-direction:column;
+    justify-content:center;               /* vertical centering  */
+    align-items:center;                   /* horizontal centering */
+    text-align:center;                    /* optional: center text */
+}
+
+.main-body h1{            /* or use h2 / .page-title */
+    font-size:45px;       /* ≈ 1.875 rem */
+    margin-bottom:.75rem; /* optional spacing */
+}
+
+.main-body p{
+    font-size:20px;       /* body copy a bit larger too */
+}
+
+.footer{
+    background:#2f6a34;          /* dark green */
+    color:#e4fbe4;
+    text-align:center;
+    padding:1rem;
+    font-size:.9rem;
+}
+
+/* --------- responsive tweak --- */
+@media(max-width:600px){
+    .navbar{flex-direction:column;gap:.5rem;text-align:center}
+}
