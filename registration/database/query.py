@@ -197,3 +197,31 @@ def search_posts_tag_for_all(db_connection, query):
 
     cursor.close()
     return posts_list
+
+
+
+def describe_table(mydb, table_name):
+    cursor = mydb.cursor()
+    try:
+        query = f"DESCRIBE {table_name}"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        print(f"Structure of table '{table_name}':")
+        for row in result:
+            print(row)
+        return result
+    except Exception as e:
+        print(f"The error '{e}' occurred")
+        return None
+    finally:
+        cursor.close()
+
+DB_NAME = 'defaultdb'
+DB_USER = 'avnadmin'
+DB_PASSWORD = 'AVNS_QXs1v9qBTveDtLIXZfW'
+DB_HOST = 'mysql-374f4726-majidnamiiiii-e945.a.aivencloud.com'
+DB_PORT = '11741'
+DB_URL = "mysql://avnadmin:AVNS_QXs1v9qBTveDtLIXZfW@mysql-374f4726-majidnamiiiii-e945.a.aivencloud.com:11741/defaultdb?ssl-mode=REQUIRED"
+
+mydb = create_db_connection(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
+print ('ok')

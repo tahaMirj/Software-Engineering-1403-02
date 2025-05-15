@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحه خانه</title>
+    <link rel="stylesheet" href="{% static 'base/home_style.css' %}">
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>خوش آمدید به گروه {{ group_number }} میکروسرویس خود را اینجا توسعه دهید</h1>
+
+        <!-- نمایش دکمه‌ها بر اساس وضعیت کاربر -->
+        {% if request.user.is_authenticated %}
+            <!-- اگر کاربر وارد شده باشد -->
+            <p>سلام، {{ request.user.username }}!</p>
+            <a href="{% url 'profile' %}">مشاهده اطلاعات کاربری</a>
+            <a href="{% url 'logout' %}">خروج</a>
+        {% else %}
+            <!-- اگر کاربر وارد نشده باشد -->
+            <a href="{% url 'login' %}">ورود</a>
+            <a href="{% url 'signup' %}">ثبت‌نام</a>
+        {% endif %}
+    </div>
+</body>
+</html>

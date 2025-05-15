@@ -7,7 +7,11 @@ from .secret import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 from database.query import *
 # Create your views here.
 
+def home(request):
+    print('123')
+    print(request.user.username)
 
+    return render (request , 'home.html')
 
 
 def SignupPage(request):
@@ -32,8 +36,6 @@ def SignupPage(request):
                 print('Name:', name)  # چاپ نام
                 print('Age:', age)    # چاپ سن
                 my_user.save()
-                mydb = create_db_connection(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
-                save_user(mydb, name, uname, pass1, email, age)
                 return redirect('login')
             except IntegrityError:
                 return HttpResponse("An error occurred while creating your account. Please try again.")
@@ -42,22 +44,25 @@ def SignupPage(request):
 
 
 def LoginPage(request):
-    if request.method=='POST':
-        username=request.POST.get('username')
-        pass1=request.POST.get('pass')
-        user=authenticate(request,username=username,password=pass1)
-        print(user)
-        print(username)
-        print(pass1)
-        if user is not None:
-            login(request,user)
-            return redirect('home')
-        else:
-            return HttpResponse ("Username or Password is incorrect!!!")
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        pass1 = request.POST.get('pass')
+        user = authenticate(request, username=username, password=pass1)
 
-    return render (request,'registration/login.html')
+        if user is not None:
+            login(request, user)
+            return redirect('home')  # ریدایرکت به صفحه خانه بعد از ورود
+        else:
+            return HttpResponse("Username or Password is incorrect!!!")
+
+    return render(request, 'registration/login.html')
+
 
 def LogoutPage(request):
     logout(request)
     return redirect('login')
 
+
+
+def profile(request):
+    return render(request, 'profile.html')
