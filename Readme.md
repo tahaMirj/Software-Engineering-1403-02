@@ -25,8 +25,8 @@ Then add the following line:
 
 ```python
 
-DB_NAME = 'defaultdb'
-DB_USER = 'avnadmin'
-DB_PASSWORD = 'AVNS_QXs1v9qBTveDtLIXZfW'
-DB_HOST = 'mysql-374f4726-majidnamiiiii-e945.a.aivencloud.com'
-DB_PORT = '11741'
+DB_NAME = ''
+DB_USER = ''
+DB_PASSWORD = ''
+DB_HOST = ''
+DB_PORT = ''
