@@ -7,3 +7,4 @@ pillow
 django-storages
 boto3
 mysql-connector-python
+mysqlclient
