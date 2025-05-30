@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate,login,logout
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.conf import settings
 from .secret import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 from database.query import *
 # Create your views here.
@@ -15,6 +17,9 @@ def home(request):
 
 
 def SignupPage(request):
+    # Get the next parameter if it exists
+    next_url = request.GET.get('next', '')
+    
     if request.method == 'POST':
         uname = request.POST.get('username')
         email = request.POST.get('email')
@@ -36,14 +41,21 @@ def SignupPage(request):
                 print('Name:', name)  # چاپ نام
                 print('Age:', age)    # چاپ سن
                 my_user.save()
+                
+                # After successful signup, redirect to login with the next parameter
+                if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts=settings.ALLOWED_REDIRECT_HOSTS):
+                    return redirect(f'/registration/login/?next={next_url}')
                 return redirect('login')
             except IntegrityError:
                 return HttpResponse("An error occurred while creating your account. Please try again.")
     
-    return render(request, 'registration/signup.html')
+    return render(request, 'registration/signup.html', {'next': next_url})
 
 
 def LoginPage(request):
+    # Get the next parameter if it exists
+    next_url = request.GET.get('next', '')
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         pass1 = request.POST.get('pass')
@@ -51,15 +63,22 @@ def LoginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('home')  # ریدایرکت به صفحه خانه بعد از ورود
+            # Check if next_url is safe and exists
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts=settings.ALLOWED_REDIRECT_HOSTS):
+                return redirect(next_url)
+            return redirect('home')
         else:
             return HttpResponse("Username or Password is incorrect!!!")
 
-    return render(request, 'registration/login.html')
+    return render(request, 'registration/login.html', {'next': next_url})
 
 
 def LogoutPage(request):
+    # Get the next parameter if it exists
+    next_url = request.GET.get('next', '')
     logout(request)
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts=settings.ALLOWED_REDIRECT_HOSTS):
+        return redirect(f'/registration/login/?next={next_url}')
     return redirect('login')
 
 

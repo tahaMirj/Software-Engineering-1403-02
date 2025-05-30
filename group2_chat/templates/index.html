@@ -1,27 +1,226 @@
-<!-- chat/templates/chat/index.html -->
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <title>Chat Rooms</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Chat Lobby</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .site-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            font-size: 1rem;
+        }
+
+        .main-body {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .lobby-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .new-chat-form {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .new-chat-form input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .new-chat-form button {
+            padding: 0.5rem 1rem;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .new-chat-form button:hover {
+            background-color: #34495e;
+        }
+
+        .chat-list {
+            list-style: none;
+        }
+
+        .chat-item {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .chat-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .chat-item:last-child {
+            border-bottom: none;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-username {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .last-message {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 400px;
+        }
+
+        .timestamp {
+            color: #6c757d;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            margin-left: 1rem;
+        }
+
+        .messages {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .no-chats {
+            padding: 2rem;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-    What chat room would you like to enter?<br>
-    <input id="room-name-input" type="text" size="100"><br>
-    <input id="room-name-submit" type="button" value="Enter">
+    <nav class="navbar">
+        <div class="site-name">Chat Lobby</div>
+        <div class="user-info">Logged in as: {{ user.username }}</div>
+    </nav>
+
+    <main class="main-body">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="lobby-container">
+            <form class="new-chat-form" id="new-chat-form">
+                <input type="text" id="username-input" placeholder="Enter username to start a new chat" required>
+                <button type="submit">Start Chat</button>
+            </form>
+
+            {% if chat_partners %}
+            <div class="chat-list">
+                {% for partner in chat_partners %}
+                <a href="/group2/chat/{{ partner.username }}/" class="chat-item">
+                    <div class="chat-info">
+                        <div class="chat-username">{{ partner.username }}</div>
+                        <div class="last-message">{{ partner.last_message }}</div>
+                    </div>
+                    {% if partner.last_message_time %}
+                    <div class="timestamp">
+                        {{ partner.last_message_time|date:"M d, Y" }}
+                    </div>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-chats">
+                <p>No chat history yet. Start a new chat above!</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        © {% now "Y" %} Chat Application
+    </footer>
 
     <script>
-        document.querySelector('#room-name-input').focus();
-        document.querySelector('#room-name-input').onkeyup = function(e) {
-            if (e.key === 'Enter') {  // enter, return
-                document.querySelector('#room-name-submit').click();
+        document.getElementById('new-chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username-input').value.trim();
+            if (username) {
+                window.location.pathname = '/group2/chat/' + username + '/';
             }
-        };
-
-        document.querySelector('#room-name-submit').onclick = function(e) {
-            var roomName = document.querySelector('#room-name-input').value;
-            window.location.pathname = '/chat/' + roomName + '/';
-        };
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Error</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'g2/css/base.css' %}" />
+    <style>
+        .error-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            margin: auto;
+        }
+        .error-title {
+            color: #c62828;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            color: #103b0f;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="site-name">Chat Error</div>
+    </nav>
+
+    <main class="main-body">
+        <div class="container error-container">
+            <h1 class="error-title">{{ error_title }}</h1>
+            <p class="error-message">{{ error_message }}</p>
+            <a href="/" class="form-button">Back to Home</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        © {% now "Y" %} Chat Application
+    </footer>
+</body>
+</html> 

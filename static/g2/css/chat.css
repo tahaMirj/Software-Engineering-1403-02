@@ -1,0 +1,92 @@
+/* static/css/chat.css */
+/* ---------- GLOBAL & your existing palette ----------- */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+.navbar{background:#b8f2c2;color:#103b0f;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.site-name{font-size:1.35rem;font-weight:600}
+.main-body{flex:1;background:#70c779;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.main-body h1{font-size:45px;margin-bottom:.75rem}
+.main-body p{font-size:20px}
+.footer{background:#2f6a34;color:#e4fbe4;text-align:center;padding:1rem;font-size:.9rem}
+@media(max-width:600px){.navbar{flex-direction:column;gap:.5rem;text-align:center}}
+
+/* ---------- CHAT-SPECIFIC STYLES ---------- */
+.chat-container {
+  width: 100%;
+  max-width: 600px;
+  height: 70vh;
+  background: #fff;
+  color: #103b0f;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#messages {
+  flex: 1;
+  list-style: none;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+#messages li {
+  margin-bottom: 0.75rem;
+  max-width: 80%;
+  word-wrap: break-word;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+#messages li.sent {
+  background: #b8f2c2;
+  color: #103b0f;
+  align-self: flex-end;
+  border-bottom-right-radius: 0;
+}
+
+#messages li.received {
+  background: #e4fbe4;
+  color: #103b0f;
+  align-self: flex-start;
+  border-bottom-left-radius: 0;
+}
+
+#messages li .meta {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+#chat-form {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+#chat-input {
+  flex: 1;
+  border: none;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+#chat-input:focus {
+  outline: none;
+}
+
+#chat-form button {
+  background: #2f6a34;
+  color: #e4fbe4;
+  border: none;
+  padding: 0 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#chat-form button:hover {
+  background: #234c26;
+}
