@@ -38,25 +38,57 @@ class ChatConsumer(WebsocketConsumer):
 
         # Get or create chat room for these users
         self.chat = Chat.get_or_create_direct_chat(self.user, self.other_user)
-        self.room_group_name = f"chat_{self.chat.id}"
+        self.chat_room_group_name = f"chat_{self.chat.id}"
+        self.chat_lobby_group_name = f"lobby_{self.other_user.id}"
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name, self.channel_name
+            self.chat_room_group_name, self.channel_name
+        )
+        async_to_sync(self.channel_layer.group_add)(    
+            self.chat_lobby_group_name, self.channel_name
         )
 
         self.accept()
+        
+        # Mark all messages in this chat as seen
+        Message.objects.filter(
+            chat=self.chat,
+            sender=self.other_user,
+            seen=False
+        ).update(seen=True)
         # Send success connection message
         self.send(text_data=json.dumps({
             "type": "connection_established",
             "message": f"Connected to chat with {self.other_username}"
         }))
 
+        # Notify other user that messages have been seen
+        async_to_sync(self.channel_layer.group_send)(
+            self.chat_room_group_name,
+            {
+                "type": "messages_seen",
+                "user": self.user.username
+            }
+        )
+        async_to_sync(self.channel_layer.group_send)(
+            self.chat_lobby_group_name,
+            {
+                "type": "messages_seen",
+                "user": self.user.username
+            }
+        )
+
     def disconnect(self, close_code):
-        if hasattr(self, 'room_group_name'):
+        if hasattr(self, 'chat_room_group_name'):
             # Leave room group
             async_to_sync(self.channel_layer.group_discard)(
-                self.room_group_name, self.channel_name
+                self.chat_room_group_name, self.channel_name
+            )
+        if hasattr(self, 'chat_lobby_group_name'):
+            # Leave room group
+            async_to_sync(self.channel_layer.group_discard)(
+                self.chat_lobby_group_name, self.channel_name
             )
 
     def receive(self, text_data):
@@ -77,14 +109,39 @@ class ChatConsumer(WebsocketConsumer):
                 "type": "chat.message",
                 "message": message_text,
                 "sender_username": self.user.username,
-                "timestamp": message.timestamp.isoformat()
+                "timestamp": message.timestamp.isoformat(),
+                "message_id": message.id,
             }
         )
 
     def chat_message(self, event):
+        # If the other user is the sender and we're connected, mark the message as seen
+        if event['sender_username'] != self.user.username:
+            Message.objects.filter(
+                chat=self.chat,
+                sender__username=event['sender_username'],
+                id=event['message_id']
+            ).update(seen=True)
+
+            # Send seen notification back
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    "type": "messages_seen",
+                    "user": self.user.username
+                }
+            )
+
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             "message": event["message"],
             "sender_username": event["sender_username"],
             "timestamp": event["timestamp"]
+        }))
+
+    def messages_seen(self, event):
+        # Send seen status to WebSocket
+        self.send(text_data=json.dumps({
+            "type": "messages_seen",
+            "user": event["user"]
         }))
