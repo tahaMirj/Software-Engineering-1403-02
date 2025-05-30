@@ -9,6 +9,12 @@ class Chat(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def get_other_participant(self, user):
+        return self.participants.exclude(id=user.id).first()
+
+    def get_unseen_count(self, user):
+        return self.messages.filter(receiver=user, seen=False).count()
+
     class Meta:
         ordering = ['-updated_at']
 
@@ -44,7 +50,8 @@ class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     text = models.TextField()
-    timestamp = models.DateTimeField(default=timezone.now)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    seen = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['timestamp']
