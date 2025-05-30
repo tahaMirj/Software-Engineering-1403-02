@@ -167,3 +167,41 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
 #messages::-webkit-scrollbar-thumb:hover {
   background: rgba(0,0,0,0.2);
 }
+
+/* Message seen status */
+.seen-status {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 0.8em;
+    color: #4caf50;
+    transition: color 0.3s ease;
+}
+
+.seen-status.pending {
+    color: #bdbdbd;
+}
+
+/* Update timestamp container for better alignment */
+.timestamp {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+/* Ensure sent messages align properly */
+#messages li.sent .timestamp {
+    justify-content: flex-end;
+}
+
+#messages li.received .timestamp {
+    justify-content: flex-start;
+}
+
+/* Hide seen status on received messages */
+#messages li.received .seen-status {
+    display: none;
+}

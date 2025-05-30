@@ -104,7 +104,7 @@ class ChatConsumer(WebsocketConsumer):
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
+            self.chat_room_group_name,
             {
                 "type": "chat.message",
                 "message": message_text,
@@ -125,7 +125,7 @@ class ChatConsumer(WebsocketConsumer):
 
             # Send seen notification back
             async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
+                self.chat_room_group_name,
                 {
                     "type": "messages_seen",
                     "user": self.user.username
