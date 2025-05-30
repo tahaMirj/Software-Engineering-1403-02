@@ -9,8 +9,15 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 
 import os
 
+from channels.routing import ProtocolTypeRouter
 from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'english_website.settings')
 
-application = get_asgi_application()
+django_asgi_app = get_asgi_application()
+
+# This wraps the default django ASGI app for more functionalities like support for ws protocol
+application = ProtocolTypeRouter({
+    "http": django_asgi_app,
+    
+})
