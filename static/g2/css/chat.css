@@ -29,16 +29,49 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   list-style: none;
   padding: 1rem;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Date separator */
+.date-separator {
+  text-align: center;
+  margin: 1rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.date-separator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(0,0,0,0.1);
+  z-index: -1;
+}
+
+.date-separator span {
+  background: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  color: #666;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Message styles */
 #messages li {
   margin-bottom: 0.75rem;
-  max-width: 80%;
+  max-width: 70%;
   word-wrap: break-word;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem;
   border-radius: 12px;
   font-size: 0.95rem;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 #messages li.sent {
@@ -58,13 +91,31 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
 #messages li .meta {
   font-size: 0.75rem;
   color: #666;
+  margin-bottom: 0.25rem;
+  text-align: right;
+  order: -1; /* Move to top */
+}
+
+#messages li .message-content {
+  width: fit-content;
+  max-width: 100%;
+}
+
+#messages li .timestamp {
+  font-size: 0.7rem;
+  color: #666;
   margin-top: 0.25rem;
   text-align: right;
+}
+
+#messages li .timestamp[title] {
+  cursor: help;
 }
 
 #chat-form {
   display: flex;
   border-top: 1px solid #ddd;
+  background: white;
 }
 
 #chat-input {
@@ -72,6 +123,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   border: none;
   padding: 0.75rem;
   font-size: 1rem;
+  background: transparent;
 }
 
 #chat-input:focus {
@@ -85,8 +137,27 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   padding: 0 1.5rem;
   cursor: pointer;
   font-size: 1rem;
+  transition: background-color 0.2s;
 }
 
 #chat-form button:hover {
   background: #234c26;
+}
+
+/* Custom scrollbar for messages */
+#messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+#messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#messages::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+#messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.2);
 }

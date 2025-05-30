@@ -1,5 +1,6 @@
 <!-- templates/chat.html -->
 {% load static %}
+{% load tz %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +17,31 @@
 
   <main class="main-body">
     <div class="chat-container">
-      <ul id="messages"></ul>
+      <ul id="messages">
+        {% regroup previous_messages by timestamp|date:"Y-m-d" as messages_by_date %}
+        {% for date_group in messages_by_date %}
+          {% with first_message=date_group.list.0 %}
+            <li class="date-separator">
+              <span>
+                {% if first_message.timestamp|date:"Y-m-d" == now|date:"Y-m-d" %}
+                  Today
+                {% else %}
+                  {{ first_message.timestamp|date:"F j, Y" }}
+                {% endif %}
+              </span>
+            </li>
+          {% endwith %}
+          {% for message in date_group.list %}
+            <li class="{% if message.sender == user %}sent{% else %}received{% endif %}">
+              <div class="meta">{{ message.sender.username }}</div>
+              <div class="message-content">{{ message.text }}</div>
+              <div class="timestamp" title="{{ message.timestamp|date:'F j, Y g:i A' }}">
+                {{ message.timestamp|date:"g:i A" }}
+              </div>
+            </li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
       <form id="chat-form">
         <input id="chat-input" type="text" placeholder="Type a message…" autocomplete="off" required />
         <button type="submit">Send</button>
@@ -31,11 +56,39 @@
   <script>
     // pass the URL route param into JS
     const otherUsername = "{{ other_username }}";
+    const currentUsername = "{{ user.username }}";
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
     const chatSocket = new WebSocket(
       wsScheme + '://' + window.location.host +
       '/ws/chat/' + otherUsername + '/'
     );
+
+    // Helper function to format dates
+    function formatMessageDate(timestamp) {
+      const date = new Date(timestamp);
+      const today = new Date();
+      
+      if (date.toDateString() === today.toDateString()) {
+        return 'Today';
+      } else {
+        return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      }
+    }
+
+    // Helper function to format time
+    function formatTime(timestamp) {
+      return new Date(timestamp).toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+    }
+
+    // Scroll to bottom of messages on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const messagesUl = document.getElementById('messages');
+      messagesUl.scrollTop = messagesUl.scrollHeight;
+    });
   </script>
   <script src="{% static 'g2/js/chat.js' %}"></script>
 </body>

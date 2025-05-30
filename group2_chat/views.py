@@ -48,4 +48,14 @@ def chat(request, other_username):
         messages.error(request, f"The user '{other_username}' does not exist.")
         return redirect('/group2/chat')
 
-    return render(request, "chat.html", {"other_username": other_username})
+    # Get or create chat room for these users
+    chat = Chat.get_or_create_direct_chat(request.user, other_user)
+    
+    # Get previous messages
+    previous_messages = chat.messages.order_by('timestamp').select_related('sender')
+    
+    return render(request, "chat.html", {
+        "other_username": other_username,
+        "previous_messages": previous_messages,
+        "user": request.user
+    })
