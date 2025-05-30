@@ -33,15 +33,19 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   flex-direction: column;
 }
 
-/* Date separator */
-.date-separator {
-  text-align: center;
-  margin: 1rem 0;
+/* Date separator styles */
+#messages li.date-separator {
+  align-self: center;
+  background: transparent;
+  margin: 1.5rem 0 1rem;
+  padding: 0;
   position: relative;
-  z-index: 1;
+  width: 100%;
+  text-align: center;
+  border-radius: 0;
 }
 
-.date-separator::before {
+#messages li.date-separator::before {
   content: '';
   position: absolute;
   left: 0;
@@ -49,16 +53,18 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   top: 50%;
   height: 1px;
   background: rgba(0,0,0,0.1);
-  z-index: -1;
+  z-index: 1;
 }
 
-.date-separator span {
+#messages li.date-separator span {
   background: #fff;
   padding: 0.5rem 1rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #666;
-  border: 1px solid rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 2;
+  border-radius: 15px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* Message styles */
@@ -74,18 +80,18 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   flex-direction: column;
 }
 
-#messages li.sent {
-  background: #b8f2c2;
-  color: #103b0f;
-  align-self: flex-end;
-  border-bottom-right-radius: 0;
-}
-
-#messages li.received {
+#messages li:not(.date-separator) {
   background: #e4fbe4;
   color: #103b0f;
   align-self: flex-start;
   border-bottom-left-radius: 0;
+}
+
+#messages li.sent:not(.date-separator) {
+  background: #b8f2c2;
+  color: #103b0f;
+  align-self: flex-end;
+  border-bottom-right-radius: 0;
 }
 
 #messages li .meta {
