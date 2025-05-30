@@ -33,6 +33,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Allowed hosts for redirect URLs (used in authentication)
+ALLOWED_REDIRECT_HOSTS = ['localhost', '127.0.0.1']
+
+AUTH_USER_MODEL = "auth.User"
+
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+
+LOGIN_URL = "/registration/login/"
+
+LOGIN_REDIRECT_URL = "/registration/profile/"
+
+LOGOUT_REDIRECT_URL = "/"
 
 # Application definition
 
