@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'group1',
     'group2',
+    'group2_chat',
     'group3',
     'group4',
     'group5',
@@ -89,6 +90,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'english_website.wsgi.application'
 ASGI_APPLICATION = 'english_website.asgi.application'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
