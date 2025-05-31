@@ -30,3 +30,9 @@ DB_USER = ''
 DB_PASSWORD = ''
 DB_HOST = ''
 DB_PORT = ''
+```
+
+to run a redis instance:
+```
+docker run --rm -p 6379:6379 redis
+```

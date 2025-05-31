@@ -50,34 +50,44 @@ class ChatConsumer(WebsocketConsumer):
         )
 
         self.accept()
-        
+
         # Mark all messages in this chat as seen
-        Message.objects.filter(
+        seen_count = Message.objects.filter(
             chat=self.chat,
             sender=self.other_user,
             seen=False
         ).update(seen=True)
+
         # Send success connection message
         self.send(text_data=json.dumps({
             "type": "connection_established",
             "message": f"Connected to chat with {self.other_username}"
         }))
 
-        # Notify other user that messages have been seen
-        async_to_sync(self.channel_layer.group_send)(
-            self.chat_room_group_name,
-            {
+        # If any messages were marked as seen, notify the other user
+        if seen_count > 0:
+            # Notify other user that messages have been seen
+            async_to_sync(self.channel_layer.group_send)(
+                self.chat_room_group_name,
+                {
+                    "type": "messages_seen",
+                    "user": self.user.username
+                }
+            )
+
+        # Check if any messages from current user were already seen
+        seen_messages_exist = Message.objects.filter(
+            chat=self.chat,
+            sender=self.user,
+            seen=True
+        ).exists()
+
+        if seen_messages_exist:
+            # Send seen status for user's own messages
+            self.send(text_data=json.dumps({
                 "type": "messages_seen",
-                "user": self.user.username
-            }
-        )
-        async_to_sync(self.channel_layer.group_send)(
-            self.chat_lobby_group_name,
-            {
-                "type": "messages_seen",
-                "user": self.user.username
-            }
-        )
+                "user": self.other_username
+            }))
 
     def disconnect(self, close_code):
         if hasattr(self, 'chat_room_group_name'):

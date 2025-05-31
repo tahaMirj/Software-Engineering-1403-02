@@ -84,7 +84,16 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   background: #e4fbe4;
   color: #103b0f;
   align-self: flex-start;
+  border-radius: 12px;
   border-bottom-left-radius: 0;
+  margin-bottom: 0.75rem;
+  max-width: 70%;
+  word-wrap: break-word;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 #messages li.sent:not(.date-separator) {
@@ -92,6 +101,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   color: #103b0f;
   align-self: flex-end;
   border-bottom-right-radius: 0;
+  border-bottom-left-radius: 12px;
 }
 
 #messages li .meta {
@@ -177,8 +187,14 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
     transition: color 0.3s ease;
 }
 
-.seen-status.pending {
+.seen-status.pending::after {
+    content: '✓';
     color: #bdbdbd;
+}
+
+.seen-status:not(.pending)::after {
+    content: '✓✓';
+    color: #4caf50;
 }
 
 /* Update timestamp container for better alignment */
