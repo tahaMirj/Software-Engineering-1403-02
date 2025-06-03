@@ -38,7 +38,7 @@ class Quiz(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
-class VocabularyQuestion(models.Model, Question):
+class VocabularyQuestion(models.Model):
     id = models.AutoField(primary_key=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     user_answer = models.CharField(max_length=255, blank=True, null=True)
@@ -48,7 +48,7 @@ class VocabularyQuestion(models.Model, Question):
     def __str__(self):
         return f"VocabularyQuestion {self.id} - Question ID: {self.question.id} - Order: {self.order_in_quiz}"
 
-class GrammarQuestion(models.Model, Question):
+class GrammarQuestion(models.Model):
     id = models.AutoField(primary_key=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     user_answer = models.CharField(max_length=255, blank=True, null=True)
@@ -58,7 +58,7 @@ class GrammarQuestion(models.Model, Question):
     def __str__(self):
         return f"GrammarQuestion {self.id} - Question ID: {self.question.id} - Order: {self.order_in_quiz}"
 
-class SentenceQuestion(models.Model, Question):
+class SentenceQuestion(models.Model):
     id = models.AutoField(primary_key=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     user_answer = models.CharField(max_length=255, blank=True, null=True)
