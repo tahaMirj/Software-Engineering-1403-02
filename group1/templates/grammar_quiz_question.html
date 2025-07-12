@@ -1,0 +1,221 @@
+{% extends "group1.html" %}
+{% block content %}
+<style>
+    /* Consider moving these styles to a static CSS file for maintainability */
+    .quiz-card {
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .quiz-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+        transform: none !important;
+    }
+    .option-btn {
+        background-color: #23232b;
+        border: 1.5px solid #4B5563;
+        color: #e0e0e0;
+        border-radius: 0.7rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 1.1rem 1.2rem;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        transition: border 0.18s, color 0.18s, box-shadow 0.18s;
+        outline: none;
+        box-shadow: none;
+        cursor: pointer;
+    }
+    .option-btn:not(:disabled):hover {
+        border-color: #a78bfa;
+        color: #fff;
+        box-shadow: 0 0 0 2px #7c5cff33;
+        /* background-color: #23232b; */
+        transition: all 0.2s;
+    }
+    .option-btn.selected {
+        background-color: #7c5cff;
+        border-color: #a78bfa;
+        border: 1px solid #a78bfa;
+        color: #fff;
+        box-shadow: 0 0 0 2px #7c5cff55;
+        transition: all 0.2s;
+    }
+    .option-btn.correct {
+        background-color: #10B981;
+        border-color: #34D399;
+        color: #fff;
+        box-shadow: 0 0 0 2px #10B98155;
+        animation: pop-correct 0.25s;
+    }
+    .option-btn.incorrect {
+        background-color: #EF4444;
+        border-color: #F87171;
+        color: #fff;
+        box-shadow: 0 0 0 2px #EF444455;
+        animation: shake-wrong 0.25s;
+    }
+    @keyframes pop-correct {
+        0% { transform: scale(1); }
+        60% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+    }
+    @keyframes shake-wrong {
+        0% { transform: translateX(0); }
+        20% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+        100% { transform: translateX(0); }
+    }
+    .option-btn:disabled {
+        cursor: default;
+        opacity: 1;
+    }
+    #next-btn {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    #next-btn:focus, #next-btn:active {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    .progress-bar {
+        background: #333333;
+        border-radius: 0.5rem;
+        height: 0.6rem;
+        width: 100%;
+        overflow: hidden;
+        margin-top: 0.25rem;
+    }
+    .progress {
+        background: #7c5cff;
+        height: 100%;
+        transition: width 0.3s cubic-bezier(.4,2,.6,1);
+    }
+    #feedback {
+        animation: fadeIn 0.4s;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @media (max-width: 600px) {
+        .option-btn {
+            font-size: 1.2rem;
+            padding: 1.3rem 1rem;
+        }
+        .quiz-card {
+            padding: 0.5rem;
+        }
+    }
+</style>
+<div class="dashboard-container" style="max-width: 600px; margin: 0 auto;">
+    <div class="quiz-card" style="margin-top: 2rem;">
+        <!-- Header: Title and Progress -->
+        <div style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.3rem; font-weight: bold; color: #fff;">Grammar Quiz</h2>
+                <span style="font-size: 1rem; color: #b0b0b0;">Question {{ current_index }} of {{ total_questions }}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ quiz_progress }}%;"></div>
+            </div>
+        </div>
+        <!-- Question Text -->
+        <div style="margin-bottom: 2rem;">
+            <p class="question-text" style="font-size: 1.1rem; color: #fff;">{{ question.text_or_prompt }}</p>
+        </div>
+        <!-- Answer Options -->
+        <div id="options-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+            {% for choice in choices %}
+                <button type="button" class="option-btn start-btn" data-choice-id="{{ choice.id }}" tabindex="0" aria-pressed="false">
+                    {{ choice.text }}
+                </button>
+            {% endfor %}
+        </div>
+        <!-- Action Button -->
+        <div style="display: flex; justify-content: flex-end;">
+            <button id="next-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;" disabled>Next</button>
+        </div>
+        <!-- Feedback -->
+        <div id="feedback" style="margin-top: 1.5rem; display: none;"></div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackDiv = document.getElementById('feedback');
+        let selectedOption = null;
+        let answered = false;
+        // Get correct answer from Django context (as a data attribute)
+        const correctChoiceId = '{{ correct_choice.id }}';
+        const correctChoiceText = '{{ correct_choice.text }}';
+
+        // Keyboard accessibility: allow Enter/Space to select
+        optionsContainer.addEventListener('keydown', function(e) {
+            if (answered) return;
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('option-btn')) {
+                e.preventDefault();
+                if (selectedOption) {
+                    selectedOption.classList.remove('selected');
+                    selectedOption.setAttribute('aria-pressed', 'false');
+                }
+                selectedOption = e.target;
+                selectedOption.classList.add('selected');
+                selectedOption.setAttribute('aria-pressed', 'true');
+                nextBtn.disabled = false;
+            }
+        });
+        optionsContainer.addEventListener('click', function(e) {
+            if (answered) return; // Don't allow changing after answer
+            if (e.target.classList.contains('option-btn')) {
+                // Remove 'selected' from any previously selected option
+                if (selectedOption) {
+                    selectedOption.classList.remove('selected');
+                    selectedOption.setAttribute('aria-pressed', 'false');
+                }
+                // Add 'selected' to the new one and store it
+                selectedOption = e.target;
+                selectedOption.classList.add('selected');
+                selectedOption.setAttribute('aria-pressed', 'true');
+                // Enable the next button
+                nextBtn.disabled = false;
+            }
+        });
+        nextBtn.addEventListener('click', function() {
+            if (!selectedOption || answered) return;
+            answered = true;
+            // Check if correct
+            const selectedId = selectedOption.getAttribute('data-choice-id');
+            const isCorrect = selectedId === correctChoiceId;
+            // Style feedback
+            if (isCorrect) {
+                selectedOption.classList.remove('selected');
+                selectedOption.classList.add('correct');
+                feedbackDiv.innerHTML = '<span style="color: #4caf50; font-weight: 600;">Correct! 🎉</span>';
+            } else {
+                selectedOption.classList.remove('selected');
+                selectedOption.classList.add('incorrect');
+                // Highlight the correct answer
+                optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.getAttribute('data-choice-id') === correctChoiceId) {
+                        btn.classList.add('correct');
+                    }
+                });
+                feedbackDiv.innerHTML = '<span style="color: #ff5252; font-weight: 600;">Incorrect.</span>' +
+                    '<span style="color: #b0b0b0;"> Correct answer: <b>' + correctChoiceText + '</b></span>';
+            }
+            // Disable all options after answering
+            optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+            // Show feedback
+            feedbackDiv.style.display = 'block';
+            // Change button text to Continue
+            nextBtn.textContent = 'Continue';
+        });
+    });
+</script>
+{% endblock %} 
