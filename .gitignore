@@ -8,3 +8,5 @@ todo
 .vscode
 .mypy_cache
 *.DS_Store
+data
+.env

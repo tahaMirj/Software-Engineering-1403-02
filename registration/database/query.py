@@ -216,12 +216,4 @@ def describe_table(mydb, table_name):
     finally:
         cursor.close()
 
-DB_NAME = 'defaultdb'
-DB_USER = 'avnadmin'
-DB_PASSWORD = 'AVNS_QXs1v9qBTveDtLIXZfW'
-DB_HOST = 'mysql-374f4726-majidnamiiiii-e945.a.aivencloud.com'
-DB_PORT = '11741'
-DB_URL = "mysql://avnadmin:AVNS_QXs1v9qBTveDtLIXZfW@mysql-374f4726-majidnamiiiii-e945.a.aivencloud.com:11741/defaultdb?ssl-mode=REQUIRED"
-
-mydb = create_db_connection(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
 print ('ok')

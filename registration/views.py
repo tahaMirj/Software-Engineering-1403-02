@@ -3,8 +3,6 @@ from django.contrib.auth import authenticate,login,logout
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from .secret import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
-from database.query import *
 # Create your views here.
 
 def home(request):
