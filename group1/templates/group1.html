@@ -312,6 +312,7 @@
         <div class="user-greeting">Hello, John!</div>
     </header>
 
+    {% block content %}
     <div class="dashboard-container">
         <!-- Profile Section with Mock Data -->
         <div class="profile-section">
@@ -350,7 +351,7 @@
                     <h4>Grammar Quiz</h4>
                     <p>Master sentence structures and rules. Sharpen your grammatical accuracy.</p>
                     <span class="time-info"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586V7z"></path></svg>Est. 2min 30sec</span>
-                    <a href="#" class="start-btn">Start Grammar</a>
+                    <a href="{% url 'group1:grammar_quiz_question' %}" class="start-btn">Start Grammar</a>
                 </div>
                 
                 <div class="quiz-card">
@@ -464,5 +465,6 @@
             </div>
         </section>
     </div>
+    {% endblock %}
 </body>
 </html>
