@@ -41,5 +41,6 @@ def grammar_quiz_question(request):
         'is_correct': is_correct,
         'correct_choice': correct_choice,
         'next_url': '#',  # Placeholder for next question
+        'quiz_title': 'Grammar Quiz',
     }
     return render(request, 'grammar_quiz_question.html', context)
