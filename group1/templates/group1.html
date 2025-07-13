@@ -349,33 +349,44 @@
                 <div class="quiz-card">
                     <div class="quiz-icon">📝</div>
                     <h4>Grammar Quiz</h4>
-                    <p>Master sentence structures and rules. Sharpen your grammatical accuracy.</p>
-                    <span class="time-info"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586V7z"></path></svg>Est. 2min 30sec</span>
-                    <a href="{% url 'group1:grammar_quiz_question' %}" class="start-btn">Start Grammar</a>
+                    <p class="quiz-description">Test your knowledge of English grammar rules.</p>
+                    <span class="time-info">~5 mins</span>
+                    <a href="{% url 'group1:grammar_quiz_question' %}" class="start-btn">Start Quiz</a>
                 </div>
-                
                 <div class="quiz-card">
-                    <div class="quiz-icon">📚</div>
+                    <div class="quiz-icon">🗣️</div>
                     <h4>Vocabulary Quiz</h4>
-                    <p>Expand your word bank. Learn new terms and their meanings effectively.</p>
-                    <span class="time-info"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586V7z"></path></svg>Est. 2min 30sec</span>
-                    <a href="#" class="start-btn">Start Vocabulary</a>
+                    <p class="quiz-description">Expand your word power with new challenges.</p>
+                    <span class="time-info">~5 mins</span>
+                    <a href="{% url 'group1:vocabulary_quiz_question' %}" class="start-btn">Start Quiz</a>
                 </div>
-
                 <div class="quiz-card">
-                    <div class="quiz-icon">🎧</div>
-                    <h4>Listening Quiz</h4>
-                    <p>Improve comprehension. Test your ability to understand spoken language.</p>
-                    <span class="time-info"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586V7z"></path></svg>Est. 2min 30sec</span>
-                    <a href="#" class="start-btn">Start Listening</a>
+                    <div class="quiz-icon">🖼️</div>
+                    <h4>Image Quiz</h4>
+                    <p class="quiz-description">Identify objects and scenes in images.</p>
+                    <span class="time-info">~5 mins</span>
+                    <a href="{% url 'group1:image_quiz_question' %}" class="start-btn">Start Quiz</a>
                 </div>
-
                 <div class="quiz-card">
                     <div class="quiz-icon">✍️</div>
                     <h4>Writing Quiz</h4>
-                    <p>Practice your composition. Enhance your skills in expressing ideas clearly.</p>
-                    <span class="time-info"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586V7z"></path></svg>Est. 2min 30sec</span>
-                    <a href="#" class="start-btn">Start Writing</a>
+                    <p class="quiz-description">Practice your writing with guided exercises.</p>
+                    <span class="time-info">~10 mins</span>
+                    <a href="{% url 'group1:writing_quiz_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-icon">🧩</div>
+                    <h4>Sentence Building</h4>
+                    <p class="quiz-description">Construct sentences from scrambled words.</p>
+                    <span class="time-info">~7 mins</span>
+                    <a href="{% url 'group1:sentence_building_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-icon">👂</div>
+                    <h4>Listening Quiz</h4>
+                    <p class="quiz-description">Sharpen your comprehension of audio clips.</p>
+                    <span class="time-info">~7 mins</span>
+                    <a href="{% url 'group1:listening_quiz_question' %}" class="start-btn">Start Quiz</a>
                 </div>
             </div>
         </section>
