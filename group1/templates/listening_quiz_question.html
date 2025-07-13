@@ -1,4 +1,5 @@
 {% extends "quiz_frame.html" %}
+{% load static %}
 {% block quiz_content %}
 <style>
     .question-text {
@@ -7,17 +8,40 @@
         margin-bottom: 1.5rem;
     }
     .audio-player-wrapper {
+        background-color: #F5F3FF; /* Light pastel purple */
+        border-radius: 50px;
+        padding: 0.5rem 1rem;
         margin-bottom: 2rem;
     }
     audio {
         width: 100%;
-        background-color: #2d2d37;
-        border-radius: 50px;
+        outline: none;
+        border: none;
+        background: transparent;
     }
-    /* Basic styling for audio player controls */
     audio::-webkit-media-controls-panel {
-        background-color: #2d2d37;
-        border-radius: 50px;
+        background: transparent;
+    }
+    audio::-webkit-media-controls-play-button,
+    audio::-webkit-media-controls-mute-button {
+        background-color: #7C5CFF; /* Vibrant purple */
+        border-radius: 50%;
+    }
+    audio::-webkit-media-controls-timeline {
+        background-color: #DDD6FE; /* Softer purple for the track */
+        border-radius: 6px;
+        height: 8px;
+        margin: 0 10px;
+    }
+    audio::-webkit-media-controls-volume-slider {
+        background-color: #DDD6FE; /* Softer purple for the track */
+        border-radius: 6px;
+        height: 8px;
+    }
+    audio::-webkit-media-controls-current-time-display,
+    audio::-webkit-media-controls-time-remaining-display {
+        color: #4C1D95; /* Dark purple text for contrast */
+        font-weight: 500;
     }
     .option-btn {
         background-color: #23232b;
@@ -75,7 +99,7 @@
 <div class="audio-player-wrapper">
     <!-- Note: You need to provide a valid audio source for this to work -->
     <audio controls>
-        <source src="/path/to/your/audio.mp3" type="audio/mpeg">
+        <source src="{% static 'audio/The plane departs at 9 AM..mp3' %}" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 </div>
