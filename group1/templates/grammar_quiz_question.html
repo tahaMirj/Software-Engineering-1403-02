@@ -1,16 +1,7 @@
-{% extends "group1.html" %}
-{% block content %}
+{% extends "quiz_frame.html" %}
+{% block quiz_content %}
 <style>
     /* Consider moving these styles to a static CSS file for maintainability */
-    .quiz-card {
-        position: relative;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        transition: box-shadow 0.2s, transform 0.2s;
-    }
-    .quiz-card:hover {
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-        transform: none !important;
-    }
     .option-btn {
         background-color: #23232b;
         border: 1.5px solid #4B5563;
@@ -30,7 +21,6 @@
         border-color: #a78bfa;
         color: #fff;
         box-shadow: 0 0 0 2px #7c5cff33;
-        /* background-color: #23232b; */
         transition: all 0.2s;
     }
     .option-btn.selected {
@@ -80,19 +70,6 @@
         outline: none !important;
         box-shadow: none !important;
     }
-    .progress-bar {
-        background: #333333;
-        border-radius: 0.5rem;
-        height: 0.6rem;
-        width: 100%;
-        overflow: hidden;
-        margin-top: 0.25rem;
-    }
-    .progress {
-        background: #7c5cff;
-        height: 100%;
-        transition: width 0.3s cubic-bezier(.4,2,.6,1);
-    }
     #feedback {
         animation: fadeIn 0.4s;
     }
@@ -105,43 +82,26 @@
             font-size: 1.2rem;
             padding: 1.3rem 1rem;
         }
-        .quiz-card {
-            padding: 0.5rem;
-        }
     }
 </style>
-<div class="dashboard-container" style="max-width: 600px; margin: 0 auto;">
-    <div class="quiz-card" style="margin-top: 2rem;">
-        <!-- Header: Title and Progress -->
-        <div style="margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <h2 style="font-size: 1.3rem; font-weight: bold; color: #fff;">Grammar Quiz</h2>
-                <span style="font-size: 1rem; color: #b0b0b0;">Question {{ current_index }} of {{ total_questions }}</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress" style="width: {{ quiz_progress }}%;"></div>
-            </div>
-        </div>
-        <!-- Question Text -->
-        <div style="margin-bottom: 2rem;">
-            <p class="question-text" style="font-size: 1.1rem; color: #fff;">{{ question.text_or_prompt }}</p>
-        </div>
-        <!-- Answer Options -->
-        <div id="options-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
-            {% for choice in choices %}
-                <button type="button" class="option-btn start-btn" data-choice-id="{{ choice.id }}" tabindex="0" aria-pressed="false">
-                    {{ choice.text }}
-                </button>
-            {% endfor %}
-        </div>
-        <!-- Action Button -->
-        <div style="display: flex; justify-content: flex-end;">
-            <button id="next-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;" disabled>Next</button>
-        </div>
-        <!-- Feedback -->
-        <div id="feedback" style="margin-top: 1.5rem; display: none;"></div>
-    </div>
+<!-- Question Text -->
+<div style="margin-bottom: 2rem;">
+    <p class="question-text" style="font-size: 1.1rem; color: #fff;">{{ question.text_or_prompt }}</p>
 </div>
+<!-- Answer Options -->
+<div id="options-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+    {% for choice in choices %}
+        <button type="button" class="option-btn start-btn" data-choice-id="{{ choice.id }}" tabindex="0" aria-pressed="false">
+            {{ choice.text }}
+        </button>
+    {% endfor %}
+</div>
+<!-- Action Button -->
+<div style="display: flex; justify-content: flex-end;">
+    <button id="next-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;" disabled>Next</button>
+</div>
+<!-- Feedback -->
+<div id="feedback" style="margin-top: 1.5rem; display: none;"></div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const optionsContainer = document.getElementById('options-container');
