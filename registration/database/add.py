@@ -1,12 +1,14 @@
 import mysql.connector
 
+from english_website.secret import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+
 # اتصال به پایگاه داده
 mydb = mysql.connector.connect(
-    host="mysql-374f4726-majidnamiiiii-e945.a.aivencloud.com",
-    user="avnadmin",
-    password="AVNS_QXs1v9qBTveDtLIXZfW",
-    database="defaultdb",
-    port=11741
+    host=DB_HOST,
+    port=DB_PORT,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    database=DB_NAME
 )
 
 # تابع برای وارد کردن متن (پاساژ)

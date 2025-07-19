@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
-from .secret import (DB_NAME, DB_USER,
+from english_website.secret import (DB_NAME, DB_USER,
                      DB_PASSWORD,
                      DB_HOST,
                      DB_PORT)
