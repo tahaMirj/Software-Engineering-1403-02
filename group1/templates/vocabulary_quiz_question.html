@@ -1,0 +1,153 @@
+{% extends "quiz_frame.html" %}
+{% block quiz_content %}
+<style>
+    /* Reusing styles from grammar_quiz_question.html for consistency */
+    .option-btn {
+        background-color: #23232b;
+        border: 1.5px solid #4B5563;
+        color: #e0e0e0;
+        border-radius: 0.7rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 1.1rem 1.2rem;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        transition: border 0.18s, color 0.18s, box-shadow 0.18s;
+        outline: none;
+        box-shadow: none;
+        cursor: pointer;
+    }
+    .option-btn:not(:disabled):hover {
+        border-color: #a78bfa;
+        color: #fff;
+        box-shadow: 0 0 0 2px #7c5cff33;
+    }
+    .option-btn.selected {
+        background-color: #7c5cff;
+        border-color: #a78bfa;
+        color: #fff;
+        box-shadow: 0 0 0 2px #7c5cff55;
+    }
+    .option-btn.correct {
+        background-color: #10B981;
+        border-color: #34D399;
+        color: #fff;
+        animation: pop-correct 0.25s;
+    }
+    .option-btn.incorrect {
+        background-color: #EF4444;
+        border-color: #F87171;
+        color: #fff;
+        animation: shake-wrong 0.25s;
+    }
+    .question-text-vocab {
+        font-size: 1.2rem;
+        color: #fff;
+        line-height: 1.6;
+    }
+    .question-text-vocab .blank {
+        display: inline-block;
+        width: 120px;
+        height: 2px;
+        background-color: #4B5563;
+        vertical-align: baseline;
+        margin: 0 4px;
+    }
+    #next-btn {
+        outline: none !important;
+        box-shadow: none !important;
+        background: #7c5cff;
+        color: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.8rem 2.2rem;
+        border-radius: 0.5rem;
+        border: none;
+    }
+    #next-btn:disabled {
+        background-color: #5a4a9c;
+        cursor: not-allowed;
+    }
+    @keyframes pop-correct {
+        0% { transform: scale(1); } 60% { transform: scale(1.08); } 100% { transform: scale(1); }
+    }
+    @keyframes shake-wrong {
+        0% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } 100% { transform: translateX(0); }
+    }
+</style>
+
+<!-- Question Text -->
+<div style="margin-bottom: 2rem;">
+    <p class="question-text-vocab">A person who is fluent in many languages is known as a<span class="blank"></span>.</p>
+</div>
+
+<!-- Answer Options -->
+<div id="options-container" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
+    <button type="button" class="option-btn" data-choice-id="1">Linguist</button>
+    <button type="button" class="option-btn" data-choice-id="2">Polyglot</button>
+    <button type="button" class="option-btn" data-choice-id="3">Bilingual</button>
+    <button type="button" class="option-btn" data-choice-id="4">Orator</button>
+</div>
+
+<!-- Action Button -->
+<div style="display: flex; justify-content: flex-end;">
+    <button id="next-btn" disabled>Next</button>
+</div>
+
+<!-- Feedback -->
+<div id="feedback" style="margin-top: 1.5rem; min-height: 24px;"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const optionsContainer = document.getElementById('options-container');
+    const nextBtn = document.getElementById('next-btn');
+    const feedbackDiv = document.getElementById('feedback');
+    let selectedOption = null;
+    let answered = false;
+    const correctChoiceId = '2'; // Mock data: Polyglot is correct
+
+    optionsContainer.addEventListener('click', function(e) {
+        if (answered || !e.target.classList.contains('option-btn')) return;
+
+        if (selectedOption) {
+            selectedOption.classList.remove('selected');
+        }
+        selectedOption = e.target;
+        selectedOption.classList.add('selected');
+        nextBtn.disabled = false;
+    });
+
+    nextBtn.addEventListener('click', function() {
+        if (!selectedOption || answered) return;
+        
+        if (nextBtn.textContent === 'Continue') {
+            // Here you would typically navigate to the next question.
+            // For this mock, we'll just log to console.
+            console.log('Moving to the next question...');
+            return;
+        }
+
+        answered = true;
+        const isCorrect = selectedOption.getAttribute('data-choice-id') === correctChoiceId;
+
+        if (isCorrect) {
+            selectedOption.classList.remove('selected');
+            selectedOption.classList.add('correct');
+            feedbackDiv.innerHTML = '<span style="color: #4caf50; font-weight: 600;">Correct! 🎉</span>';
+        } else {
+            selectedOption.classList.remove('selected');
+            selectedOption.classList.add('incorrect');
+            const correctButton = optionsContainer.querySelector(`[data-choice-id="${correctChoiceId}"]`);
+            correctButton.classList.add('correct');
+            feedbackDiv.innerHTML = '<span style="color: #ff5252; font-weight: 600;">Not quite. The correct answer is Polyglot.</span>';
+        }
+
+        optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+            btn.disabled = true;
+        });
+
+        nextBtn.textContent = 'Continue';
+    });
+});
+</script>
+{% endblock %}

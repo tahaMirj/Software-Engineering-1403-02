@@ -1,0 +1,154 @@
+{% extends "quiz_frame.html" %}
+{% block quiz_content %}
+<style>
+    .question-text {
+        font-size: 1.2rem;
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+    .drop-zone, .word-bank {
+        border: 2px dashed #4B5563;
+        border-radius: 0.7rem;
+        padding: 1rem;
+        min-height: 60px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+    }
+    .word-bank {
+        margin-top: 1.5rem;
+        min-height: 80px;
+    }
+    .word-tile {
+        background-color: #374151;
+        color: #e0e0e0;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: grab;
+        transition: background-color 0.2s, transform 0.2s;
+        user-select: none;
+    }
+    .word-tile:hover {
+        background-color: #4B5563;
+    }
+    .word-tile.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+    .drop-zone .word-tile {
+        cursor: pointer;
+    }
+    #check-btn {
+        background: #7c5cff;
+        color: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.8rem 2.2rem;
+        border-radius: 0.5rem;
+        border: none;
+    }
+    #check-btn:disabled {
+        background-color: #5a4a9c;
+        cursor: not-allowed;
+    }
+    .feedback-correct { color: #4caf50; font-weight: 600; }
+    .feedback-incorrect { color: #ff5252; font-weight: 600; }
+</style>
+
+<!-- Question Text -->
+<p class="question-text">Drag the words into the box below to form a correct sentence.</p>
+
+<!-- Drop Zone -->
+<div id="drop-zone" class="drop-zone"></div>
+
+<!-- Word Bank -->
+<div id="word-bank" class="word-bank">
+    <div class="word-tile" draggable="true" data-word="the">the</div>
+    <div class="word-tile" draggable="true" data-word="quick">quick</div>
+    <div class="word-tile" draggable="true" data-word="brown">brown</div>
+    <div class="word-tile" draggable="true" data-word="fox">fox</div>
+    <div class="word-tile" draggable="true" data-word="jumps">jumps</div>
+</div>
+
+<!-- Action Button & Feedback -->
+<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 2rem; min-height: 40px;">
+    <div id="feedback" style="margin-right: auto;"></div>
+    <button id="check-btn" disabled>Check</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const containers = [document.getElementById('drop-zone'), document.getElementById('word-bank')];
+    const checkBtn = document.getElementById('check-btn');
+    const feedbackDiv = document.getElementById('feedback');
+    const correctSentence = "the quick brown fox jumps";
+
+    document.addEventListener('dragstart', e => {
+        if (e.target.classList.contains('word-tile')) {
+            e.target.classList.add('dragging');
+        }
+    });
+
+    document.addEventListener('dragend', e => {
+        if (e.target.classList.contains('word-tile')) {
+            e.target.classList.remove('dragging');
+            updateCheckButtonState();
+        }
+    });
+
+    containers.forEach(container => {
+        container.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(container, e.clientX);
+            const draggable = document.querySelector('.dragging');
+            if (draggable) {
+                if (afterElement == null) {
+                    container.appendChild(draggable);
+                } else {
+                    container.insertBefore(draggable, afterElement);
+                }
+            }
+        });
+    });
+
+    function getDragAfterElement(container, x) {
+        const draggableElements = [...container.querySelectorAll('.word-tile:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = x - box.left - box.width / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function updateCheckButtonState() {
+        const dropZone = document.getElementById('drop-zone');
+        checkBtn.disabled = dropZone.children.length === 0;
+    }
+
+    checkBtn.addEventListener('click', function() {
+        const dropZone = document.getElementById('drop-zone');
+        const constructedSentence = Array.from(dropZone.children)
+            .map(tile => tile.getAttribute('data-word'))
+            .join(' ');
+
+        if (constructedSentence === correctSentence) {
+            feedbackDiv.innerHTML = '<span class="feedback-correct">Correct! Well done.</span>';
+            checkBtn.style.backgroundColor = '#10B981';
+            checkBtn.textContent = 'Continue';
+        } else {
+            feedbackDiv.innerHTML = '<span class="feedback-incorrect">Not quite, try again.</span>';
+        }
+
+        if (checkBtn.textContent === 'Continue') {
+            document.querySelectorAll('.word-tile').forEach(t => t.draggable = false);
+        }
+    });
+});
+</script>
+{% endblock %}

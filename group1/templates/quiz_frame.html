@@ -1,0 +1,70 @@
+{% comment %}
+Reusable quiz frame for all quiz types. Expects:
+- quiz_title
+- current_index
+- total_questions
+- quiz_progress
+Provides a block 'quiz_content' for injecting the specific question UI.
+{% endcomment %}
+<style>
+    body, .quiz-bg {
+        background: #18181b !important;
+        min-height: 100vh;
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+    }
+    .quiz-bg {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        width: 100vw;
+    }
+    .dashboard-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .quiz-card {
+        background: #23232b;
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 32px rgba(0,0,0,0.25);
+        padding: 2.5rem 2rem 2rem 2rem;
+        margin-top: 2rem;
+        width: 100%;
+    }
+    .progress-bar {
+        background: #292933;
+        border-radius: 0.5rem;
+        height: 0.6rem;
+        width: 100%;
+        overflow: hidden;
+        margin-top: 0.25rem;
+    }
+    .progress {
+        background: #7c5cff;
+        height: 100%;
+        transition: width 0.3s cubic-bezier(.4,2,.6,1);
+    }
+</style>
+<div class="quiz-bg">
+  <div class="dashboard-container">
+    <div class="quiz-card">
+        <!-- Header: Title and Progress -->
+        <div style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.3rem; font-weight: bold; color: #fff;">{{ quiz_title }}</h2>
+                <span style="font-size: 1rem; color: #b0b0b0;">Question {{ current_index }} of {{ total_questions }}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ quiz_progress }}%;"></div>
+            </div>
+        </div>
+        <!-- Question Content Block -->
+        {% block quiz_content %}
+        {% endblock %}
+    </div>
+  </div>
+</div> 
