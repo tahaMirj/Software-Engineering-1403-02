@@ -1,7 +1,481 @@
-{% extends "groups/groups_base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Learning Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text color */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-{% block title %}Group 1 Dashboard{% endblock %}
-{% block content %}
-    <h2>Welcome to Group 1</h2>
-    <p>This page shows your microservice status.</p>
-{% endblock %}
+        .dashboard-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: #1f1f1f; /* Slightly lighter than body */
+            border-bottom: 1px solid #333;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7c5cff; /* Accent color */
+        }
+        
+        .dashboard-header .user-greeting {
+            font-size: 1rem;
+            color: #b0b0b0;
+        }
+
+        /* Profile Section Styles */
+        .profile-section {
+            background: #1f1f1f; /* Card background */
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #333;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem; /* Reduced gap */
+        }
+
+        .profile-avatar img {
+            width: 70px; /* Slightly smaller */
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid #7c5cff; /* Accent border */
+        }
+
+        .profile-info h2 {
+            margin: 0 0 0.5rem 0;
+            color: #ffffff;
+            font-size: 1.5rem; /* Slightly larger */
+        }
+
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-item {
+            color: #b0b0b0; /* Lighter grey for stat text */
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.8rem; /* Smaller label */
+            color: #888;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .progress-bar {
+            background: #333333; /* Darker progress bar background */
+            border-radius: 0.5rem;
+            height: 0.6rem; /* Slightly thicker */
+            width: 120px; /* Wider */
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .progress {
+            background: #7c5cff; /* Accent color for progress */
+            height: 100%;
+        }
+
+        /* General Section & Card Styles */
+        h3 {
+            color: #ffffff;
+            margin: 2.5rem 0 1.5rem; /* Adjusted margins */
+            font-size: 1.75rem; /* Larger section titles */
+            border-bottom: 2px solid #7c5cff;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .quiz-grid, .review-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* Slightly larger min card width */
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .quiz-card, .review-card, .ranking-section {
+            background: #1f1f1f; /* Card background */
+            border-radius: 1rem;
+            padding: 1.75rem; /* Increased padding */
+            color: #e0e0e0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #333;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .quiz-card:hover, .review-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(124, 92, 255, 0.3); /* Accent shadow on hover */
+        }
+
+        .quiz-icon {
+            font-size: 2.25rem; /* Larger icons */
+            margin-bottom: 1rem;
+            color: #7c5cff; /* Accent color for icons */
+        }
+
+        .quiz-card h4 {
+            margin: 0.5rem 0;
+            color: #ffffff;
+            font-size: 1.2rem; /* Larger card titles */
+        }
+
+        .quiz-card p {
+            color: #b0b0b0; /* Lighter grey for card text */
+            margin: 0.5rem 0 1rem 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .start-btn {
+            display: inline-block;
+            background: #7c5cff;
+            color: white;
+            padding: 0.75rem 1.25rem; /* Larger button */
+            border-radius: 0.5rem;
+            text-decoration: none;
+            margin-top: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .start-btn:hover {
+            background: #6a4ee0; /* Darker shade on hover */
+            transform: translateY(-2px);
+        }
+        
+        .time-info {
+            color: #888;
+            font-size: 0.8rem; /* Smaller time info */
+            display: block; /* Ensure it takes its own line if needed */
+            margin-top: 0.75rem;
+        }
+
+
+        /* Review Section Styles */
+        .question-type {
+            color: #7c5cff; /* Accent color */
+            font-weight: 600; /* Bolder */
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .question-text {
+            margin: 0.5rem 0 1rem 0; /* Adjusted margins */
+            line-height: 1.5;
+        }
+
+        .correct-answer {
+            color: #4caf50; /* Green for correct */
+            margin: 0.5rem 0;
+            font-weight: 500;
+        }
+
+        .your-answer {
+            color: #ff5252; /* Red for incorrect */
+            font-weight: 500;
+        }
+
+        .no-reviews {
+            color: #888;
+            text-align: center;
+            padding: 2rem;
+            font-style: italic;
+        }
+
+        /* Ranking Section Styles */
+        .ranking-table {
+            overflow-x: auto; /* Keep for responsiveness */
+        }
+
+        .ranking-table table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #e0e0e0;
+        }
+
+        .ranking-table th,
+        .ranking-table td {
+            padding: 1rem 1.25rem; /* Increased padding */
+            text-align: left;
+            border-bottom: 1px solid #333333; /* Darker border */
+        }
+
+        .ranking-table th {
+            color: #888;
+            font-weight: 600; /* Bolder headers */
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .current-user td { /* Target td directly for more specific styling */
+            background: rgba(124, 92, 255, 0.1); /* Lighter accent background */
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .current-user td:first-child {
+            border-left: 3px solid #7c5cff;
+        }
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+            .dashboard-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .stats {
+                justify-content: center;
+                flex-wrap: wrap; /* Allow stats to wrap */
+                gap: 1rem;
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            .quiz-card, .review-card, .ranking-section {
+                padding: 1.25rem;
+            }
+            .ranking-table {
+                margin: 0; /* Remove negative margins if any */
+                border-radius: 1rem; /* Keep consistent rounding */
+            }
+        }
+
+         @media (max-width: 480px) {
+            .quiz-grid, .review-cards {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+            }
+            .start-btn {
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+            }
+         }
+
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="logo">LinguaLearn</div>
+        <div class="user-greeting">Hello, John!</div>
+    </header>
+
+    {% block content %}
+    <div class="dashboard-container">
+        <!-- Profile Section with Mock Data -->
+        <div class="profile-section">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=7c5cff&color=fff&bold=true" alt="Profile Picture">
+                </div>
+                <div class="profile-info">
+                    <h2>John Doe</h2>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Health</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Level</span>
+                            <span class="stat-value">12</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">XP</span>
+                            <span class="stat-value">2,450</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Types Section -->
+        <section class="quiz-types-section">
+            <h3>Practice & Learn</h3>
+            <div class="quiz-grid">
+                <div class="quiz-card">
+                    <div class="quiz-icon">📝</div>
+                    <h4>Grammar Quiz</h4>
+                    <p class="quiz-description">Test your knowledge of English grammar rules.</p>
+                    <span class="time-info">~5 mins</span>
+                    <a href="{% url 'group1:grammar_quiz_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-icon">🗣️</div>
+                    <h4>Vocabulary Quiz</h4>
+                    <p class="quiz-description">Expand your word power with new challenges.</p>
+                    <span class="time-info">~5 mins</span>
+                    <a href="{% url 'group1:vocabulary_quiz_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-icon">🖼️</div>
+                    <h4>Image Quiz</h4>
+                    <p class="quiz-description">Identify objects and scenes in images.</p>
+                    <span class="time-info">~5 mins</span>
+                    <a href="{% url 'group1:image_quiz_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-icon">✍️</div>
+                    <h4>Writing Quiz</h4>
+                    <p class="quiz-description">Practice your writing with guided exercises.</p>
+                    <span class="time-info">~10 mins</span>
+                    <a href="{% url 'group1:writing_quiz_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-icon">🧩</div>
+                    <h4>Sentence Building</h4>
+                    <p class="quiz-description">Construct sentences from scrambled words.</p>
+                    <span class="time-info">~7 mins</span>
+                    <a href="{% url 'group1:sentence_building_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-icon">👂</div>
+                    <h4>Listening Quiz</h4>
+                    <p class="quiz-description">Sharpen your comprehension of audio clips.</p>
+                    <span class="time-info">~7 mins</span>
+                    <a href="{% url 'group1:listening_quiz_question' %}" class="start-btn">Start Quiz</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Review Section with Mock Data -->
+        <section class="review-section">
+            <h3>Review Missed Questions</h3>
+            <div class="review-cards">
+                <div class="review-card">
+                    <div class="question-type">Grammar</div>
+                    <p class="question-text">Choose the correct form of the verb: "She ___ to the store yesterday."</p>
+                    <div class="correct-answer">Correct: went</div>
+                    <div class="your-answer">Your answer: goed</div>
+                </div>
+                <div class="review-card">
+                    <div class="question-type">Vocabulary</div>
+                    <p class="question-text">What is the meaning of 'ubiquitous'?</p>
+                    <div class="correct-answer">Correct: Present everywhere</div>
+                    <div class="your-answer">Your answer: Unique</div>
+                </div>
+                <div class="review-card">
+                    <div class="question-type">Listening</div>
+                    <p class="question-text">What did the speaker say about climate change?</p>
+                    <div class="correct-answer">Correct: It requires immediate action</div>
+                    <div class="your-answer">Your answer: It's not important</div>
+                </div>
+                 <div class="review-card">
+                    <div class="question-type">Writing</div>
+                    <p class="question-text">"Describe your favorite holiday." (Feedback on clarity and grammar)</p>
+                    <div class="correct-answer">Review: Focus on varied sentence structure.</div>
+                    <div class="your-answer">Your attempt: "My favorite holiday is fun. I like it. We eat food."</div>
+                </div>
+                {% if not missed_questions %}
+                <div class="no-reviews-container" style="grid-column: 1 / -1;"> <!-- Spans full width if no reviews -->
+                     <p class="no-reviews">🎉 Great job! No questions to review at the moment!</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Ranking Section with Mock Data -->
+        <section class="ranking-section">
+            <h3>Leaderboard</h3>
+            <div class="ranking-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>User</th>
+                            <th>Score</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Sarah Smith</td>
+                            <td>9,850</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Mike Johnson</td>
+                            <td>8,720</td>
+                            <td>14</td>
+                        </tr>
+                        <tr class="current-user">
+                            <td>3</td>
+                            <td>John Doe</td>
+                            <td>7,450</td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Emma Wilson</td>
+                            <td>6,890</td>
+                            <td>11</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Alex Brown</td>
+                            <td>5,670</td>
+                            <td>10</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    {% endblock %}
+</body>
+</html>

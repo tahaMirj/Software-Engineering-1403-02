@@ -1,6 +1,6 @@
 import json
 import pika
-from secret import AMQP_URL
+from english_website.secret import AMQP_URL
 
 
 class RabbitMQ:
