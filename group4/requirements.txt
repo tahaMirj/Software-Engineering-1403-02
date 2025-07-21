@@ -1,0 +1,19 @@
+# production requirements
+Django==4.1.3
+djangorestframework
+pyyaml
+requests
+django-cors-headers
+pillow
+django-storages
+boto3
+mysql-connector-python~=9.3.0
+mysqlclient
+
+python3-pika~=0.9.14
+python-dotenv~=1.1.0
+
+# development requirements
+ruff==0.12.3
+isort==5.13.2
+mypy==1.13.0
