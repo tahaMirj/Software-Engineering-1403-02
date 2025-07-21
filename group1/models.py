@@ -21,6 +21,7 @@ class Question(models.Model):
         ('VOCAB', 'Vocab'),
         ('LISTENING', 'Listening'),
         ('WRITING', 'Writing'),
+        ('SENTENCE', 'Sentence Building'),
     ]
     DIFFICULTY_LEVELS = [
         ('Easy', 'Easy'),
@@ -31,10 +32,12 @@ class Question(models.Model):
     type = models.CharField(max_length=20, choices=QUESTION_TYPES)
     difficulty_level = models.CharField(max_length=10, choices=DIFFICULTY_LEVELS)
     text_or_prompt = models.TextField()
-    passage_text = models.TextField(null=True, blank=True)
-    image_url = models.URLField(null=True, blank=True)
-    word_list = models.JSONField(null=True, blank=True)  # Requires Django 3.1+
-    correct_text_answer = models.TextField(null=True, blank=True)
+    passage_text = models.TextField(null=True, blank=True)  # For reading main question
+    image_url = models.URLField(null=True, blank=True)      # For image questions
+    voice_url = models.URLField(null=True, blank=True)      # For listening questions
+    word_list = models.JSONField(null=True, blank=True)     # For sentence building
+    correct_text_answer = models.TextField(null=True, blank=True)  # For sentence building
+    parent_question = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='sub_questions')  # For reading sub-questions
 
     def __str__(self):
         return f"Question {self.id} - {self.type} - {self.difficulty_level}"
