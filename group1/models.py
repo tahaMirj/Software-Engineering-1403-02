@@ -5,13 +5,14 @@ from django.contrib.postgres.fields import JSONField  # For word_list
 
 class Quiz(models.Model):
     id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255, default='New Quiz')
     user_id = models.IntegerField()  # Will be replaced with FK to User later
-    status = models.CharField(max_length=20, choices=[('in_progress', 'In Progress'), ('completed', 'Completed')], default='in_progress')
+    status = models.CharField(max_length=20, choices=[('not_started', 'Not Started'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='not_started')
     current_question_index = models.IntegerField(default=0)
     create_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Quiz {self.id} (User {self.user_id}) - {self.status}"
+        return f"Quiz {self.id}: {self.title} (User {self.user_id}) - {self.status}"
 
 class Question(models.Model):
     QUESTION_TYPES = [
