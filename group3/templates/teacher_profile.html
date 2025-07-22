@@ -1,9 +1,20 @@
-<h2>Teacher Profile</h2>
+{% extends "groups/groups_base.html" %}
 
-<p><strong>Name:</strong> {{ teacher.name }}</p>
-<p><strong>Email:</strong> {{ teacher.email }}</p>
-<p><strong>Phone Number:</strong> {{ teacher.phone_number|default:"Not provided" }}</p>
-<p><strong>Biography:</strong> {{ teacher.biography|default:"No biography yet." }}</p>
-<p><strong>Language:</strong> {{ teacher.language }}</p>
-<p><strong>Rating:</strong> {{ teacher.rating }}</p>
-<p><a href="{% url 'group3:teacher_landing' %}">Back to Teacher Portal</a></p>
+{% block title %}Teacher Profile{% endblock %}
+
+{% block content %}
+  <h2 class="text-2xl font-bold mb-4">Teacher Profile</h2>
+
+  <p><strong>Name:</strong> {{ teacher.name }}</p>
+  <p><strong>Email:</strong> {{ teacher.email }}</p>
+  <p><strong>Phone Number:</strong> {{ teacher.phone_number|default:"Not provided" }}</p>
+  <p><strong>Biography:</strong> {{ teacher.biography|default:"No biography yet." }}</p>
+  <p><strong>Language:</strong> {{ teacher.language }}</p>
+  <p><strong>Rating:</strong> {{ teacher.rating }}</p>
+
+  <p class="mt-6">
+    <a href="{% url 'group3:teacher_landing' %}" class="text-blue-500 hover:underline">
+      &larr; Back to Teacher Portal
+    </a>
+  </p>
+{% endblock %}

@@ -122,6 +122,20 @@ def edit_profile(request):
 
 
 @login_required
+def view_reviews(request):
+    # Look up the Teacher record for this user
+    teacher = get_object_or_404(Teacher, user=request.user)
+
+    # Grab all reviews for that teacher, newest first
+    reviews = teacher.reviews.order_by('-created_at')
+
+    return render(request, 'view_reviews.html', {
+        'teacher': teacher,
+        'reviews': reviews,
+    })
+
+
+@login_required
 def create_timeslot(request):
     teacher = get_object_or_404(Teacher, user=request.user)
 

@@ -21,4 +21,5 @@ urlpatterns = [
     path('student/book/<int:slot_id>/', views.book_timeslot, name='book_timeslot'),
     path('student/sessions/', views.student_sessions, name='student_sessions'),
     path('student/teachers/<int:teacher_id>/review/', views.add_review, name='add_review'),
+    path('reviews/', views.view_reviews, name='view_reviews'),
 ]

@@ -1,0 +1,32 @@
+{% extends "groups/groups_base.html" %}
+
+{% block title %}My Reviews{% endblock %}
+
+{% block content %}
+  <h2 class="text-2xl font-bold mb-4">Reviews for {{ teacher.name }}</h2>
+
+  {% if reviews %}
+    <div class="space-y-6">
+      {% for review in reviews %}
+        <div class="bg-white shadow rounded-lg p-6">
+          <p class="font-semibold">
+            {{ review.reviewer_name }} 
+            <span class="text-gray-600 text-sm">on {{ review.created_at|date:"Y-m-d H:i" }}</span>
+          </p>
+          <p class="mt-1"><strong>Rating:</strong> {{ review.rating }}/5</p>
+          {% if review.comment %}
+            <p class="mt-2 whitespace-pre-wrap">{{ review.comment }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-600">You have no reviews yet.</p>
+  {% endif %}
+
+  <p class="mt-6">
+    <a href="{% url 'group3:teacher_landing' %}" class="text-blue-500 hover:underline">
+      &larr; Back to Dashboard
+    </a>
+  </p>
+{% endblock %}
