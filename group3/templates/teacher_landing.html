@@ -6,13 +6,14 @@
   <h2>Teacher Portal</h2>
 
   {% if not request.user.is_authenticated %}
-    <p><a href="{% url 'group3:login' %}">Login</a></p>
-    <p><a href="{% url 'group3:signup' %}">Signup</a></p>
+    <p><a href="{% url 'group3:teacher_login' %}">Login</a></p>
+    <p><a href="{% url 'group3:teacher_signup' %}">Signup</a></p>
   {% else %}
     <p>Welcome, {{ request.user.username }}!</p>
     <p>
       <a href="{% url 'group3:teacher_profile' %}">View Profile</a> |
-      <a href="{% url 'group3:logout' %}">Logout</a>
+      <a href="{% url 'group3:teacher_logout' %}">Logout</a> |
+    <a href="{% url 'group3:edit_profile' %}">Edit Profile</a>
     </p>
     <p><a href="{% url 'group3:create_timeslot' %}">Add A New Timeslot</a></p>
 

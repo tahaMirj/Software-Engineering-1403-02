@@ -1,10 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Student Portal{% endblock %}
+
+{% block content %}
+  <h2>Student Portal</h2>
+
+  {% if not request.user.is_authenticated %}
+    <p><a href="{% url 'group3:student_login' %}">Login</a></p>
+  {% else %}
+    <p>Welcome, {{ request.user.username }}!</p>
+      <p>
+      <a href="{% url 'group3:student_logout' %}">Logout</a> |
+      <a href="{% url 'group3:teacher_list' %}">View Teachers</a> |
+      </p>
+  {% endif %}
+
+  <p><a href="{% url 'group3:group3' %}">Back to Home</a></p>
+{% endblock %}

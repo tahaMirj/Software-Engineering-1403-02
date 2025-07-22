@@ -103,6 +103,21 @@ def teacher_landing(request):
 
 
 @login_required
+def edit_profile(request):
+    teacher = get_object_or_404(Teacher, user=request.user)
+
+    if request.method == 'POST':
+        bio = request.POST.get('biography', '').strip()
+        teacher.biography = bio
+        teacher.save()
+        return redirect('group3:teacher_profile')  # adjust this URL name as needed
+
+    return render(request, 'edit_profile.html', {
+        'teacher': teacher
+    })
+
+
+@login_required
 def create_timeslot(request):
     teacher = get_object_or_404(Teacher, user=request.user)
 
@@ -228,3 +243,68 @@ def edit_timeslot(request, slot_id):
     return render(request, 'edit_timeslot.html', {'timeslot': timeslot})
 
 
+def student_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('group3:student_landing')
+        else:
+            error = "Invalid username or password."
+            return render(request, 'student_login.html', {
+                'error': error,
+                'username': username,
+            })
+
+    # GET
+    return render(request, 'student_login.html')
+
+
+def student_landing(request):
+    # If not logged in, template will render login/signup links
+    if not request.user.is_authenticated:
+        return render(request, 'student_landing.html')
+
+    # (Optional) example: list all available (unbooked) timeslots
+    available_slots = TimeSlot.objects.filter(is_booked=False).order_by('start_time')
+
+    return render(request, 'student_landing.html', {
+        'available_slots': available_slots
+    })
+
+
+@login_required
+def student_logout(request):
+    logout(request)
+    return redirect('group3:group3')
+
+
+@login_required
+def teacher_list(request):
+    """
+    Display all teachers with name, language, rating,
+    and a 'View Details' link for each.
+    """
+    teachers = Teacher.objects.all()
+    return render(request, 'teacher_list.html', {
+        'teachers': teachers
+    })
+
+
+@login_required
+def teacher_detail(request, teacher_id):
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+
+    # Only show slots that are not booked
+    available_slots = TimeSlot.objects.filter(
+        teacher=teacher,
+        is_booked=False
+    ).order_by('start_time')
+
+    return render(request, 'teacher_detail.html', {
+        'teacher': teacher,
+        'available_slots': available_slots
+    })

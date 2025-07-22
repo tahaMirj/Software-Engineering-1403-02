@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{# groups/templates/groups/edit_profile.html #}
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+  <h2>Edit Your Profile</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    <label for="biography">Biography:</label><br>
+    <textarea
+      name="biography"
+      id="biography"
+      rows="5"
+      cols="60"
+      required
+    >{{ teacher.biography }}</textarea><br><br>
+
+    <button type="submit">Save</button>
+  </form>
+
+  <p><a href="{% url 'group3:teacher_profile' %}">Back to Profile</a></p>
+{% endblock %}
