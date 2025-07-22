@@ -1,0 +1,16 @@
+{# groups/templates/groups/already_reviewed.html #}
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Already Reviewed{% endblock %}
+
+{% block content %}
+  <h2 class="text-2xl font-bold mb-4">Already Reviewed</h2>
+
+  <p>You’ve already submitted a review for <strong>{{ teacher.name }}</strong>.</p>
+
+  <p class="mt-6">
+    <a href="{% url 'group3:student_sessions' %}" class="text-blue-500 hover:underline">
+      &larr; Back to Sessions
+    </a>
+  </p>
+{% endblock %}

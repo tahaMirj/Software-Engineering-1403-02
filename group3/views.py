@@ -1,10 +1,14 @@
 from datetime import datetime
+
+from django.contrib import messages
+from django.db.models import Avg
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
-from .models import Teacher, TimeSlot, Session
+from .models import Teacher, TimeSlot, Session, Review
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -359,3 +363,71 @@ def student_sessions(request):
     return render(request, 'student_sessions.html', {
         'sessions': sessions
     })
+
+
+@login_required
+def add_review(request, teacher_id):
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+
+    # Ensure the student had a session
+    had_session = Session.objects.filter(
+        teacher=teacher,
+        student_name=request.user.username
+    ).exists()
+    if not had_session:
+        messages.error(request, "You can only review teachers you’ve had sessions with.")
+        return redirect('group3:teacher_detail', teacher_id=teacher.id)
+
+    # Prevent duplicate reviews — render an “already reviewed” page
+    already_reviewed = Review.objects.filter(
+        teacher=teacher,
+        reviewer_name=request.user.username
+    ).exists()
+    if already_reviewed:
+        return render(request, 'already_reviewed.html', {
+            'teacher': teacher
+        })
+
+    if request.method == 'POST':
+        rating  = request.POST.get('rating')
+        comment = request.POST.get('comment', '').strip()
+
+        # Validate rating
+        error = None
+        try:
+            rating_val = int(rating)
+            if not (1 <= rating_val <= 5):
+                error = "Rating must be between 1 and 5."
+        except (TypeError, ValueError):
+            error = "Please enter a valid integer rating."
+
+        if error:
+            return render(request, 'add_review.html', {
+                'teacher': teacher,
+                'error': error,
+                'rating': rating,
+                'comment': comment,
+            })
+
+        # Create the review
+        Review.objects.create(
+            teacher=teacher,
+            reviewer_name=request.user.username,
+            rating=rating_val,
+            comment=comment
+        )
+
+        # Recalculate and save the teacher's average rating
+        avg = teacher.reviews.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+        teacher.rating = round(avg, 2)
+        teacher.save()
+
+        messages.success(request, "Thank you for your review!")
+        return redirect('group3:teacher_detail', teacher_id=teacher.id)
+
+    # GET: render the form
+    return render(request, 'add_review.html', {
+        'teacher': teacher
+    })
+
+

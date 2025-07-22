@@ -9,12 +9,13 @@
     <table class="w-full table-auto border-collapse">
       <thead>
         <tr class="bg-gray-100">
-          <th class="px-4 py-2 text-left">Teacher</th>
+          <th class="px-4 py-2 text-left">Teacher's Name</th>
           <th class="px-4 py-2 text-left">Language</th>
           <th class="px-4 py-2 text-left">Start</th>
           <th class="px-4 py-2 text-left">End</th>
           <th class="px-4 py-2 text-left">Status</th>
           <th class="px-4 py-2 text-left">Notes</th>
+          <th class="px-4 py-2 text-left">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -26,6 +27,14 @@
             <td class="px-4 py-2">{{ session.end_time|date:"Y-m-d H:i" }}</td>
             <td class="px-4 py-2 capitalize">{{ session.status }}</td>
             <td class="px-4 py-2">{{ session.notes|default:"—" }}</td>
+            <td class="px-4 py-2">
+              <a
+                href="{% url 'group3:add_review' session.teacher.id %}"
+                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              >
+                Review
+              </a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
