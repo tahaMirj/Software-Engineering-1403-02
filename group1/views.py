@@ -8,9 +8,51 @@ from django.contrib import messages
 def home(request):
     return  render (request , 'group1.html' , {'group_number': '1'})
 
+def start_grammar_quiz(request):
+    """
+    Create a new grammar quiz instance with 10 random grammar questions
+    """
+    # Create a new quiz instance
+    quiz = Quiz.objects.create(
+        title='Grammar Quiz',
+        user_id=1,  # Placeholder user ID
+        status='not_started'
+    )
+    
+    # Get 10 random grammar questions
+    grammar_questions = Question.objects.filter(type='GRAMMAR').order_by('?')[:10]
+    
+    if grammar_questions.count() < 10:
+        messages.error(request, 'Not enough grammar questions available in the database.')
+        return redirect('group1:home')
+    
+    # Create QuizQuestion instances for each selected question
+    for question in grammar_questions:
+        QuizQuestion.objects.create(
+            quiz=quiz,
+            question=question,
+            user_answer=None,
+            is_correct=False
+        )
+    
+    # Store quiz ID in session to track current quiz
+    request.session['current_grammar_quiz_id'] = quiz.id
+    
+    # Redirect to the first question
+    return redirect('group1:grammar_quiz_question')
+
 def grammar_quiz_question(request):
-    # Get or create the grammar quiz (ID=1 from mock data)
-    quiz = get_object_or_404(Quiz, id=1, title='Grammar Quiz')
+    # Get the current quiz from session
+    quiz_id = request.session.get('current_grammar_quiz_id')
+    if not quiz_id:
+        # No active quiz, redirect to start a new one
+        return redirect('group1:start_grammar_quiz')
+    
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+    except Quiz.DoesNotExist:
+        # Quiz doesn't exist, start a new one
+        return redirect('group1:start_grammar_quiz')
     
     # Get all quiz questions for this quiz, ordered by question ID
     quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('question__id')

@@ -138,7 +138,7 @@
         let selectedOption = null;
         const showFeedback = {{ show_feedback|yesno:'true,false' }};
         const isCorrect = {% if is_correct %}true{% elif is_correct == False %}false{% else %}null{% endif %};
-        const correctChoiceId = '{{ correct_choice.id|default:"" }}';
+        const correctChoiceId = {{ correct_choice.id|default:'null' }};
         
         // If feedback is already shown, disable all options
         if (showFeedback) {
