@@ -1,0 +1,42 @@
+{% extends "groups/groups_base.html" %}
+
+{% block title %}My Sessions{% endblock %}
+
+{% block content %}
+  <h2 class="text-2xl font-bold mb-4">My Booked Sessions</h2>
+
+  {% if sessions %}
+    <table class="w-full table-auto border-collapse">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="px-4 py-2 text-left">Teacher</th>
+          <th class="px-4 py-2 text-left">Language</th>
+          <th class="px-4 py-2 text-left">Start</th>
+          <th class="px-4 py-2 text-left">End</th>
+          <th class="px-4 py-2 text-left">Status</th>
+          <th class="px-4 py-2 text-left">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in sessions %}
+          <tr class="border-t">
+            <td class="px-4 py-2">{{ session.teacher.name }}</td>
+            <td class="px-4 py-2">{{ session.language }}</td>
+            <td class="px-4 py-2">{{ session.start_time|date:"Y-m-d H:i" }}</td>
+            <td class="px-4 py-2">{{ session.end_time|date:"Y-m-d H:i" }}</td>
+            <td class="px-4 py-2 capitalize">{{ session.status }}</td>
+            <td class="px-4 py-2">{{ session.notes|default:"—" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-gray-600">You haven’t booked any sessions yet.</p>
+  {% endif %}
+
+  <p class="mt-6">
+    <a href="{% url 'group3:student_landing' %}" class="text-blue-500 hover:underline">
+      &larr; Back to Student Portal
+    </a>
+  </p>
+{% endblock %}

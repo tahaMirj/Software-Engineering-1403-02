@@ -1,0 +1,31 @@
+{# groups/templates/groups/book_session.html #}
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Book Session{% endblock %}
+
+{% block content %}
+  <h2>Book a Session</h2>
+
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    <p><a href="{% url 'group3:teacher_detail' timeslot.teacher.id %}">&larr; Back</a></p>
+  {% else %}
+    <p><strong>Teacher:</strong> {{ teacher.name }}</p>
+    <p><strong>Language:</strong> {{ teacher.language }}</p>
+    <p><strong>Starts:</strong> {{ timeslot.start_time|date:"Y-m-d H:i" }}</p>
+    <p><strong>Ends:</strong> {{ timeslot.end_time|date:"Y-m-d H:i" }}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <p>Student Name: <strong>{{ request.user.username }}</strong></p>
+      <p>Language: <strong>{{ teacher.language }}</strong></p>
+      <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        Confirm Booking
+      </button>
+    </form>
+
+    <p class="mt-4">
+      <a href="{% url 'group3:teacher_detail' teacher.id %}">&larr; Back to Teacher</a>
+    </p>
+  {% endif %}
+{% endblock %}

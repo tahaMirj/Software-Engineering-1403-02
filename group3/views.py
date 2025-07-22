@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
-from .models import Teacher, TimeSlot
+from .models import Teacher, TimeSlot, Session
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -307,4 +307,55 @@ def teacher_detail(request, teacher_id):
     return render(request, 'teacher_detail.html', {
         'teacher': teacher,
         'available_slots': available_slots
+    })
+
+
+@login_required
+def book_timeslot(request, slot_id):
+    # Look up the slot and ensure it's free
+    timeslot = get_object_or_404(TimeSlot, id=slot_id)
+    if timeslot.is_booked:
+        return render(request, 'book_session.html', {
+            'error': 'Sorry, this slot was just booked by someone else.',
+        })
+
+    teacher = timeslot.teacher
+
+    if request.method == 'POST':
+        # For now, we’ll use the logged-in user’s username as the student_name
+        student_name = request.user.username
+        # Default to the teacher’s language
+        language = teacher.language
+
+        # Create the session
+        Session.objects.create(
+            teacher=teacher,
+            timeslot=timeslot,
+            student_name=student_name,
+            language=language,
+            start_time=timeslot.start_time,
+            end_time=timeslot.end_time,
+        )
+
+        # Mark the slot as booked
+        timeslot.is_booked = True
+        timeslot.save()
+
+        return redirect('group3:student_landing')
+
+    # GET: show confirmation form
+    return render(request, 'book_session.html', {
+        'timeslot': timeslot,
+        'teacher': teacher,
+    })
+
+
+@login_required
+def student_sessions(request):
+    # Filter sessions by the username stored in student_name
+    sessions = Session.objects.filter(student_name=request.user.username) \
+                              .order_by('-start_time')
+
+    return render(request, 'student_sessions.html', {
+        'sessions': sessions
     })

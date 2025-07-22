@@ -18,5 +18,6 @@ urlpatterns = [
     path('student-logout/', views.student_logout, name='student_logout'),
     path('teacher-list/', views.teacher_list, name='teacher_list'),
     path('student/teachers/<int:teacher_id>/', views.teacher_detail, name='teacher_detail'),
-
+    path('student/book/<int:slot_id>/', views.book_timeslot, name='book_timeslot'),
+    path('student/sessions/', views.student_sessions, name='student_sessions'),
 ]
