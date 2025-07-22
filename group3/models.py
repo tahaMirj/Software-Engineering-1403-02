@@ -27,15 +27,38 @@ class Teacher(models.Model):
 
 
 class TimeSlot(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='time_slots')
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+        related_name='time_slots'
+    )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     is_booked = models.BooleanField(default=False)
-    # TODO use datetime instead of this shit to show the date
-    day_of_week = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(7)])
+
+    # Hard-coded day names
+    DAY_OF_WEEK_CHOICES = [
+        (1, 'Monday'),
+        (2, 'Tuesday'),
+        (3, 'Wednesday'),
+        (4, 'Thursday'),
+        (5, 'Friday'),
+        (6, 'Saturday'),
+        (7, 'Sunday'),
+    ]
+    day_of_week = models.PositiveIntegerField(
+        choices=DAY_OF_WEEK_CHOICES,
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(7)]
+    )
 
     def __str__(self):
         return f"{self.teacher.name} | {self.start_time} - {self.end_time}"
+
+    @property
+    def day_name(self):
+        """Human-readable day name for templates."""
+        return dict(self.DAY_OF_WEEK_CHOICES).get(self.day_of_week, "")
 
 
 class Session(models.Model):

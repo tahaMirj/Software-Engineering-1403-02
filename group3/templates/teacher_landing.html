@@ -1,10 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Teacher Portal{% endblock %}
+
+{% block content %}
+  <h2>Teacher Portal</h2>
+
+  {% if not request.user.is_authenticated %}
+    <p><a href="{% url 'group3:login' %}">Login</a></p>
+    <p><a href="{% url 'group3:signup' %}">Signup</a></p>
+  {% else %}
+    <p>Welcome, {{ request.user.username }}!</p>
+    <p>
+      <a href="{% url 'group3:teacher_profile' %}">View Profile</a> |
+      <a href="{% url 'group3:logout' %}">Logout</a>
+    </p>
+    <p><a href="{% url 'group3:create_timeslot' %}">Add A New Timeslot</a></p>
+
+    {% if timeslots %}
+      <h3>Your Timeslots:</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Day</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for timeslot in timeslots %}
+            <tr>
+              <td>{{ timeslot.start_time|date:"Y-m-d H:i" }}</td>
+              <td>{{ timeslot.end_time|date:"Y-m-d H:i" }}</td>
+              <td>{{ timeslot.day_name }}</td>
+              <td>
+                {% if timeslot.is_booked %}
+                  Booked
+                {% else %}
+                  Available
+                {% endif %}
+              </td>
+              <td>
+                {% if not timeslot.is_booked %}
+                  <a href="{% url 'group3:edit_timeslot' timeslot.id %}">Edit</a>
+                {% else %}
+                  &mdash;
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>You have no timeslots yet.</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

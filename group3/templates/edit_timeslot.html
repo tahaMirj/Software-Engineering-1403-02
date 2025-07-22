@@ -1,0 +1,50 @@
+{% extends "groups/groups_base.html" %}
+{% block title %}Edit TimeSlot{% endblock %}
+
+{% block content %}
+<h2>Edit TimeSlot</h2>
+
+{% if error %}
+  <p style="color: red;">{{ error }}</p>
+{% endif %}
+
+<form method="post" id="timeslot-form">
+  {% csrf_token %}
+
+  <label>Start Time:</label>
+  <input type="datetime-local" name="start_time" id="start_time"
+         value="{{ timeslot.start_time|date:'Y-m-d\\TH:i' }}" required><br><br>
+
+  <label>End Time:</label>
+  <input type="datetime-local" name="end_time" id="end_time"
+         value="{{ timeslot.end_time|date:'Y-m-d\\TH:i' }}" required><br><br>
+
+  <label>Day of Week (1=Mon, 7=Sun):</label>
+  <input type="number" name="day_of_week" min="1" max="7" value="{{ timeslot.day_of_week }}" required><br><br>
+
+  <button type="submit">Update TimeSlot</button>
+</form>
+
+<p><a href="{% url 'group3:teacher_landing' %}">Back to Dashboard</a></p>
+
+<script>
+  document.getElementById('timeslot-form').addEventListener('submit', function(event) {
+    const start = new Date(document.getElementById('start_time').value);
+    const end = new Date(document.getElementById('end_time').value);
+
+    // Check if end time is after start time
+    if (end <= start) {
+      alert('End time must be after start time.');
+      event.preventDefault();
+      return;
+    }
+
+    // Check if start and end years are the same
+    if (start.getFullYear() !== end.getFullYear()) {
+      alert('Start and end time must be in the same year.');
+      event.preventDefault();
+      return;
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "groups/groups_base.html" %}
+{% block title %}Create TimeSlot{% endblock %}
+
+{% block content %}
+  <h2>Create a TimeSlot</h2>
+
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+  {% endif %}
+
+  <form method="post" id="timeslot-form">
+    {% csrf_token %}
+
+    <label for="start_time">Start Time:</label>
+    <input
+      type="datetime-local"
+      id="start_time"
+      name="start_time"
+      value="{{ start_time|default:'' }}"
+      required
+    ><br><br>
+
+    <label for="end_time">End Time:</label>
+    <input
+      type="datetime-local"
+      id="end_time"
+      name="end_time"
+      value="{{ end_time|default:'' }}"
+      required
+    ><br><br>
+
+    <label for="day_of_week">Day of Week:</label>
+    <select id="day_of_week" name="day_of_week" required>
+      <option value="">-- Select Day --</option>
+      <option value="1" {% if day_of_week == '1' %}selected{% endif %}>Monday</option>
+      <option value="2" {% if day_of_week == '2' %}selected{% endif %}>Tuesday</option>
+      <option value="3" {% if day_of_week == '3' %}selected{% endif %}>Wednesday</option>
+      <option value="4" {% if day_of_week == '4' %}selected{% endif %}>Thursday</option>
+      <option value="5" {% if day_of_week == '5' %}selected{% endif %}>Friday</option>
+      <option value="6" {% if day_of_week == '6' %}selected{% endif %}>Saturday</option>
+      <option value="7" {% if day_of_week == '7' %}selected{% endif %}>Sunday</option>
+    </select><br><br>
+
+    <button type="submit">Create TimeSlot</button>
+  </form>
+
+  <p><a href="{% url 'group3:teacher_landing' %}">Back to Dashboard</a></p>
+
+  <script>
+    document.getElementById('timeslot-form').addEventListener('submit', function(e) {
+      const startEl = document.getElementById('start_time');
+      const endEl = document.getElementById('end_time');
+      const start = new Date(startEl.value);
+      const end = new Date(endEl.value);
+
+      if (end <= start) {
+        alert('End time must be after start time.');
+        e.preventDefault();
+        return;
+      }
+
+      if (start.getFullYear() !== end.getFullYear()) {
+        alert('Start and end time must be in the same year.');
+        e.preventDefault();
+        return;
+      }
+    });
+  </script>
+{% endblock %}
