@@ -83,10 +83,7 @@
         <a href="{% url 'group3:teacher_list' %}">View Teachers</a> |
         <a href="{% url 'group3:group3' %}">Back to Home</a>
       </div>
-    {% endif %}
-  </div>
-
-  {% if available_slots %}
+         {% if available_slots %}
     <h3>Available Time Slots</h3>
     <div class="slot-list">
       {% for slot in available_slots %}
@@ -103,15 +100,12 @@
     </div>
   {% else %}
     <p>Welcome, {{ request.user.username }}!</p>
-      <p>
-      <a href="{% url 'group3:student_logout' %}">Logout</a> |
-      <a href="{% url 'group3:teacher_list' %}">View Teachers</a> |
-      <a href="{% url 'group3:student_sessions' %}">Booked Sessions</a> |
-      </p>
     <div class="no-slots">
       <p>No available time slots at the moment.</p>
     </div>
   {% endif %}
+    {% endif %}
+  </div>
 
   <script>
     function selectSlot(slotId) {

@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Avg
-from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
@@ -40,29 +40,27 @@ def teacher_login(request):
 
 def teacher_signup(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        language = request.POST.get('language')
+        username  = request.POST.get('username')
+        password  = request.POST.get('password')
+        name      = request.POST.get('name')
+        email     = request.POST.get('email')
+        language  = request.POST.get('language')
 
-        # Check if username already exists
-        if User.objects.filter(username=username).exists():
-            return render(request, 'teacher_signup.html', {
-                'error': 'Username already exists.'
-            })
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            return render(request, 'teacher_signup.html', {'error': 'Invalid username or password.'})
 
-        # Check if teacher with same email already exists
+        if Teacher.objects.filter(user=user).exists():
+            return render(request, 'teacher_signup.html', {'error': 'This account is already a teacher.'})
+
         if Teacher.objects.filter(email=email).exists():
-            return render(request, 'teacher_signup.html', {
-                'error': 'A teacher with this email already exists.'
-            })
+            return render(request, 'teacher_signup.html', {'error': 'A teacher with this email already exists.'})
 
-        # If all good, create user and teacher
-        user = User.objects.create_user(username=username, password=password)
-        teacher = Teacher.objects.create(user=user, name=name, email=email, language=language)
+        with transaction.atomic():
+            Teacher.objects.create(user=user, name=name, email=email, language=language)
 
         login(request, user)
+        messages.success(request, 'Teacher profile created!')
         return redirect('group3:teacher_landing')
 
     return render(request, 'teacher_signup.html')

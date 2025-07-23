@@ -1,4 +1,8 @@
-<h2>Teacher Signup</h2>
+<h2>Become A Teacher</h2>
+<p style="margin-bottom:1rem; color:#555;">
+  Use an existing account: enter the <strong>username</strong> and <strong>password</strong> you already created.
+  We’ll verify them and then save your teacher details.
+</p>
 
 {% if error %}
   <p style="color: red;">{{ error }}</p>
@@ -25,4 +29,4 @@
   <button type="submit">Sign Up</button>
 </form>
 
-<p>Already have an account? <a href="{% url 'group3:teacher_login' %}">Login here</a></p>
+<p>Don't have an account? <a href="{% url 'signup' %}">Signup here</a></p>

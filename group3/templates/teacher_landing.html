@@ -174,7 +174,7 @@
   {% if not request.user.is_authenticated %}
     <div class="action-grid">
       <a class="action-card" href="{% url 'group3:teacher_login' %}">Login</a>
-      <a class="action-card" href="{% url 'group3:teacher_signup' %}">Signup</a>
+      <a class="action-card" href="{% url 'group3:teacher_signup' %}">Become A Teacher</a>
     </div>
   {% else %}
     <p class="welcome">Welcome, <strong>{{ request.user.username }}</strong>!</p>
