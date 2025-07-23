@@ -28,6 +28,14 @@ class Reading(models.Model):
     
     def __str__(self):
         return f"{self.title} ({self.difficulty})"
+    
+    def get_image_url(self):
+        """Get the full URL for the reading's image (from category)"""
+        if self.category:
+            return self.category.get_image_url()
+        else:
+            # Return default image if no category
+            return "static/group4/images/base/prac.png"
 
 
 class Results(models.Model):
@@ -160,6 +168,8 @@ class ReadingCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     color = models.CharField(max_length=7, default='#007bff', help_text="Hex color for UI display")
+    image_path = models.CharField(max_length=500, blank=True, null=True, 
+                                 help_text="Full path or URL to image (e.g., 'static/images/categories/tech.jpg' or 'https://cdn.example.com/images/tech.jpg')")
     is_active = models.BooleanField(default=True)
     
     class Meta:
@@ -168,6 +178,20 @@ class ReadingCategory(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def get_image_url(self):
+        """Get the full URL for the category's image"""
+        if self.image_path:
+            # Check if it's already a full URL (starts with http/https)
+            if self.image_path.startswith(('http://', 'https://')):
+                return self.image_path
+            else:
+                # Local path, prepend with static URL handling
+                return self.image_path
+        else:
+            # Return default image based on category name
+            default_name = self.name.lower().replace(' ', '_').replace('&', 'and')
+            return f"static/images/categories/default/{default_name}.jpg"
 
 
 class ReadingTag(models.Model):
