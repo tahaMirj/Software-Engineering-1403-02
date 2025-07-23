@@ -1,25 +1,194 @@
-{% extends "groups/groups_base.html" %}
-
 {% block title %}Teacher Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ---------- COLOR PALETTE (from your CSS) ---------- */
+  :root{
+    --light:#b8f2c2;      /* light green  */
+    --medium:#70c779;     /* medium green */
+    --dark:#2f6a34;       /* dark green   */
+    --text-dark:#103b0f;  /* deep green text */
+    --text-light:#e4fbe4; /* light text on dark bg */
+
+    --card-bg:#ffffff;
+    --radius:12px;
+    --shadow:0 6px 18px rgba(0,0,0,.08);
+    --shadow-sm:0 2px 8px rgba(0,0,0,.06);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',Tahoma,sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--medium);
+    color:#fff;
+  }
+
+  /* If your base has a navbar/footer, colors will fit */
+  .navbar{
+    background:var(--light);
+    color:var(--text-dark);
+    padding:1rem 2rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .site-name{font-size:1.35rem;font-weight:600}
+
+  .footer{
+    background:var(--dark);
+    color:var(--text-light);
+    text-align:center;
+    padding:1rem;
+    font-size:.9rem;
+  }
+
+  /* ---------- Page-specific ---------- */
+  h2,h3{
+    color:var(--text-dark);
+    margin-bottom:.75rem;
+  }
+  a{
+    color:var(--dark);
+    text-decoration:none;
+  }
+  a:hover{
+    text-decoration:underline;
+  }
+
+  .welcome{
+    margin:.5rem 0 1.25rem;
+    color:var(--text-light);
+  }
+
+  /* Action cards */
+  .action-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+    margin:1.5rem 0;
+    justify-content:center;
+  }
+  .action-card{
+    background:var(--light);
+    color:var(--text-dark);
+    padding:1rem 1.25rem;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+    transition:transform .12s ease, box-shadow .12s ease;
+    font-weight:500;
+    min-width:180px;
+    text-align:center;
+  }
+  .action-card:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow);
+    text-decoration:none;
+  }
+
+  /* Table */
+  table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    background:var(--card-bg);
+    box-shadow:var(--shadow);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin:1rem 0 2rem;
+    color:var(--text-dark);
+  }
+  thead{
+    background:var(--dark);
+    color:var(--text-light);
+  }
+  thead th{
+    padding:.75rem .9rem;
+    font-weight:600;
+    text-align:left;
+    font-size:.9rem;
+  }
+  tbody td{
+    padding:.8rem .9rem;
+    border-bottom:1px solid #e5e7eb;
+    font-size:.9rem;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#f0fff4;}
+
+  /* Status badges */
+  .badge{
+    display:inline-block;
+    padding:.25rem .55rem;
+    border-radius:999px;
+    font-size:.75rem;
+    font-weight:600;
+  }
+  .badge--ok{background:#dcfce7;color:#166534;}
+  .badge--warn{background:#fee2e2;color:#991b1b;}
+
+  /* Pagination */
+  .pagination{
+    display:flex;
+    gap:.4rem;
+    justify-content:center;
+    margin:1.5rem 0 0;
+    flex-wrap:wrap;
+  }
+  .pagination a,
+  .pagination span{
+    display:inline-block;
+    min-width:36px;
+    padding:.45rem .75rem;
+    background:var(--light);
+    color:var(--text-dark);
+    border:1px solid rgba(0,0,0,.05);
+    border-radius:8px;
+    text-align:center;
+    font-size:.85rem;
+    box-shadow:var(--shadow-sm);
+  }
+  .pagination a:hover{
+    box-shadow:var(--shadow);
+    text-decoration:none;
+  }
+  .pagination .active{
+    background:var(--dark);
+    color:var(--text-light);
+    border-color:var(--dark);
+    pointer-events:none;
+  }
+
+  /* Responsive tweak */
+  @media(max-width:600px){
+    .navbar{flex-direction:column;gap:.5rem;text-align:center}
+  }
+</style>
+{% endblock %}
 
 {% block content %}
   <h2>Teacher Portal</h2>
 
   {% if not request.user.is_authenticated %}
-    <p><a href="{% url 'group3:teacher_login' %}">Login</a></p>
-    <p><a href="{% url 'group3:teacher_signup' %}">Signup</a></p>
+    <div class="action-grid">
+      <a class="action-card" href="{% url 'group3:teacher_login' %}">Login</a>
+      <a class="action-card" href="{% url 'group3:teacher_signup' %}">Signup</a>
+    </div>
   {% else %}
-    <p>Welcome, {{ request.user.username }}!</p>
-    <p>
-      <a href="{% url 'group3:teacher_profile' %}">View Profile</a> |
-      <a href="{% url 'group3:teacher_logout' %}">Logout</a> |
-    <a href="{% url 'group3:edit_profile' %}">Edit Profile</a> |
-    <a href="{% url 'group3:view_reviews' %}">View Reviews</a> |
-    </p>
-    <p><a href="{% url 'group3:create_timeslot' %}">Add A New Timeslot</a></p>
+    <p class="welcome">Welcome, <strong>{{ request.user.username }}</strong>!</p>
+
+    <div class="action-grid">
+      <a class="action-card" href="{% url 'group3:teacher_profile' %}">View Profile</a>
+      <a class="action-card" href="{% url 'group3:edit_profile' %}">Edit Profile</a>
+      <a class="action-card" href="{% url 'group3:view_reviews' %}">View Reviews</a>
+      <a class="action-card" href="{% url 'group3:create_timeslot' %}">Add a New Timeslot</a>
+      <a class="action-card" href="{% url 'group3:teacher_logout' %}">Logout</a>
+    </div>
 
     {% if timeslots %}
-      <h3>Your Timeslots:</h3>
+      <h3>Your Timeslots</h3>
       <table>
         <thead>
           <tr>
@@ -27,7 +196,7 @@
             <th>End Time</th>
             <th>Day</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th style="width:110px;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -38,9 +207,9 @@
               <td>{{ timeslot.day_name }}</td>
               <td>
                 {% if timeslot.is_booked %}
-                  Booked
+                  <span class="badge badge--warn">Booked</span>
                 {% else %}
-                  Available
+                  <span class="badge badge--ok">Available</span>
                 {% endif %}
               </td>
               <td>
@@ -54,6 +223,29 @@
           {% endfor %}
         </tbody>
       </table>
+
+      {% if page_obj %}
+        <nav class="pagination" aria-label="Timeslot pages">
+          {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo;</a>
+            <a href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="active">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+
     {% else %}
       <p>You have no timeslots yet.</p>
     {% endif %}
