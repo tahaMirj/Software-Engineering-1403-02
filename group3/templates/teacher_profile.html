@@ -5,6 +5,36 @@
 {% block content %}
   <h2 class="text-2xl font-bold mb-4">Teacher Profile</h2>
 
+  {# ATTACHMENTS (show image instead of link) #}
+  {% for att in teacher.attachments.all %}
+    {% with url=att.upload.url|lower ext4=url|slice:"-4:" ext5=url|slice:"-5:" %}
+      {% if ext4 == ".jpg" or ext5 == ".jpeg" or ext4 == ".png" or ext4 == ".gif" %}
+        <img
+          src="{{ att.upload.url }}"
+          alt="{{ att.filename }}"
+          class="w-32 h-32 rounded-full object-cover mb-4"
+        >
+      {% elif ext4 == ".mp4" or ext5 == ".webm" %}
+        <div class="mb-4">
+          🎥 {{ att.filename }}<br>
+          <video width="320" controls class="mt-2">
+            <source src="{{ att.upload.url }}">
+          </video>
+        </div>
+      {% elif ext4 == ".pdf" %}
+        <div class="mb-4">
+          📄 {{ att.filename }}<br>
+          <iframe src="{{ att.upload.url }}" class="w-full h-96 mt-2" title="{{ att.filename }}"></iframe>
+        </div>
+      {% else %}
+        <p class="mb-3">📎 <a href="{{ att.upload.url }}" target="_blank">{{ att.filename }}</a></p>
+      {% endif %}
+    {% endwith %}
+  {% empty %}
+    {# No attachments. Either show nothing or hard-code a default image: #}
+    <!-- <img src="/static/img/default-profile.png" alt="Default profile" class="w-32 h-32 rounded-full object-cover mb-4"> -->
+  {% endfor %}
+
   <p><strong>Name:</strong> {{ teacher.name }}</p>
   <p><strong>Email:</strong> {{ teacher.email }}</p>
   <p><strong>Phone Number:</strong> {{ teacher.phone_number|default:"Not provided" }}</p>

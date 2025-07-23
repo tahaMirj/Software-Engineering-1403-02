@@ -108,3 +108,21 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review for {self.teacher.name} ({self.rating}/5)"
+
+
+class TeacherAttachment(models.Model):
+    teacher = models.ForeignKey(
+        'Teacher',
+        on_delete=models.CASCADE,
+        related_name='attachments'
+    )
+    upload = models.FileField(
+        upload_to='teacher_attachments/%Y/%m/%d/'
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def filename(self):
+        return self.upload.name.rsplit('/', 1)[-1]
+
+    def __str__(self):
+        return self.filename()

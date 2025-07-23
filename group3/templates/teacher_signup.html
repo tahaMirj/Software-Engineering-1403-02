@@ -1,32 +1,46 @@
-<h2>Become A Teacher</h2>
-<p style="margin-bottom:1rem; color:#555;">
-  Use an existing account: enter the <strong>username</strong> and <strong>password</strong> you already created.
-  We’ll verify them and then save your teacher details.
-</p>
+{% extends "groups/groups_base.html" %}
+{% block title %}Become A Teacher{% endblock %}
 
-{% if error %}
-  <p style="color: red;">{{ error }}</p>
-{% endif %}
+{% block content %}
+  <h2>Become A Teacher</h2>
+  <p style="margin-bottom:1rem; color:#555;">
+    Use an existing account: enter the <strong>username</strong> and <strong>password</strong> you already created.
+    We’ll verify them and then save your teacher details.
+  </p>
 
-<form method="post">
-  {% csrf_token %}
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+  {% endif %}
 
-  <label>Username:</label>
-  <input type="text" name="username" value="{{ request.POST.username }}" required><br>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 
-  <label>Password:</label>
-  <input type="password" name="password" required><br>
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username" value="{{ request.POST.username }}" required><br><br>
 
-  <label>Name:</label>
-  <input type="text" name="name" value="{{ request.POST.name }}" required><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
 
-  <label>Email:</label>
-  <input type="email" name="email" value="{{ request.POST.email }}" required><br>
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" value="{{ request.POST.name }}" required><br><br>
 
-  <label>Language:</label>
-  <input type="text" name="language" value="{{ request.POST.language }}" required><br>
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" value="{{ request.POST.email }}" required><br><br>
 
-  <button type="submit">Sign Up</button>
-</form>
+    <label for="language">Language:</label><br>
+    <input type="text" id="language" name="language" value="{{ request.POST.language }}" required><br><br>
 
-<p>Don't have an account? <a href="{% url 'signup' %}">Signup here</a></p>
+    <label for="profile_picture">Profile Picture (optional):</label><br>
+    <input type="file" id="profile_picture" name="profile_picture" accept="image/*"><br><br>
+
+    <label for="resume">Resume (PDF, optional):</label><br>
+    <input type="file" id="resume" name="resume" accept="application/pdf"><br><br>
+
+    <label for="intro_video">Introductory Video (optional):</label><br>
+    <input type="file" id="intro_video" name="intro_video" accept="video/*"><br><br>
+
+    <button type="submit">Confirm</button>
+  </form>
+
+  <p>Don't have an account? <a href="{% url 'signup' %}">Signup here</a></p>
+{% endblock %}

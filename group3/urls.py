@@ -1,6 +1,7 @@
-from django.urls import path
 from . import views
-
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = 'group3'
 urlpatterns = [
@@ -23,3 +24,5 @@ urlpatterns = [
     path('student/teachers/<int:teacher_id>/review/', views.add_review, name='add_review'),
     path('reviews/', views.view_reviews, name='view_reviews'),
 ]
+
+

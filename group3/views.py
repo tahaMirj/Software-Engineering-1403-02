@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
-from .models import Teacher, TimeSlot, Session, Review
+from .models import Teacher, TimeSlot, Session, Review, TeacherAttachment
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -46,18 +46,42 @@ def teacher_signup(request):
         email     = request.POST.get('email')
         language  = request.POST.get('language')
 
+        # Files (optional)
+        pic_file    = request.FILES.get('profile_picture')
+        resume_file = request.FILES.get('resume')
+        video_file  = request.FILES.get('intro_video')
+
         user = authenticate(request, username=username, password=password)
         if user is None:
-            return render(request, 'teacher_signup.html', {'error': 'Invalid username or password.'})
+            return render(request, 'teacher_signup.html', {
+                'error': 'Invalid username or password.'
+            })
 
         if Teacher.objects.filter(user=user).exists():
-            return render(request, 'teacher_signup.html', {'error': 'This account is already a teacher.'})
+            return render(request, 'teacher_signup.html', {
+                'error': 'This account is already a teacher.'
+            })
 
         if Teacher.objects.filter(email=email).exists():
-            return render(request, 'teacher_signup.html', {'error': 'A teacher with this email already exists.'})
+            return render(request, 'teacher_signup.html', {
+                'error': 'A teacher with this email already exists.'
+            })
 
         with transaction.atomic():
-            Teacher.objects.create(user=user, name=name, email=email, language=language)
+            teacher = Teacher.objects.create(
+                user=user,
+                name=name,
+                email=email,
+                language=language
+            )
+
+            # Create attachments if provided
+            for upload in (pic_file, resume_file, video_file):
+                if upload:
+                    TeacherAttachment.objects.create(
+                        teacher=teacher,
+                        upload=upload
+                    )
 
         login(request, user)
         messages.success(request, 'Teacher profile created!')
