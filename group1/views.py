@@ -36,10 +36,10 @@ def start_grammar_quiz(request):
         )
     
     # Store quiz ID in session to track current quiz
-    request.session['current_grammar_quiz_id'] = quiz.id
+    request.session['current_vocabulary_quiz_id'] = quiz.id
     
     # Redirect to the first question
-    return redirect('group1:grammar_quiz_question')
+    return redirect('group1:vocabulary_quiz_question')
 
 def grammar_quiz_question(request):
     # Get the current quiz from session
@@ -59,7 +59,7 @@ def grammar_quiz_question(request):
     
     if not quiz_questions.exists():
         messages.error(request, 'No questions found for this quiz.')
-        return redirect('group1:group1')
+        return redirect('group1:home')
     
     total_questions = quiz_questions.count()
     current_index = quiz.current_question_index
@@ -116,6 +116,14 @@ def grammar_quiz_question(request):
     else:
         next_url = 'group1:grammar_quiz_question'
     
+    # Data for JavaScript
+    js_data = {
+        'show_feedback': show_feedback,
+        'is_correct': is_correct,
+        'correct_choice_id': correct_choice.id if correct_choice else None,
+        'user_answer_id': int(user_answer) if user_answer else None,
+    }
+
     context = {
         'quiz': quiz,
         'question': question,
@@ -123,21 +131,132 @@ def grammar_quiz_question(request):
         'current_index': current_index + 1,  # Display as 1-based
         'total_questions': total_questions,
         'quiz_progress': quiz_progress,
-        'user_answer': user_answer,
-        'is_correct': is_correct,
-        'correct_choice': correct_choice,
         'show_feedback': show_feedback,
         'next_url': next_url,
         'quiz_title': 'Grammar Quiz',
+        'js_data': js_data,
     }
     return render(request, 'grammar_quiz_question.html', context)
 
+def start_vocabulary_quiz(request):
+    """
+    Create a new vocabulary quiz instance with 10 random vocabulary questions
+    """
+    # Create a new quiz instance
+    quiz = Quiz.objects.create(
+        title='Vocabulary Quiz',
+        user_id=1,  # Placeholder user ID
+        status='not_started'
+    )
+    
+    # Get 10 random vocabulary questions
+    vocabulary_questions = Question.objects.filter(type='VOCAB').order_by('?')[:10]
+    
+    if vocabulary_questions.count() < 10:
+        messages.error(request, 'Not enough vocabulary questions available in the database.')
+        return redirect('group1:home')
+    
+    # Create QuizQuestion instances for each selected question
+    for question in vocabulary_questions:
+        QuizQuestion.objects.create(
+            quiz=quiz,
+            question=question,
+            user_answer=None,
+            is_correct=False
+        )
+    
+    # Store quiz ID in session to track current quiz
+    request.session['current_vocabulary_quiz_id'] = quiz.id
+    
+    # Redirect to the first question
+    return redirect('group1:vocabulary_quiz_question')
+
 def vocabulary_quiz_question(request):
+    # Get the current quiz from session
+    quiz_id = request.session.get('current_vocabulary_quiz_id')
+    if not quiz_id:
+        # No active quiz, redirect to start a new one
+        return redirect('group1:start_vocabulary_quiz')
+    
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+    except Quiz.DoesNotExist:
+        # Quiz doesn't exist, start a new one
+        return redirect('group1:start_vocabulary_quiz')
+    
+    quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('id')
+    
+    if not quiz_questions.exists():
+        messages.error(request, 'No questions found for this quiz.')
+        return redirect('group1:home')
+    
+    total_questions = quiz_questions.count()
+    current_index = quiz.current_question_index
+    
+    # Check if quiz is completed
+    if current_index >= total_questions:
+        return redirect('group1:quiz_complete', quiz_id=quiz.id)
+    
+    # Get current question
+    current_quiz_question = quiz_questions[current_index]
+    question = current_quiz_question.question
+    choices = Choice.objects.filter(question=question).order_by('id')
+    
+    # Calculate progress
+    quiz_progress = int(((current_index + 1) / total_questions) * 100)
+    
+    # Handle form submission
+    user_answer = None
+    is_correct = None
+    correct_choice = None
+    show_feedback = False
+    
+    if request.method == 'POST':
+        if 'submit_answer' in request.POST:
+            # Process answer submission
+            user_answer = request.POST.get('user_answer')
+            correct_choice = choices.filter(is_correct=True).first()
+            
+            if user_answer and correct_choice:
+                is_correct = (int(user_answer) == correct_choice.id)
+                
+                # Update the quiz question with user's answer
+                current_quiz_question.user_answer = user_answer
+                current_quiz_question.is_correct = is_correct
+                current_quiz_question.save()
+                
+                show_feedback = True
+            
+        elif 'next_question' in request.POST:
+            # Move to next question
+            quiz.current_question_index += 1
+            if quiz.current_question_index >= total_questions:
+                quiz.status = 'completed'
+            else:
+                quiz.status = 'in_progress'
+            quiz.save()
+            
+            # Redirect to avoid form resubmission
+            return redirect('group1:vocabulary_quiz_question')
+    
+    # Data for JavaScript
+    js_data = {
+        'show_feedback': show_feedback,
+        'is_correct': is_correct,
+        'correct_choice_id': correct_choice.id if correct_choice else None,
+        'user_answer_id': int(user_answer) if user_answer else None,
+    }
+
     context = {
+        'quiz': quiz,
+        'question': question,
+        'choices': choices,
+        'current_index': current_index + 1,  # Display as 1-based
+        'total_questions': total_questions,
+        'quiz_progress': quiz_progress,
+        'show_feedback': show_feedback,
         'quiz_title': 'Vocabulary Quiz',
-        'current_index': 1,
-        'total_questions': 5,
-        'quiz_progress': 20,
+        'js_data': js_data,
     }
     return render(request, 'vocabulary_quiz_question.html', context)
 

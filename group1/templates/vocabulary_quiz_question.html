@@ -1,7 +1,7 @@
 {% extends "quiz_frame.html" %}
 {% block quiz_content %}
 <style>
-    /* Reusing styles from grammar_quiz_question.html for consistency */
+    /* Using shared styles for consistency */
     .option-btn {
         background-color: #23232b;
         border: 1.5px solid #4B5563;
@@ -12,9 +12,7 @@
         padding: 1.1rem 1.2rem;
         margin-bottom: 0.5rem;
         text-align: left;
-        transition: border 0.18s, color 0.18s, box-shadow 0.18s;
-        outline: none;
-        box-shadow: none;
+        transition: all 0.2s;
         cursor: pointer;
     }
     .option-btn:not(:disabled):hover {
@@ -40,33 +38,17 @@
         color: #fff;
         animation: shake-wrong 0.25s;
     }
-    .question-text-vocab {
+    .question-text {
         font-size: 1.2rem;
         color: #fff;
         line-height: 1.6;
     }
-    .question-text-vocab .blank {
-        display: inline-block;
-        width: 120px;
-        height: 2px;
-        background-color: #4B5563;
-        vertical-align: baseline;
-        margin: 0 4px;
-    }
-    #next-btn {
+    #submit-btn, #next-btn {
         outline: none !important;
         box-shadow: none !important;
-        background: #7c5cff;
-        color: #fff;
-        cursor: pointer;
-        font-size: 1rem;
-        padding: 0.8rem 2.2rem;
-        border-radius: 0.5rem;
-        border: none;
     }
-    #next-btn:disabled {
-        background-color: #5a4a9c;
-        cursor: not-allowed;
+    #feedback {
+        animation: fadeIn 0.4s;
     }
     @keyframes pop-correct {
         0% { transform: scale(1); } 60% { transform: scale(1.08); } 100% { transform: scale(1); }
@@ -74,79 +56,106 @@
     @keyframes shake-wrong {
         0% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } 100% { transform: translateX(0); }
     }
+    @keyframes fadeIn {
+        from { opacity: 0; } to { opacity: 1; }
+    }
 </style>
 
 <!-- Question Text -->
 <div style="margin-bottom: 2rem;">
-    <p class="question-text-vocab">A person who is fluent in many languages is known as a<span class="blank"></span>.</p>
+    <p class="question-text">{{ question.text_or_prompt|safe }}</p>
 </div>
 
-<!-- Answer Options -->
-<div id="options-container" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
-    <button type="button" class="option-btn" data-choice-id="1">Linguist</button>
-    <button type="button" class="option-btn" data-choice-id="2">Polyglot</button>
-    <button type="button" class="option-btn" data-choice-id="3">Bilingual</button>
-    <button type="button" class="option-btn" data-choice-id="4">Orator</button>
-</div>
+<!-- Form for answer submission -->
+<form method="post" id="quiz-form">
+    {% csrf_token %}
+    
+    <!-- Answer Options -->
+    <div id="options-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+        {% for choice in choices %}
+            <label class="option-btn start-btn" data-choice-id="{{ choice.id }}" tabindex="0" aria-pressed="false">
+                <input type="radio" name="user_answer" value="{{ choice.id }}" style="display: none;">
+                {{ choice.text }}
+            </label>
+        {% endfor %}
+    </div>
+    
+    <!-- Action Buttons -->
+    <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+        {% if not show_feedback %}
+            <button type="submit" name="submit_answer" id="submit-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;" disabled>Submit Answer</button>
+        {% else %}
+            <button type="submit" name="next_question" id="next-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;">Next Question</button>
+        {% endif %}
+    </div>
+</form>
 
-<!-- Action Button -->
-<div style="display: flex; justify-content: flex-end;">
-    <button id="next-btn" disabled>Next</button>
-</div>
+{{ js_data|json_script:"js-data" }}
 
 <!-- Feedback -->
-<div id="feedback" style="margin-top: 1.5rem; min-height: 24px;"></div>
+{% if show_feedback %}
+<div id="feedback" style="margin-top: 1.5rem;">
+    {% if js_data.is_correct %}
+        <span style="color: #4caf50; font-weight: 600;">Correct! 🎉</span>
+    {% else %}
+        <span style="color: #ff5252; font-weight: 600;">Incorrect.</span>
+        <span style="color: #b0b0b0;"> Correct answer: <b>{{ correct_choice.text }}</b></span>
+    {% endif %}
+</div>
+{% endif %}
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const jsData = JSON.parse(document.getElementById('js-data').textContent);
+    const showFeedback = jsData.show_feedback;
+    const isCorrect = jsData.is_correct;
+    const correctChoiceId = jsData.correct_choice_id;
+    const userAnswerId = jsData.user_answer_id;
+
     const optionsContainer = document.getElementById('options-container');
-    const nextBtn = document.getElementById('next-btn');
-    const feedbackDiv = document.getElementById('feedback');
+    const submitBtn = document.getElementById('submit-btn');
     let selectedOption = null;
-    let answered = false;
-    const correctChoiceId = '2'; // Mock data: Polyglot is correct
+
+    if (showFeedback) {
+        optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            const choiceId = btn.getAttribute('data-choice-id');
+            
+            if (choiceId == userAnswerId) {
+                btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                btn.classList.add('selected');
+            }
+            if (choiceId == correctChoiceId) {
+                btn.classList.add('correct');
+            }
+        });
+        return;
+    }
 
     optionsContainer.addEventListener('click', function(e) {
-        if (answered || !e.target.classList.contains('option-btn')) return;
-
+        const label = e.target.closest('.option-btn');
+        if (!label) return;
+        
         if (selectedOption) {
             selectedOption.classList.remove('selected');
+            selectedOption.setAttribute('aria-pressed', 'false');
         }
-        selectedOption = e.target;
+        
+        selectedOption = label;
         selectedOption.classList.add('selected');
-        nextBtn.disabled = false;
+        selectedOption.setAttribute('aria-pressed', 'true');
+        
+        const input = label.querySelector('input[type="radio"]');
+        if (input) input.checked = true;
+        
+        if (submitBtn) submitBtn.disabled = false;
     });
 
-    nextBtn.addEventListener('click', function() {
-        if (!selectedOption || answered) return;
-        
-        if (nextBtn.textContent === 'Continue') {
-            // Here you would typically navigate to the next question.
-            // For this mock, we'll just log to console.
-            console.log('Moving to the next question...');
-            return;
+    optionsContainer.addEventListener('keydown', function(e) {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('option-btn')) {
+            e.preventDefault();
+            e.target.click();
         }
-
-        answered = true;
-        const isCorrect = selectedOption.getAttribute('data-choice-id') === correctChoiceId;
-
-        if (isCorrect) {
-            selectedOption.classList.remove('selected');
-            selectedOption.classList.add('correct');
-            feedbackDiv.innerHTML = '<span style="color: #4caf50; font-weight: 600;">Correct! 🎉</span>';
-        } else {
-            selectedOption.classList.remove('selected');
-            selectedOption.classList.add('incorrect');
-            const correctButton = optionsContainer.querySelector(`[data-choice-id="${correctChoiceId}"]`);
-            correctButton.classList.add('correct');
-            feedbackDiv.innerHTML = '<span style="color: #ff5252; font-weight: 600;">Not quite. The correct answer is Polyglot.</span>';
-        }
-
-        optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-            btn.disabled = true;
-        });
-
-        nextBtn.textContent = 'Continue';
     });
 });
 </script>

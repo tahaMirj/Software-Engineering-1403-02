@@ -118,6 +118,8 @@
     </div>
 </form>
 
+{{ js_data|json_script:"js-data" }}
+
 <!-- Feedback -->
 {% if show_feedback %}
 <div id="feedback" style="margin-top: 1.5rem;">
@@ -132,14 +134,17 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const jsData = JSON.parse(document.getElementById('js-data').textContent);
+        const showFeedback = jsData.show_feedback;
+        const isCorrect = jsData.is_correct;
+        const correctChoiceId = jsData.correct_choice_id;
+        const userAnswerId = jsData.user_answer_id;
+
         const optionsContainer = document.getElementById('options-container');
         const submitBtn = document.getElementById('submit-btn');
         const form = document.getElementById('quiz-form');
         let selectedOption = null;
-        const showFeedback = {{ show_feedback|yesno:'true,false' }};
-        const isCorrect = {% if is_correct %}true{% elif is_correct == False %}false{% else %}null{% endif %};
-        const correctChoiceId = {{ correct_choice.id|default:'null' }};
-        
+
         // If feedback is already shown, disable all options
         if (showFeedback) {
             optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
