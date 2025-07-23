@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import Quiz, Question, Choice, QuizQuestion
 from django.contrib import messages
+import random
+import string
 
 # Create your views here.
 
@@ -278,12 +280,112 @@ def writing_quiz_question(request):
     }
     return render(request, 'writing_quiz_question.html', context)
 
+def start_sentence_building_quiz(request):
+    # Create a new quiz instance
+    quiz = Quiz.objects.create(
+        title='Sentence Building Quiz',
+        user_id=1,  # Placeholder user ID
+        status='not_started'
+    )
+    
+    # Get 10 random sentence building questions
+    sentence_questions = Question.objects.filter(type='SENTENCE').order_by('?')[:10]
+    
+    if sentence_questions.count() < 10:
+        messages.error(request, 'Not enough sentence building questions available in the database.')
+        return redirect('group1:home')
+    
+    # Create QuizQuestion instances for each selected question
+    for question in sentence_questions:
+        QuizQuestion.objects.create(
+            quiz=quiz,
+            question=question,
+            user_answer=None,
+            is_correct=False
+        )
+    
+    # Store quiz ID in session to track current quiz
+    request.session['current_sentence_building_quiz_id'] = quiz.id
+    
+    # Redirect to the first question
+    return redirect('group1:sentence_building_question')
+
 def sentence_building_question(request):
+    quiz_id = request.session.get('current_sentence_building_quiz_id')
+    if not quiz_id:
+        return redirect('group1:start_sentence_building_quiz')
+
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+    except Quiz.DoesNotExist:
+        return redirect('group1:start_sentence_building_quiz')
+
+    quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('id')
+    if not quiz_questions.exists():
+        messages.error(request, 'No questions found for this quiz.')
+        return redirect('group1:home')
+
+    total_questions = quiz_questions.count()
+    current_index = quiz.current_question_index
+
+    if current_index >= total_questions:
+        return redirect('group1:quiz_complete', quiz_id=quiz.id)
+
+    current_quiz_question = quiz_questions[current_index]
+    question = current_quiz_question.question
+    
+    # The correct sentence is stored in text_or_prompt
+    correct_sentence = question.correct_text_answer
+    # The words to scramble are in word_list, assumed to be comma-separated
+    words_to_scramble = [word.strip() for word in question.word_list]
+    random.shuffle(words_to_scramble)
+
+    show_feedback = False
+    is_correct = None
+    user_submitted_sentence = ''
+
+    if request.method == 'POST':
+        if 'submit_answer' in request.POST:
+            user_submitted_sentence = request.POST.get('user_answer', '').strip()
+            # Normalize sentences for comparison to handle whitespace, case, and punctuation
+            if correct_sentence:
+                translator = str.maketrans('', '', string.punctuation)
+                normalized_user_answer = user_submitted_sentence.lower().translate(translator)
+                normalized_correct_answer = correct_sentence.lower().translate(translator)
+
+                normalized_user_answer = ' '.join(normalized_user_answer.split())
+                normalized_correct_answer = ' '.join(normalized_correct_answer.split())
+
+                is_correct = normalized_user_answer == normalized_correct_answer
+            else:
+                is_correct = False
+            
+            current_quiz_question.user_answer = user_submitted_sentence
+            current_quiz_question.is_correct = is_correct
+            current_quiz_question.save()
+            show_feedback = True
+
+        elif 'next_question' in request.POST:
+            quiz.current_question_index += 1
+            if quiz.current_question_index >= total_questions:
+                quiz.status = 'completed'
+            else:
+                quiz.status = 'in_progress'
+            quiz.save()
+            return redirect('group1:sentence_building_question')
+
     context = {
-        'quiz_title': 'Sentence Building',
-        'current_index': 4,
-        'total_questions': 5,
-        'quiz_progress': 80,
+        'quiz': quiz,
+        'question': question,
+        'words_to_scramble': words_to_scramble,
+        'correct_sentence': correct_sentence,
+        'current_index': current_index + 1,
+        'total_questions': total_questions,
+        'quiz_progress': int(((current_index + 1) / total_questions) * 100),
+        'show_feedback': show_feedback,
+        'is_correct': is_correct,
+        'user_submitted_sentence': user_submitted_sentence,
+        'quiz_title': 'Sentence Building Quiz',
     }
     return render(request, 'sentence_building_question.html', context)
 
