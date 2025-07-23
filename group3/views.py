@@ -320,21 +320,30 @@ def teacher_detail(request, teacher_id):
     })
 
 
+#method for booking a session from a specific teacher
 @login_required
 def book_timeslot(request, slot_id):
-    # Look up the slot and ensure it's free
     timeslot = get_object_or_404(TimeSlot, id=slot_id)
+    teacher = timeslot.teacher
+
+    # Should not be able to book an already-booked timeslot
     if timeslot.is_booked:
         return render(request, 'book_session.html', {
             'error': 'Sorry, this slot was just booked by someone else.',
+            'timeslot': timeslot,
+            'teacher': teacher,
         })
 
-    teacher = timeslot.teacher
+    # Users should not be able to book their own timeslots
+    if teacher.user == request.user:
+        return render(request, 'book_session.html', {
+            'error': "Sorry, you can't book your own class.",
+            'timeslot': timeslot,
+            'teacher': teacher,
+        })
 
     if request.method == 'POST':
-        # For now, we’ll use the logged-in user’s username as the student_name
         student_name = request.user.username
-        # Default to the teacher’s language
         language = teacher.language
 
         # Create the session
@@ -353,11 +362,12 @@ def book_timeslot(request, slot_id):
 
         return redirect('group3:student_landing')
 
-    # GET: show confirmation form
+    # GET: render the booking confirmation
     return render(request, 'book_session.html', {
         'timeslot': timeslot,
         'teacher': teacher,
     })
+
 
 
 @login_required
@@ -435,5 +445,6 @@ def add_review(request, teacher_id):
     return render(request, 'add_review.html', {
         'teacher': teacher
     })
+
 
 
