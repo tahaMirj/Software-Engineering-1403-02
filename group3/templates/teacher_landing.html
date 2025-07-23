@@ -1,14 +1,16 @@
+{% extends "groups/groups_base.html" %}
+
 {% block title %}Teacher Portal{% endblock %}
 
 {% block extra_css %}
 <style>
-  /* ---------- COLOR PALETTE (from your CSS) ---------- */
+  /* ---------- COLOR PALETTE ---------- */
   :root{
     --light:#b8f2c2;      /* light green  */
     --medium:#70c779;     /* medium green */
     --dark:#2f6a34;       /* dark green   */
     --text-dark:#103b0f;  /* deep green text */
-    --text-light:#e4fbe4; /* light text on dark bg */
+    --text-light:#e4fbe4; /* light text */
 
     --card-bg:#ffffff;
     --radius:12px;
@@ -19,51 +21,10 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     font-family:'Segoe UI',Tahoma,sans-serif;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
     background:var(--medium);
     color:#fff;
   }
 
-  /* If your base has a navbar/footer, colors will fit */
-  .navbar{
-    background:var(--light);
-    color:var(--text-dark);
-    padding:1rem 2rem;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .site-name{font-size:1.35rem;font-weight:600}
-
-  .footer{
-    background:var(--dark);
-    color:var(--text-light);
-    text-align:center;
-    padding:1rem;
-    font-size:.9rem;
-  }
-
-  /* ---------- Page-specific ---------- */
-  h2,h3{
-    color:var(--text-dark);
-    margin-bottom:.75rem;
-  }
-  a{
-    color:var(--dark);
-    text-decoration:none;
-  }
-  a:hover{
-    text-decoration:underline;
-  }
-
-  .welcome{
-    margin:.5rem 0 1.25rem;
-    color:var(--text-light);
-  }
-
-  /* Action cards */
   .action-grid{
     display:flex;
     flex-wrap:wrap;
@@ -81,14 +42,13 @@
     font-weight:500;
     min-width:180px;
     text-align:center;
+    text-decoration:none;
   }
   .action-card:hover{
     transform:translateY(-2px);
     box-shadow:var(--shadow);
-    text-decoration:none;
   }
 
-  /* Table */
   table{
     width:100%;
     border-collapse:separate;
@@ -100,154 +60,90 @@
     margin:1rem 0 2rem;
     color:var(--text-dark);
   }
-  thead{
-    background:var(--dark);
-    color:var(--text-light);
-  }
-  thead th{
-    padding:.75rem .9rem;
-    font-weight:600;
-    text-align:left;
-    font-size:.9rem;
-  }
-  tbody td{
-    padding:.8rem .9rem;
-    border-bottom:1px solid #e5e7eb;
-    font-size:.9rem;
-  }
-  tbody tr:last-child td{border-bottom:none;}
-  tbody tr:hover{background:#f0fff4;}
+  thead{background:var(--dark);color:var(--text-light)}
+  thead th{padding:.75rem .9rem;font-weight:600;text-align:left;font-size:.9rem}
+  tbody td{padding:.8rem .9rem;border-bottom:1px solid #e5e7eb;font-size:.9rem}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#f0fff4}
 
-  /* Status badges */
-  .badge{
-    display:inline-block;
-    padding:.25rem .55rem;
-    border-radius:999px;
-    font-size:.75rem;
-    font-weight:600;
-  }
-  .badge--ok{background:#dcfce7;color:#166534;}
-  .badge--warn{background:#fee2e2;color:#991b1b;}
-
-  /* Pagination */
-  .pagination{
-    display:flex;
-    gap:.4rem;
-    justify-content:center;
-    margin:1.5rem 0 0;
-    flex-wrap:wrap;
-  }
-  .pagination a,
-  .pagination span{
-    display:inline-block;
-    min-width:36px;
-    padding:.45rem .75rem;
-    background:var(--light);
-    color:var(--text-dark);
-    border:1px solid rgba(0,0,0,.05);
-    border-radius:8px;
-    text-align:center;
-    font-size:.85rem;
-    box-shadow:var(--shadow-sm);
-  }
-  .pagination a:hover{
-    box-shadow:var(--shadow);
-    text-decoration:none;
-  }
-  .pagination .active{
-    background:var(--dark);
-    color:var(--text-light);
-    border-color:var(--dark);
-    pointer-events:none;
-  }
-
-  /* Responsive tweak */
-  @media(max-width:600px){
-    .navbar{flex-direction:column;gap:.5rem;text-align:center}
-  }
+  .badge{display:inline-block;padding:.25rem .55rem;border-radius:999px;font-size:.75rem;font-weight:600}
+  .badge--ok{background:#dcfce7;color:#166534}
+  .badge--warn{background:#fee2e2;color:#991b1b}
 </style>
 {% endblock %}
 
 {% block content %}
-  <h2>Teacher Portal</h2>
+  <h2 class="text-2xl font-bold mb-4">Teacher Portal</h2>
 
   {% if not request.user.is_authenticated %}
     <div class="action-grid">
       <a class="action-card" href="{% url 'group3:teacher_login' %}">Login</a>
       <a class="action-card" href="{% url 'group3:teacher_signup' %}">Become A Teacher</a>
     </div>
+
   {% else %}
-    <p class="welcome">Welcome, <strong>{{ request.user.username }}</strong>!</p>
+    {% if teacher %}
+      <p class="mb-4">Welcome, <strong>{{ request.user.username }}</strong>!</p>
 
-    <div class="action-grid">
-      <a class="action-card" href="{% url 'group3:teacher_profile' %}">View Profile</a>
-      <a class="action-card" href="{% url 'group3:edit_profile' %}">Edit Profile</a>
-      <a class="action-card" href="{% url 'group3:view_reviews' %}">View Reviews</a>
-      <a class="action-card" href="{% url 'group3:create_timeslot' %}">Add a New Timeslot</a>
-      <a class="action-card" href="{% url 'group3:teacher_logout' %}">Logout</a>
-    </div>
+      <div class="action-grid">
+        <a class="action-card" href="{% url 'group3:teacher_profile' %}">View Profile</a>
+        <a class="action-card" href="{% url 'group3:edit_profile' %}">Edit Profile</a>
+        <a class="action-card" href="{% url 'group3:view_reviews' %}">View Reviews</a>
+        <a class="action-card" href="{% url 'group3:create_timeslot' %}">Add New Timeslot</a>
+        <a class="action-card" href="{% url 'group3:teacher_logout' %}">Logout</a>
+      </div>
 
-    {% if timeslots %}
-      <h3>Your Timeslots</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Day</th>
-            <th>Status</th>
-            <th style="width:110px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for timeslot in timeslots %}
+      {% if timeslots %}
+        <h3 class="text-xl font-semibold mt-6 mb-2">Your Timeslots</h3>
+        <table>
+          <thead>
             <tr>
-              <td>{{ timeslot.start_time|date:"Y-m-d H:i" }}</td>
-              <td>{{ timeslot.end_time|date:"Y-m-d H:i" }}</td>
-              <td>{{ timeslot.day_name }}</td>
-              <td>
-                {% if timeslot.is_booked %}
-                  <span class="badge badge--warn">Booked</span>
-                {% else %}
-                  <span class="badge badge--ok">Available</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if not timeslot.is_booked %}
-                  <a href="{% url 'group3:edit_timeslot' timeslot.id %}">Edit</a>
-                {% else %}
-                  &mdash;
-                {% endif %}
-              </td>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Day</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      {% if page_obj %}
-        <nav class="pagination" aria-label="Timeslot pages">
-          {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo;</a>
-            <a href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
-          {% endif %}
-
-          {% for num in page_obj.paginator.page_range %}
-            {% if num == page_obj.number %}
-              <span class="active">{{ num }}</span>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-              <a href="?page={{ num }}">{{ num }}</a>
-            {% endif %}
-          {% endfor %}
-
-          {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
-          {% endif %}
-        </nav>
+          </thead>
+          <tbody>
+            {% for timeslot in timeslots %}
+              <tr>
+                <td>{{ timeslot.start_time|date:"Y-m-d H:i" }}</td>
+                <td>{{ timeslot.end_time|date:"Y-m-d H:i" }}</td>
+                <td>{{ timeslot.day_name }}</td>
+                <td>
+                  {% if timeslot.is_booked %}
+                    <span class="badge badge--warn">Booked</span>
+                  {% else %}
+                    <span class="badge badge--ok">Available</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if not timeslot.is_booked %}
+                    <a href="{% url 'group3:edit_timeslot' timeslot.id %}">Edit</a>
+                  {% else %}
+                    &mdash;
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>You have no timeslots yet.</p>
       {% endif %}
 
     {% else %}
-      <p>You have no timeslots yet.</p>
+      <p class="mb-4">Hi {{ request.user.username }}, you haven’t set up your teacher profile yet.</p>
+      <div class="action-grid">
+        <a class="action-card" href="{% url 'group3:teacher_signup' %}">Become A Teacher</a>
+      </div>
     {% endif %}
   {% endif %}
+
+  <p class="mt-6">
+    <a href="{% url 'group3:group3' %}" class="text-white hover:underline">
+      &larr; Back to Home
+    </a>
+  </p>
 {% endblock %}

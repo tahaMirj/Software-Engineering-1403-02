@@ -83,24 +83,18 @@ def teacher_logout(request):
 
 
 def teacher_landing(request):
-    # If the user isn’t logged in, just render the portal template
-    # (the template itself handles the login/signup links).
-    if not request.user.is_authenticated:
-        return render(request, 'teacher_landing.html')
+    # If the user is logged in, try to fetch their Teacher profile (or get None)
+    teacher = None
+    if request.user.is_authenticated:
+        teacher = Teacher.objects.filter(user=request.user).first()
 
-    # Otherwise, look up their teacher profile and timeslots.
-    try:
-        teacher = Teacher.objects.get(user=request.user)
-    except Teacher.DoesNotExist:
-        # If somehow they have an account but no Teacher profile,
-        # you could redirect or just render with no timeslots.
-        return render(request, 'teacher_landing.html', {
-            'timeslots': []
-        })
+    timeslots = []
+    if teacher:
+        timeslots = TimeSlot.objects.filter(teacher=teacher)
 
-    timeslots = TimeSlot.objects.filter(teacher=teacher)
     return render(request, 'teacher_landing.html', {
-        'timeslots': timeslots
+        'teacher': teacher,
+        'timeslots': timeslots,
     })
 
 
