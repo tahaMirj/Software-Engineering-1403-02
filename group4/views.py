@@ -180,29 +180,6 @@ def reading_list_quiz(request):
     return render(request, 'search_readings.html', context)
 
 
-def reading_detail(request, reading_id):
-    """
-    Reading Detail Information Page
-    
-    Shows detailed information about a specific reading:
-    - Reading title, description, difficulty level
-    - Available accents and audio files
-    - Exercise count and types
-    - User's previous attempts/scores
-    - Options to enter Practice or Quiz mode
-    
-    Args:
-    - reading_id: ID of the reading to display
-    
-    TODO: Fetch reading details from database
-    NOTE: UI layout may change based on design decisions
-    """
-    # TODO: Fetch reading from database or return 404
-    # TODO: Get user's previous attempts if authenticated
-    context = {'reading_id': reading_id}
-    return render(request, 'group4/reading_detail.html', context)
-
-
 def practice_mode(request, reading_id):
     """
     Practice Mode Interface
