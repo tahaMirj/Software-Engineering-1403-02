@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User # Import Django's built-in User model for foreign key relationships
 
 class DifficultyChoices(models.IntegerChoices):
     BEGINNER = 1, 'Beginner'
@@ -60,4 +61,85 @@ class Words(models.Model):
 
     def __str__(self):
         return f"{self.text} ({self.get_difficulty_display()})"
+    
 
+# this table tracks how many times a user has correctly or incorrectly guessed a specific word
+class UserWordStats(models.Model):
+    # stat_id: AutoField as the primary key for each stat entry
+    stat_id = models.AutoField(primary_key=True, verbose_name="Stat ID")
+    
+    # user: ForeignKey to Django's built-in User model
+    # on_delete=models.CASCADE: If a user is deleted, all their associated word stats are also deleted
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        db_column='user_id', 
+        null=False,
+        verbose_name="User"
+    )
+    
+    # word: ForeignKey to Words
+    # on_delete=models.CASCADE: If a word is deleted, its associated stats entries are also deleted
+    word = models.ForeignKey(
+        Words,
+        on_delete=models.CASCADE,
+        db_column='word_id',
+        null=False,
+        verbose_name="Word"
+    )
+    
+    correct_count = models.IntegerField(default=0, verbose_name="Correct Guesses")
+
+    incorrect_count = models.IntegerField(default=0, verbose_name="Incorrect Guesses")
+
+    # timestamp: DateTimeField to record when this stat entry was last updated (or created)
+    # auto_now_add=True: Automatically sets the timestamp when the object is first created
+    # this is crucial for retrieving "last N words" for level calculation
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Last Updated")
+
+    class Meta:
+        db_table = 'user_word_stats'
+        verbose_name = "User Word Stat"
+        verbose_name_plural = "User Word Stats"
+        unique_together = ('user', 'word')
+        # Ordering by timestamp ensures that when we query, the most recent stats come last (or first if descending)
+        ordering = ['timestamp']
+
+    def __str__(self):
+        return f"Stats for {self.user.username} on '{self.word.text}': Correct={self.correct_count}, Incorrect={self.incorrect_count}"
+
+# the overall learning level assigned to each user
+class UserLevel(models.Model):
+    # user: OneToOneField establishes a one-to-one relationship with Django's User model
+    # primary_key=True: both the foreign key to User and the primary key for this table
+    # this ensures each user has exactly one UserLevel entry
+    # on_delete=models.CASCADE: If a user is deleted, their associated level entry is also deleted
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        db_column='user_id', 
+        verbose_name="User"
+    )
+    
+    # level: SmallIntegerField to store the user's current level
+    # null=False: Ensures every user has an assigned level
+    level = models.SmallIntegerField(
+        choices=DifficultyChoices.choices,
+        default=DifficultyChoices.BEGINNER,
+        null=False,
+        verbose_name="Current Level"
+    )
+    
+    # updated_at: DateTimeField to record the last time the user's level was updated
+    # auto_now=True: Automatically updates the timestamp every time the object is saved
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Last Updated At")
+
+    class Meta:
+        db_table = 'user_level'
+        verbose_name = "User Level"
+        verbose_name_plural = "User Levels"
+
+    def __str__(self):
+        # get_level_display() is a Django-generated method for fields with choices
+        return f"{self.user.username}'s Level: {self.get_level_display()}"
