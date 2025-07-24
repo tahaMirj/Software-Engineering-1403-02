@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Show Answer page Learnnig Without Limits</title>
+ 
+  <link rel="stylesheet" href="{% static 'group6/showpage.css' %}"/>
+
+
+</head>
+<body>
+  <div class="main-box">
+    <div class="img-box" id="imgBox">
+     
+      <img src="{% static 'group6/apple.jpg' %}" alt="Flash Card" class="flashcard" />
+    </div>
+    <input type="text" id="feedbackInput" class="feedback-input" placeholder="your guess is not true try again">
+    <div class="button-row">
+      <button class="btn" onclick="location.href='{% url "group6:second" %}'">Next</button> 
+      <button class="btn" onclick="location.href='{% url "group6:endsection" %}'">End section</button> 
+    </div>
+  </div>
+
+  <script >
+    
+  </script>
+</body>
+</html>
