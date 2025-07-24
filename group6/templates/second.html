@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>guess page Learnnig Without Limits</title>
+ 
+  <link rel="stylesheet" href="{% static 'group6/secondpage.css' %}">
+
+
+</head>
+<body>
+  <div class="main-box">
+    <div class="img-box" id="imgBox">
+      <img src="{% static 'group6/apple.jpg' %}" alt="Flash Card" class="flashcard" />
+  </div>
+    <input type="text" id="guessInput" class="guess-input" placeholder="Typing  Your guess...">
+    <div class="button-row">
+      <!--<button class="btn" onclick="showImage()">show</button> -->
+      <button class="btn" onclick="location.href='{% url "group6:showpage" %}'"> Show </button> 
+      <button class="btn" onclick="location.href='{% url "group6:endsection" %}'">End Session</button> 
+    </div>
+  </div>
+
+  <script>
+    
+  </script>
+</body>
+</html>

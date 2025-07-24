@@ -1,0 +1,171 @@
+/* Reset & body */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  color: #222;
+}
+
+/* Header */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 10px 30px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.logo {
+  margin-right: auto;
+  font-size: 30px;
+  font-weight: bold;
+  color: #07e307;
+}
+.nav-link {
+  text-decoration: none;
+  color: black;
+  
+}
+.nav-link {
+  text-decoration: none;
+}
+/* Notification */
+.notification {
+  position: relative;
+  font-family: sans-serif;
+}
+
+.notification-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  position: relative;
+  color: black;
+}
+
+.bell-icon {
+  pointer-events: none;
+}
+
+.notification-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 50%;
+  min-width: 20px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.red-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  background: red;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Profile Dropdown */
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background: rgb(246, 243, 243);
+  color: black;
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: none;
+  min-width: 150px;
+  border-radius: 4px;
+  z-index: 1000;
+ 
+}
+.dropdown-menu a {
+  text-decoration: none;
+}
+
+
+.dropdown-menu li {
+  padding: 8px 20px;
+}
+
+.dropdown-menu li:hover {
+  background-color: #eee;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+/* Main Hero Section */
+.hero {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  padding: 90px 60px;
+  background: rgb(243, 240, 240);
+}
+
+.container {
+  background: rgb(244, 242, 242);
+  padding: 60px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.btn {
+  padding: 10px 30px;
+  margin: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background: #b1e9bf;
+  color: rgb(3, 83, 35);
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background: rgb(183, 227, 235);
+}
