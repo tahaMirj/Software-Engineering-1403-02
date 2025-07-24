@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Selection</title>
+    <link rel="stylesheet" href="{% static 'group4/style/style_level.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Level Selection To Test</h1>
+    </header>
+
+    <main>
+        <div class="level-selection">
+            <h2>Select Your Level</h2>
+            <div class="levels">
+                <a href="{% url 'group4:reading_list_quiz' %}?level=A1" class="level" id="level-a1">
+                    <img src="{% static 'group4/images/test/A1.png' %}" alt="A1 Listening Tests">
+                </a>
+                <a href="{% url 'group4:reading_list_quiz' %}?level=A2" class="level" id="level-a2">
+                    <img src="{% static 'group4/images/test/A2.png' %}" alt="A2 Listening Tests">
+                </a>
+                <a href="{% url 'group4:reading_list_quiz' %}?level=B1" class="level" id="level-b1">
+                    <img src="{% static 'group4/images/test/B1.png' %}" alt="B1 Listening Tests">
+                </a>
+                <a href="{% url 'group4:reading_list_quiz' %}?level=B2" class="level" id="level-b2">
+                    <img src="{% static 'group4/images/test/B2.png' %}" alt="B2 Listening Tests">
+                </a>
+                <a href="{% url 'group4:reading_list_quiz' %}?level=C1" class="level" id="level-c1">
+                    <img src="{% static 'group4/images/test/C1.png' %}" alt="C1 Listening Tests">
+                </a>
+                <a href="{% url 'group4:reading_list_quiz' %}?level=C2" class="level" id="level-c2">
+                    <img src="{% static 'group4/images/test/C2.png' %}" alt="C2 Listening Tests">
+                </a>
+            </div>
+            <!-- Button section -->
+            <div class="button-container">
+                <p>Discover your current English level by taking a free online test.</p>
+                <!-- لینک را برای انتقال به سایت در تب جدید اضافه می‌کنیم -->
+                <a href="https://learnenglish.britishcouncil.org/english-levels/online-english-level-test" target="_blank">
+                    <button>Discover your level</button>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Language Learning Project</p>
+    </footer>
+</body>
+</html>

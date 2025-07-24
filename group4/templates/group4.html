@@ -1,7 +1,35 @@
-{% extends "groups/groups_base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening Microservice Project</title>
+    <link rel="stylesheet" href="{% static 'group4/style/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Listening Microservice</h1>
+    </header>
 
-{% block title %}Group 4 Dashboard{% endblock %}
-{% block content %}
-    <h2>Welcome to Group 4</h2>
-    <p>This page shows your microservice status.</p>
-{% endblock %}
+    <main>
+        <section class="option">
+            <img src="{% static 'group4/images/base/prac.png' %}" alt="Practice Mode" class="option-img">
+            <h2>Practice Mode</h2>
+            <p>Listening exercises to improve your skills</p>
+            <a href="{% url 'group4:practice_selection' %}" class="btn">Start</a>
+        </section>
+
+        <section class="option">
+            <img src="{% static 'group4/images/base/test.png' %}" alt="Test Mode" class="option-img">
+            <h2>Test Mode</h2>
+            <p>Listening tests to evaluate your skills</p>
+            <a href="{% url 'group4:quiz_selection' %}" class="btn">Start</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Language Learning Project</p>
+    </footer>
+</body>
+</html>

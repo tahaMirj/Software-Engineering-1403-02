@@ -18,6 +18,12 @@ psycopg2-binary # because group1 uses PostgreSQL and we have no choice but to in
 # tts library
 edge-tts
 
+# audio library
+pydub
+audioop-lts
+ffmpeg
+
+
 # development requirements
 ruff==0.12.3
 isort==5.13.2
