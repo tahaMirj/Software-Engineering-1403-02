@@ -62,11 +62,11 @@
         cursor: default;
         opacity: 1;
     }
-    #next-btn {
+    #submit-btn, #next-btn {
         outline: none !important;
         box-shadow: none !important;
     }
-    #next-btn:focus, #next-btn:active {
+    #submit-btn:focus, #submit-btn:active, #next-btn:focus, #next-btn:active {
         outline: none !important;
         box-shadow: none !important;
     }
@@ -84,97 +84,125 @@
         }
     }
 </style>
+
 <!-- Question Text -->
 <div style="margin-bottom: 2rem;">
     <p class="question-text" style="font-size: 1.1rem; color: #fff;">{{ question.text_or_prompt }}</p>
 </div>
-<!-- Answer Options -->
-<div id="options-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
-    {% for choice in choices %}
-        <button type="button" class="option-btn start-btn" data-choice-id="{{ choice.id }}" tabindex="0" aria-pressed="false">
-            {{ choice.text }}
-        </button>
-    {% endfor %}
-</div>
-<!-- Action Button -->
-<div style="display: flex; justify-content: flex-end;">
-    <button id="next-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;" disabled>Next</button>
-</div>
+
+<!-- Form for answer submission -->
+<form method="post" id="quiz-form">
+    {% csrf_token %}
+    
+    <!-- Answer Options -->
+    <div id="options-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+        {% for choice in choices %}
+            <label class="option-btn start-btn" data-choice-id="{{ choice.id }}" tabindex="0" aria-pressed="false">
+                <input type="radio" name="user_answer" value="{{ choice.id }}" style="display: none;" {% if user_answer and user_answer == choice.id|stringformat:'s' %}checked{% endif %}>
+                {{ choice.text }}
+            </label>
+        {% endfor %}
+    </div>
+    
+    <!-- Action Buttons -->
+    <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+        {% if not show_feedback %}
+            <button type="submit" name="submit_answer" id="submit-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;" disabled>Submit Answer</button>
+        {% else %}
+            {% if next_url %}
+                <button type="submit" name="next_question" id="next-btn" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; cursor: pointer;">Next Question</button>
+            {% else %}
+                <a href="{% url 'group1:quiz_complete' quiz.id %}" class="start-btn" style="font-size: 1rem; padding: 0.8rem 2.2rem; background: #7c5cff; color: #fff; text-decoration: none; display: inline-block;">View Results</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</form>
+
+{{ js_data|json_script:"js-data" }}
+
 <!-- Feedback -->
-<div id="feedback" style="margin-top: 1.5rem; display: none;"></div>
+{% if show_feedback %}
+<div id="feedback" style="margin-top: 1.5rem;">
+    {% if is_correct %}
+        <span style="color: #4caf50; font-weight: 600;">Correct! 🎉</span>
+    {% else %}
+        <span style="color: #ff5252; font-weight: 600;">Incorrect.</span>
+        <span style="color: #b0b0b0;"> Correct answer: <b>{{ correct_choice.text }}</b></span>
+    {% endif %}
+</div>
+{% endif %}
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const optionsContainer = document.getElementById('options-container');
-        const nextBtn = document.getElementById('next-btn');
-        const feedbackDiv = document.getElementById('feedback');
-        let selectedOption = null;
-        let answered = false;
-        // Get correct answer from Django context (as a data attribute)
-        const correctChoiceId = '{{ correct_choice.id }}';
-        const correctChoiceText = '{{ correct_choice.text }}';
+        const jsData = JSON.parse(document.getElementById('js-data').textContent);
+        const showFeedback = jsData.show_feedback;
+        const isCorrect = jsData.is_correct;
+        const correctChoiceId = jsData.correct_choice_id;
+        const userAnswerId = jsData.user_answer_id;
 
+        const optionsContainer = document.getElementById('options-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const form = document.getElementById('quiz-form');
+        let selectedOption = null;
+
+        // If feedback is already shown, disable all options
+        if (showFeedback) {
+            optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+                btn.style.pointerEvents = 'none';
+                const input = btn.querySelector('input[type="radio"]');
+                if (input && input.checked) {
+                    btn.classList.add('selected');
+                    if (isCorrect) {
+                        btn.classList.add('correct');
+                    } else {
+                        btn.classList.add('incorrect');
+                        // Highlight correct answer
+                        optionsContainer.querySelectorAll('.option-btn').forEach(correctBtn => {
+                            const correctInput = correctBtn.querySelector('input[type="radio"]');
+                            if (correctInput && correctInput.value === correctChoiceId) {
+                                correctBtn.classList.add('correct');
+                            }
+                        });
+                    }
+                }
+            });
+            return;
+        }
+        
+        // Handle option selection
+        optionsContainer.addEventListener('click', function(e) {
+            const label = e.target.closest('.option-btn');
+            if (!label) return;
+            
+            // Remove 'selected' from any previously selected option
+            if (selectedOption) {
+                selectedOption.classList.remove('selected');
+                selectedOption.setAttribute('aria-pressed', 'false');
+            }
+            
+            // Add 'selected' to the new one and store it
+            selectedOption = label;
+            selectedOption.classList.add('selected');
+            selectedOption.setAttribute('aria-pressed', 'true');
+            
+            // Check the radio button
+            const input = label.querySelector('input[type="radio"]');
+            if (input) {
+                input.checked = true;
+            }
+            
+            // Enable the submit button
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
+        });
+        
         // Keyboard accessibility: allow Enter/Space to select
         optionsContainer.addEventListener('keydown', function(e) {
-            if (answered) return;
             if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('option-btn')) {
                 e.preventDefault();
-                if (selectedOption) {
-                    selectedOption.classList.remove('selected');
-                    selectedOption.setAttribute('aria-pressed', 'false');
-                }
-                selectedOption = e.target;
-                selectedOption.classList.add('selected');
-                selectedOption.setAttribute('aria-pressed', 'true');
-                nextBtn.disabled = false;
+                e.target.click();
             }
-        });
-        optionsContainer.addEventListener('click', function(e) {
-            if (answered) return; // Don't allow changing after answer
-            if (e.target.classList.contains('option-btn')) {
-                // Remove 'selected' from any previously selected option
-                if (selectedOption) {
-                    selectedOption.classList.remove('selected');
-                    selectedOption.setAttribute('aria-pressed', 'false');
-                }
-                // Add 'selected' to the new one and store it
-                selectedOption = e.target;
-                selectedOption.classList.add('selected');
-                selectedOption.setAttribute('aria-pressed', 'true');
-                // Enable the next button
-                nextBtn.disabled = false;
-            }
-        });
-        nextBtn.addEventListener('click', function() {
-            if (!selectedOption || answered) return;
-            answered = true;
-            // Check if correct
-            const selectedId = selectedOption.getAttribute('data-choice-id');
-            const isCorrect = selectedId === correctChoiceId;
-            // Style feedback
-            if (isCorrect) {
-                selectedOption.classList.remove('selected');
-                selectedOption.classList.add('correct');
-                feedbackDiv.innerHTML = '<span style="color: #4caf50; font-weight: 600;">Correct! 🎉</span>';
-            } else {
-                selectedOption.classList.remove('selected');
-                selectedOption.classList.add('incorrect');
-                // Highlight the correct answer
-                optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-                    if (btn.getAttribute('data-choice-id') === correctChoiceId) {
-                        btn.classList.add('correct');
-                    }
-                });
-                feedbackDiv.innerHTML = '<span style="color: #ff5252; font-weight: 600;">Incorrect.</span>' +
-                    '<span style="color: #b0b0b0;"> Correct answer: <b>' + correctChoiceText + '</b></span>';
-            }
-            // Disable all options after answering
-            optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-                btn.disabled = true;
-            });
-            // Show feedback
-            feedbackDiv.style.display = 'block';
-            // Change button text to Continue
-            nextBtn.textContent = 'Continue';
         });
     });
 </script>
