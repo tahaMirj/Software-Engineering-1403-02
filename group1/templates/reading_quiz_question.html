@@ -2,46 +2,37 @@
 {% load static %}
 {% block quiz_content %}
 <style>
-    .question-text {
+    .reading-container {
+        display: flex;
+        gap: 2rem;
+        color: #e0e0e0;
+    }
+    .passage-section {
+        flex: 1;
+        background-color: #2a2a3e;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .passage-title {
         font-size: 1.2rem;
+        font-weight: bold;
         color: #fff;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
-    .audio-player-wrapper {
-        background-color: #F5F3FF;
-        border-radius: 50px;
-        padding: 0.5rem 1rem;
-        margin-bottom: 2rem;
+    .passage-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #d1d5db;
     }
-    audio {
-        width: 100%;
-        outline: none;
-        border: none;
-        background: transparent;
+    .question-section {
+        flex: 1;
     }
-    audio::-webkit-media-controls-panel {
-        background: transparent;
-    }
-    audio::-webkit-media-controls-play-button,
-    audio::-webkit-media-controls-mute-button {
-        background-color: #7C5CFF;
-        border-radius: 50%;
-    }
-    audio::-webkit-media-controls-timeline {
-        background-color: #DDD6FE;
-        border-radius: 6px;
-        height: 8px;
-        margin: 0 10px;
-    }
-    audio::-webkit-media-controls-volume-slider {
-        background-color: #DDD6FE;
-        border-radius: 6px;
-        height: 8px;
-    }
-    audio::-webkit-media-controls-current-time-display,
-    audio::-webkit-media-controls-time-remaining-display {
-        color: #4C1D95;
+    .question-text {
+        font-size: 1.1rem;
         font-weight: 500;
+        margin-bottom: 1.5rem;
     }
     .options-container {
         display: flex;
@@ -98,37 +89,37 @@
     }
 </style>
 
-<form method="post" action="">
-    {% csrf_token %}
-    <input type="hidden" name="user_answer" id="user-answer-input">
-
-    <!-- Question Text -->
-    <p class="question-text">{{ question.text }}</p>
-
-    <!-- Audio Player -->
-    <div class="audio-player-wrapper">
-        <audio controls>
-            <source src="{{ resolved_voice_url }}" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
+<div class="reading-container">
+    <!-- Passage Section -->
+    <div class="passage-section">
+        <h4 class="passage-title">Reading Passage</h4>
+        <p class="passage-text">{{ passage_text }}</p>
     </div>
 
-    <!-- Answer Options -->
-    <div id="options-container" class="options-container">
-        {% for choice in choices %}
-            <button type="button" class="option-btn" data-choice-id="{{ choice.id }}">{{ choice.text }}</button>
-        {% endfor %}
-    </div>
+    <!-- Question Section -->
+    <div class="question-section">
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="user_answer" id="user-answer-input">
 
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        {% if not show_feedback %}
-            <button type="submit" name="submit_answer" id="submit-btn" class="submit-btn" disabled>Submit</button>
-        {% else %}
-            <button type="submit" name="next_question" class="next-btn">Next Question</button>
-        {% endif %}
+            <p class="question-text">{{ question.text_or_prompt }}</p>
+
+            <div id="options-container" class="options-container">
+                {% for choice in choices %}
+                    <button type="button" class="option-btn" data-choice-id="{{ choice.id }}">{{ choice.text }}</button>
+                {% endfor %}
+            </div>
+
+            <div class="action-buttons">
+                {% if not show_feedback %}
+                    <button type="submit" name="submit_answer" id="submit-btn" class="submit-btn" disabled>Submit</button>
+                {% else %}
+                    <button type="submit" name="next_question" class="next-btn">Next Question</button>
+                {% endif %}
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 {{ js_data|json_script:"js-data" }}
 <script>
@@ -139,19 +130,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const userAnswerInput = document.getElementById('user-answer-input');
     const optionButtons = optionsContainer.querySelectorAll('.option-btn');
 
-    // Handle option selection
     if (!jsData.show_feedback) {
         optionsContainer.addEventListener('click', function(e) {
             if (e.target.classList.contains('option-btn')) {
-                // Clear previous selection
                 optionButtons.forEach(btn => btn.classList.remove('selected'));
-                
-                // Set new selection
                 const selectedBtn = e.target;
                 selectedBtn.classList.add('selected');
                 userAnswerInput.value = selectedBtn.getAttribute('data-choice-id');
-                
-                // Enable submit button
                 if (submitBtn) {
                     submitBtn.disabled = false;
                 }
@@ -159,29 +144,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // If feedback is shown, apply styles and disable buttons
     if (jsData.show_feedback) {
         const correctChoiceId = jsData.correct_choice_id;
         const userAnswerId = jsData.user_answer_id;
 
         optionButtons.forEach(btn => {
             const choiceId = parseInt(btn.getAttribute('data-choice-id'));
-
             if (choiceId === correctChoiceId) {
                 btn.classList.add('correct');
             } else if (choiceId === userAnswerId) {
                 btn.classList.add('incorrect');
             }
-
-            // Mark the selected answer regardless of correctness
             if (choiceId === userAnswerId) {
                 btn.classList.add('selected');
             }
-
-            btn.disabled = true; // Disable all buttons after answering
+            btn.disabled = true;
         });
     }
 });
 </script>
-</div>
 {% endblock %}

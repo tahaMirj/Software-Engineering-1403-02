@@ -1,5 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
+from django.templatetags.static import static
+from django.db.models import F
+from django.templatetags.static import static
 from .models import Quiz, Question, Choice, QuizQuestion
 from django.contrib import messages
 import random
@@ -14,20 +17,24 @@ def start_grammar_quiz(request):
     """
     Create a new grammar quiz instance with 10 random grammar questions
     """
+    # Clear any previous quiz session data to ensure a fresh start
+    if 'current_grammar_quiz_id' in request.session:
+        del request.session['current_grammar_quiz_id']
+
     # Create a new quiz instance
     quiz = Quiz.objects.create(
         title='Grammar Quiz',
         user_id=1,  # Placeholder user ID
-        status='not_started'
+        status='in_progress'
     )
-    
+
     # Get 10 random grammar questions
     grammar_questions = Question.objects.filter(type='GRAMMAR').order_by('?')[:10]
-    
+
     if grammar_questions.count() < 10:
         messages.error(request, 'Not enough grammar questions available in the database.')
-        return redirect('group1:home')
-    
+        return redirect('group1:group1')
+
     # Create QuizQuestion instances for each selected question
     for question in grammar_questions:
         QuizQuestion.objects.create(
@@ -36,12 +43,12 @@ def start_grammar_quiz(request):
             user_answer=None,
             is_correct=False
         )
-    
+
     # Store quiz ID in session to track current quiz
-    request.session['current_vocabulary_quiz_id'] = quiz.id
-    
+    request.session['current_grammar_quiz_id'] = quiz.id
+
     # Redirect to the first question
-    return redirect('group1:vocabulary_quiz_question')
+    return redirect('group1:grammar_quiz_question')
 
 def grammar_quiz_question(request):
     # Get the current quiz from session
@@ -61,7 +68,7 @@ def grammar_quiz_question(request):
     
     if not quiz_questions.exists():
         messages.error(request, 'No questions found for this quiz.')
-        return redirect('group1:home')
+        return redirect('group1:group1')
     
     total_questions = quiz_questions.count()
     current_index = quiz.current_question_index
@@ -144,11 +151,15 @@ def start_vocabulary_quiz(request):
     """
     Create a new vocabulary quiz instance with 10 random vocabulary questions
     """
+    # Clear any previous quiz session data to ensure a fresh start
+    if 'current_vocabulary_quiz_id' in request.session:
+        del request.session['current_vocabulary_quiz_id']
+
     # Create a new quiz instance
     quiz = Quiz.objects.create(
         title='Vocabulary Quiz',
         user_id=1,  # Placeholder user ID
-        status='not_started'
+        status='in_progress'
     )
     
     # Get 10 random vocabulary questions
@@ -156,7 +167,7 @@ def start_vocabulary_quiz(request):
     
     if vocabulary_questions.count() < 10:
         messages.error(request, 'Not enough vocabulary questions available in the database.')
-        return redirect('group1:home')
+        return redirect('group1:group1')
     
     # Create QuizQuestion instances for each selected question
     for question in vocabulary_questions:
@@ -190,7 +201,7 @@ def vocabulary_quiz_question(request):
     
     if not quiz_questions.exists():
         messages.error(request, 'No questions found for this quiz.')
-        return redirect('group1:home')
+        return redirect('group1:group1')
     
     total_questions = quiz_questions.count()
     current_index = quiz.current_question_index
@@ -262,14 +273,247 @@ def vocabulary_quiz_question(request):
     }
     return render(request, 'vocabulary_quiz_question.html', context)
 
+def start_image_quiz(request):
+    """
+    Create a new image quiz instance with 10 random image questions
+    """
+    # Clear any previous quiz session data to ensure a fresh start
+    if 'current_image_quiz_id' in request.session:
+        del request.session['current_image_quiz_id']
+
+    # Create a new quiz instance
+    quiz = Quiz.objects.create(
+        title='Image Quiz',
+        user_id=1,  # Placeholder user ID
+        status='in_progress'
+    )
+    
+    # Get 10 random image questions
+    image_questions = Question.objects.filter(type='IMAGE').order_by('?')[:10]
+    
+    if image_questions.count() < 10:
+        messages.error(request, 'Not enough image questions available in the database.')
+        return redirect('group1:group1')
+    
+    # Create QuizQuestion instances for each selected question
+    for question in image_questions:
+        QuizQuestion.objects.create(
+            quiz=quiz,
+            question=question,
+            user_answer=None,
+            is_correct=False
+        )
+    
+    # Store quiz ID in session to track current quiz
+    request.session['current_image_quiz_id'] = quiz.id
+    
+    # Redirect to the first question
+    return redirect('group1:image_quiz_question')
+
 def image_quiz_question(request):
+    # Get the current quiz from session
+    quiz_id = request.session.get('current_image_quiz_id')
+    if not quiz_id:
+        # No active quiz, redirect to start a new one
+        return redirect('group1:start_image_quiz')
+    
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+    except Quiz.DoesNotExist:
+        # Quiz doesn't exist, start a new one
+        return redirect('group1:start_image_quiz')
+    
+    quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('id')
+    
+    if not quiz_questions.exists():
+        messages.error(request, 'No questions found for this quiz.')
+        return redirect('group1:group1')
+    
+    total_questions = quiz_questions.count()
+    current_index = quiz.current_question_index
+    
+    # Check if quiz is completed
+    if current_index >= total_questions:
+        return redirect('group1:quiz_complete', quiz_id=quiz.id)
+    
+    # Get current question
+    current_quiz_question = quiz_questions[current_index]
+    question = current_quiz_question.question
+    choices = Choice.objects.filter(question=question).order_by('id')
+    
+    # Calculate progress
+    quiz_progress = int(((current_index + 1) / total_questions) * 100)
+    
+    # Handle form submission
+    user_answer = None
+    is_correct = None
+    correct_choice = None
+    show_feedback = False
+    
+    if request.method == 'POST':
+        if 'submit_answer' in request.POST:
+            # Process answer submission
+            user_answer = request.POST.get('user_answer')
+            correct_choice = choices.filter(is_correct=True).first()
+            
+            if user_answer and correct_choice:
+                is_correct = (int(user_answer) == correct_choice.id)
+                
+                # Update the quiz question with user's answer
+                current_quiz_question.user_answer = user_answer
+                current_quiz_question.is_correct = is_correct
+                current_quiz_question.save()
+                
+                show_feedback = True
+            
+        elif 'next_question' in request.POST:
+            # Move to next question
+            quiz.current_question_index += 1
+            if quiz.current_question_index >= total_questions:
+                quiz.status = 'completed'
+            else:
+                quiz.status = 'in_progress'
+            quiz.save()
+            
+            # Redirect to avoid form resubmission
+            return redirect('group1:image_quiz_question')
+    
+    # Data for JavaScript
+    js_data = {
+        'show_feedback': show_feedback,
+        'is_correct': is_correct,
+        'correct_choice_id': correct_choice.id if correct_choice else None,
+        'user_answer_id': int(user_answer) if user_answer else None,
+    }
+
     context = {
+        'quiz': quiz,
+        'question': question,
+        'choices': choices,
+        'current_index': current_index + 1,  # Display as 1-based
+        'total_questions': total_questions,
+        'quiz_progress': quiz_progress,
+        'show_feedback': show_feedback,
         'quiz_title': 'Image Quiz',
-        'current_index': 2,
-        'total_questions': 5,
-        'quiz_progress': 40,
+        'js_data': js_data,
     }
     return render(request, 'image_quiz_question.html', context)
+
+def start_reading_quiz(request):
+    """
+    Create a new reading quiz instance with a random main reading question and its sub-questions.
+    """
+    if 'current_reading_quiz_id' in request.session:
+        del request.session['current_reading_quiz_id']
+
+    quiz = Quiz.objects.create(
+        title='Reading Quiz',
+        user_id=1,  # Placeholder
+        status='in_progress'
+    )
+
+    # Get one random main reading question, where the question is its own parent
+    main_question = Question.objects.filter(type='READING', parent_question_id=F('id')).order_by('?').first()
+    
+    if not main_question:
+        messages.error(request, 'No reading passages available.')
+        return redirect('group1:group1')
+
+    # Get all sub-questions for the selected main question, excluding the main question itself
+    sub_questions = Question.objects.filter(parent_question=main_question).exclude(pk=main_question.pk).order_by('id')
+
+    if not sub_questions.exists():
+        messages.error(request, 'No sub-questions found for the selected reading passage.')
+        return redirect('group1:group1')
+
+    # Create QuizQuestion instances for each sub-question
+    for sub_question in sub_questions:
+        QuizQuestion.objects.create(
+            quiz=quiz,
+            question=sub_question,
+        )
+
+    request.session['current_reading_quiz_id'] = quiz.id
+    request.session['main_reading_question_id'] = main_question.id
+    
+    return redirect('group1:reading_quiz_question')
+
+def reading_quiz_question(request):
+    quiz_id = request.session.get('current_reading_quiz_id')
+    main_question_id = request.session.get('main_reading_question_id')
+
+    if not quiz_id or not main_question_id:
+        return redirect('group1:start_reading_quiz')
+
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+        main_question = Question.objects.get(id=main_question_id)
+    except Quiz.DoesNotExist or Question.DoesNotExist:
+        return redirect('group1:start_reading_quiz')
+
+    quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('question__id')
+    
+    if not quiz_questions.exists():
+        messages.error(request, 'No questions found for this quiz.')
+        return redirect('group1:group1')
+
+    total_questions = quiz_questions.count()
+    current_index = quiz.current_question_index
+
+    if current_index >= total_questions:
+        return redirect('group1:quiz_complete', quiz_id=quiz.id)
+
+    current_quiz_question = quiz_questions[current_index]
+    question = current_quiz_question.question
+    choices = Choice.objects.filter(question=question).order_by('id')
+    
+    quiz_progress = int(((current_index + 1) / total_questions) * 100)
+    
+    show_feedback = False
+    is_correct = None
+    correct_choice = None
+    user_answer = None
+
+    if request.method == 'POST':
+        if 'submit_answer' in request.POST:
+            user_answer = request.POST.get('user_answer')
+            correct_choice = choices.filter(is_correct=True).first()
+            
+            if user_answer and correct_choice:
+                is_correct = (int(user_answer) == correct_choice.id)
+                current_quiz_question.user_answer = user_answer
+                current_quiz_question.is_correct = is_correct
+                current_quiz_question.save()
+                show_feedback = True
+            
+        elif 'next_question' in request.POST:
+            quiz.current_question_index += 1
+            if quiz.current_question_index >= total_questions:
+                quiz.status = 'completed'
+            quiz.save()
+            return redirect('group1:reading_quiz_question')
+
+    js_data = {
+        'show_feedback': show_feedback,
+        'is_correct': is_correct,
+        'correct_choice_id': correct_choice.id if correct_choice else None,
+        'user_answer_id': int(user_answer) if user_answer else None,
+    }
+
+    context = {
+        'quiz': quiz,
+        'question': question,
+        'choices': choices,
+        'passage_text': main_question.passage_text,
+        'current_index': current_index + 1,
+        'total_questions': total_questions,
+        'quiz_progress': quiz_progress,
+        'show_feedback': show_feedback,
+        'quiz_title': 'Reading Quiz',
+        'js_data': js_data,
+        'quiz_width': '900px',
+    }
+    return render(request, 'reading_quiz_question.html', context)
 
 def writing_quiz_question(request):
     context = {
@@ -281,11 +525,15 @@ def writing_quiz_question(request):
     return render(request, 'writing_quiz_question.html', context)
 
 def start_sentence_building_quiz(request):
+    # Clear any previous quiz session data to ensure a fresh start
+    if 'current_sentence_building_quiz_id' in request.session:
+        del request.session['current_sentence_building_quiz_id']
+
     # Create a new quiz instance
     quiz = Quiz.objects.create(
         title='Sentence Building Quiz',
         user_id=1,  # Placeholder user ID
-        status='not_started'
+        status='in_progress'
     )
     
     # Get 10 random sentence building questions
@@ -293,7 +541,7 @@ def start_sentence_building_quiz(request):
     
     if sentence_questions.count() < 10:
         messages.error(request, 'Not enough sentence building questions available in the database.')
-        return redirect('group1:home')
+        return redirect('group1:group1')
     
     # Create QuizQuestion instances for each selected question
     for question in sentence_questions:
@@ -323,7 +571,7 @@ def sentence_building_question(request):
     quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('id')
     if not quiz_questions.exists():
         messages.error(request, 'No questions found for this quiz.')
-        return redirect('group1:home')
+        return redirect('group1:group1')
 
     total_questions = quiz_questions.count()
     current_index = quiz.current_question_index
@@ -389,12 +637,124 @@ def sentence_building_question(request):
     }
     return render(request, 'sentence_building_question.html', context)
 
+def start_listening_quiz(request):
+    """Create a new listening quiz instance with 10 random listening questions"""
+    # Clear any previous quiz session data to ensure a fresh start
+    if 'current_listening_quiz_id' in request.session:
+        del request.session['current_listening_quiz_id']
+
+    quiz = Quiz.objects.create(
+        title='Listening Quiz',
+        user_id=1,  # Placeholder until auth system
+        status='in_progress'
+    )
+
+    listening_questions = Question.objects.filter(type='LISTENING').order_by('?')[:10]
+    if listening_questions.count() < 10:
+        messages.error(request, 'Not enough listening questions available in the database.')
+        return redirect('group1:group1')
+
+    for question in listening_questions:
+        QuizQuestion.objects.create(
+            quiz=quiz,
+            question=question,
+            user_answer=None,
+            is_correct=False
+        )
+
+    request.session['current_listening_quiz_id'] = quiz.id
+    return redirect('group1:listening_quiz_question')
+
 def listening_quiz_question(request):
+    quiz_id = request.session.get('current_listening_quiz_id')
+    if not quiz_id:
+        return redirect('group1:start_listening_quiz')
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+    except Quiz.DoesNotExist:
+        # If quiz is not found, clear the session and start a new one
+        if 'current_listening_quiz_id' in request.session:
+            del request.session['current_listening_quiz_id']
+        return redirect('group1:start_listening_quiz')
+
+    # If the quiz found in the session is already completed, force a new start
+    if quiz.status == 'completed':
+        del request.session['current_listening_quiz_id']
+        return redirect('group1:start_listening_quiz')
+
+    quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('id')
+    if not quiz_questions.exists():
+        messages.error(request, 'No questions found for this quiz.')
+        return redirect('group1:group1')
+
+    total_questions = quiz_questions.count()
+    current_index = quiz.current_question_index
+    if current_index >= total_questions:
+        return redirect('group1:quiz_complete', quiz_id=quiz.id)
+
+    current_quiz_question = quiz_questions[current_index]
+    question = current_quiz_question.question
+    choices = Choice.objects.filter(question=question).order_by('id')
+
+    quiz_progress = int(((current_index + 1) / total_questions) * 100)
+
+    show_feedback = False
+    is_correct = None
+    correct_choice = choices.filter(is_correct=True).first()
+    user_answer = None
+
+    js_data = {
+        'show_feedback': False,
+        'is_correct': None,
+        'correct_choice_id': correct_choice.id if correct_choice else None,
+        'user_answer_id': None,
+    }
+
+    if request.method == 'POST':
+        if 'submit_answer' in request.POST:
+            user_answer = request.POST.get('user_answer')
+            if user_answer and correct_choice:
+                is_correct = (int(user_answer) == correct_choice.id)
+                current_quiz_question.user_answer = user_answer
+                current_quiz_question.is_correct = is_correct
+                current_quiz_question.save()
+                show_feedback = True
+
+                js_data.update({
+                    'show_feedback': True,
+                    'is_correct': is_correct,
+                    'user_answer_id': int(user_answer),
+                })
+        elif 'next_question' in request.POST:
+            quiz.current_question_index += 1
+            quiz.save()
+
+            if quiz.current_question_index >= total_questions:
+                quiz.status = 'completed'
+                quiz.save()
+                return redirect('group1:quiz_complete', quiz_id=quiz.id)
+            
+            return redirect('group1:listening_quiz_question')
+
+    # Resolve voice_url to handle both external URLs and local static files
+    resolved_voice_url = question.voice_url
+    if resolved_voice_url and not resolved_voice_url.startswith('http'):
+        resolved_voice_url = static(resolved_voice_url)
+
     context = {
+        'quiz': quiz,
+        'question': question,
+        'choices': choices,
+        'resolved_voice_url': resolved_voice_url,
+        'current_index': current_index + 1,
+        'total_questions': total_questions,
+        'quiz_progress': quiz_progress,
+        'show_feedback': show_feedback,
+        'is_correct': is_correct,
+        'correct_choice_id': correct_choice.id if correct_choice else None,
         'quiz_title': 'Listening Quiz',
-        'current_index': 5,
-        'total_questions': 5,
-        'quiz_progress': 100,
+        'js_data': js_data,
+        'quiz_width': '700px',  # Custom width for this quiz
     }
     return render(request, 'listening_quiz_question.html', context)
 
@@ -402,11 +762,11 @@ def quiz_complete(request, quiz_id):
     """View to display quiz completion results"""
     quiz = get_object_or_404(Quiz, id=quiz_id)
     quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').prefetch_related('question__choices')
-    
+
     total_questions = quiz_questions.count()
     correct_answers = quiz_questions.filter(is_correct=True).count()
     score_percentage = int((correct_answers / total_questions) * 100) if total_questions > 0 else 0
-    
+
     # Add correct answer info for each question
     quiz_questions_with_answers = []
     for quiz_question in quiz_questions:
@@ -415,7 +775,27 @@ def quiz_complete(request, quiz_id):
             'quiz_question': quiz_question,
             'correct_choice': correct_choice,
         })
-    
+
+    # Determine the session key based on the quiz title and clear it
+    quiz_type_key = None
+    if 'Grammar' in quiz.title:
+        quiz_type_key = 'current_grammar_quiz_id'
+    elif 'Vocabulary' in quiz.title:
+        quiz_type_key = 'current_vocabulary_quiz_id'
+    elif 'Image' in quiz.title:
+        quiz_type_key = 'current_image_quiz_id'
+    elif 'Reading' in quiz.title:
+        quiz_type_key = 'current_reading_quiz_id'
+    elif 'Listening' in quiz.title:
+        quiz_type_key = 'current_listening_quiz_id'
+    elif 'Sentence Building' in quiz.title:
+        quiz_type_key = 'current_sentence_building_quiz_id'
+
+    if quiz_type_key and quiz_type_key in request.session:
+        del request.session[quiz_type_key]
+        if 'main_reading_question_id' in request.session:
+            del request.session['main_reading_question_id']
+
     context = {
         'quiz': quiz,
         'total_questions': total_questions,
@@ -442,4 +822,3 @@ def reset_quiz(request, quiz_id):
     
     messages.success(request, f'{quiz.title} has been reset. You can start over!')
     return redirect('group1:group1')
-
