@@ -1,0 +1,166 @@
+{% extends "quiz_frame.html" %}
+{% load static %}
+{% block quiz_content %}
+<style>
+    .reading-container {
+        display: flex;
+        gap: 2rem;
+        color: #e0e0e0;
+    }
+    .passage-section {
+        flex: 1;
+        background-color: #2a2a3e;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .passage-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+    .passage-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #d1d5db;
+    }
+    .question-section {
+        flex: 1;
+    }
+    .question-text {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+    .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+    .option-btn {
+        background-color: transparent;
+        border: 1px solid #4a4a68;
+        border-radius: 0.75rem;
+        padding: 1rem 1.5rem;
+        width: 100%;
+        text-align: left;
+        color: #e0e0e0;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+    .option-btn:hover {
+        background-color: #2a2a3e;
+    }
+    .option-btn.selected {
+        background-color: #4a4a68;
+        border-color: #7C5CFF;
+    }
+    .option-btn.correct {
+        background-color: #164b35;
+        border-color: #22c55e;
+        color: #fff;
+    }
+    .option-btn.incorrect {
+        background-color: #451a24;
+        border-color: #ef4444;
+        color: #fff;
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+    }
+    .submit-btn, .next-btn {
+        background-color: #7C5CFF;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .submit-btn:disabled {
+        background-color: #5a4a9c;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="reading-container">
+    <!-- Passage Section -->
+    <div class="passage-section">
+        <h4 class="passage-title">Reading Passage</h4>
+        <p class="passage-text">{{ passage_text }}</p>
+    </div>
+
+    <!-- Question Section -->
+    <div class="question-section">
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="user_answer" id="user-answer-input">
+
+            <p class="question-text">{{ question.text_or_prompt }}</p>
+
+            <div id="options-container" class="options-container">
+                {% for choice in choices %}
+                    <button type="button" class="option-btn" data-choice-id="{{ choice.id }}">{{ choice.text }}</button>
+                {% endfor %}
+            </div>
+
+            <div class="action-buttons">
+                {% if not show_feedback %}
+                    <button type="submit" name="submit_answer" id="submit-btn" class="submit-btn" disabled>Submit</button>
+                {% else %}
+                    <button type="submit" name="next_question" class="next-btn">Next Question</button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{{ js_data|json_script:"js-data" }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const jsData = JSON.parse(document.getElementById('js-data').textContent);
+    const optionsContainer = document.getElementById('options-container');
+    const submitBtn = document.getElementById('submit-btn');
+    const userAnswerInput = document.getElementById('user-answer-input');
+    const optionButtons = optionsContainer.querySelectorAll('.option-btn');
+
+    if (!jsData.show_feedback) {
+        optionsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option-btn')) {
+                optionButtons.forEach(btn => btn.classList.remove('selected'));
+                const selectedBtn = e.target;
+                selectedBtn.classList.add('selected');
+                userAnswerInput.value = selectedBtn.getAttribute('data-choice-id');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                }
+            }
+        });
+    }
+
+    if (jsData.show_feedback) {
+        const correctChoiceId = jsData.correct_choice_id;
+        const userAnswerId = jsData.user_answer_id;
+
+        optionButtons.forEach(btn => {
+            const choiceId = parseInt(btn.getAttribute('data-choice-id'));
+            if (choiceId === correctChoiceId) {
+                btn.classList.add('correct');
+            } else if (choiceId === userAnswerId) {
+                btn.classList.add('incorrect');
+            }
+            if (choiceId === userAnswerId) {
+                btn.classList.add('selected');
+            }
+            btn.disabled = true;
+        });
+    }
+});
+</script>
+{% endblock %}
