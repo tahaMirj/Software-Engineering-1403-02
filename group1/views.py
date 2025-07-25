@@ -272,12 +272,129 @@ def vocabulary_quiz_question(request):
     }
     return render(request, 'vocabulary_quiz_question.html', context)
 
+def start_image_quiz(request):
+    """
+    Create a new image quiz instance with 10 random image questions
+    """
+    # Clear any previous quiz session data to ensure a fresh start
+    if 'current_image_quiz_id' in request.session:
+        del request.session['current_image_quiz_id']
+
+    # Create a new quiz instance
+    quiz = Quiz.objects.create(
+        title='Image Quiz',
+        user_id=1,  # Placeholder user ID
+        status='in_progress'
+    )
+    
+    # Get 10 random image questions
+    image_questions = Question.objects.filter(type='IMAGE').order_by('?')[:10]
+    
+    if image_questions.count() < 10:
+        messages.error(request, 'Not enough image questions available in the database.')
+        return redirect('group1:home')
+    
+    # Create QuizQuestion instances for each selected question
+    for question in image_questions:
+        QuizQuestion.objects.create(
+            quiz=quiz,
+            question=question,
+            user_answer=None,
+            is_correct=False
+        )
+    
+    # Store quiz ID in session to track current quiz
+    request.session['current_image_quiz_id'] = quiz.id
+    
+    # Redirect to the first question
+    return redirect('group1:image_quiz_question')
+
 def image_quiz_question(request):
+    # Get the current quiz from session
+    quiz_id = request.session.get('current_image_quiz_id')
+    if not quiz_id:
+        # No active quiz, redirect to start a new one
+        return redirect('group1:start_image_quiz')
+    
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+    except Quiz.DoesNotExist:
+        # Quiz doesn't exist, start a new one
+        return redirect('group1:start_image_quiz')
+    
+    quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').order_by('id')
+    
+    if not quiz_questions.exists():
+        messages.error(request, 'No questions found for this quiz.')
+        return redirect('group1:home')
+    
+    total_questions = quiz_questions.count()
+    current_index = quiz.current_question_index
+    
+    # Check if quiz is completed
+    if current_index >= total_questions:
+        return redirect('group1:quiz_complete', quiz_id=quiz.id)
+    
+    # Get current question
+    current_quiz_question = quiz_questions[current_index]
+    question = current_quiz_question.question
+    choices = Choice.objects.filter(question=question).order_by('id')
+    
+    # Calculate progress
+    quiz_progress = int(((current_index + 1) / total_questions) * 100)
+    
+    # Handle form submission
+    user_answer = None
+    is_correct = None
+    correct_choice = None
+    show_feedback = False
+    
+    if request.method == 'POST':
+        if 'submit_answer' in request.POST:
+            # Process answer submission
+            user_answer = request.POST.get('user_answer')
+            correct_choice = choices.filter(is_correct=True).first()
+            
+            if user_answer and correct_choice:
+                is_correct = (int(user_answer) == correct_choice.id)
+                
+                # Update the quiz question with user's answer
+                current_quiz_question.user_answer = user_answer
+                current_quiz_question.is_correct = is_correct
+                current_quiz_question.save()
+                
+                show_feedback = True
+            
+        elif 'next_question' in request.POST:
+            # Move to next question
+            quiz.current_question_index += 1
+            if quiz.current_question_index >= total_questions:
+                quiz.status = 'completed'
+            else:
+                quiz.status = 'in_progress'
+            quiz.save()
+            
+            # Redirect to avoid form resubmission
+            return redirect('group1:image_quiz_question')
+    
+    # Data for JavaScript
+    js_data = {
+        'show_feedback': show_feedback,
+        'is_correct': is_correct,
+        'correct_choice_id': correct_choice.id if correct_choice else None,
+        'user_answer_id': int(user_answer) if user_answer else None,
+    }
+
     context = {
+        'quiz': quiz,
+        'question': question,
+        'choices': choices,
+        'current_index': current_index + 1,  # Display as 1-based
+        'total_questions': total_questions,
+        'quiz_progress': quiz_progress,
+        'show_feedback': show_feedback,
         'quiz_title': 'Image Quiz',
-        'current_index': 2,
-        'total_questions': 5,
-        'quiz_progress': 40,
+        'js_data': js_data,
     }
     return render(request, 'image_quiz_question.html', context)
 
@@ -548,6 +665,8 @@ def quiz_complete(request, quiz_id):
         quiz_type_key = 'current_grammar_quiz_id'
     elif 'Vocabulary' in quiz.title:
         quiz_type_key = 'current_vocabulary_quiz_id'
+    elif 'Image' in quiz.title:
+        quiz_type_key = 'current_image_quiz_id'
     elif 'Listening' in quiz.title:
         quiz_type_key = 'current_listening_quiz_id'
     elif 'Sentence Building' in quiz.title:
@@ -582,4 +701,3 @@ def reset_quiz(request, quiz_id):
     
     messages.success(request, f'{quiz.title} has been reset. You can start over!')
     return redirect('group1:group1')
-

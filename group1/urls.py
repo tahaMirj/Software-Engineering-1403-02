@@ -9,6 +9,7 @@ urlpatterns = [
   path('start-grammar-quiz/', views.start_grammar_quiz, name='start_grammar_quiz'),
   path('vocabulary-quiz/', views.vocabulary_quiz_question, name='vocabulary_quiz_question'),
   path('start-vocabulary-quiz/', views.start_vocabulary_quiz, name='start_vocabulary_quiz'),
+  path('image-quiz/start/', views.start_image_quiz, name='start_image_quiz'),
   path('image-quiz/', views.image_quiz_question, name='image_quiz_question'),
   path('writing-quiz/', views.writing_quiz_question, name='writing_quiz_question'),
   path('sentence-building-quiz/start/', views.start_sentence_building_quiz, name='start_sentence_building_quiz'),
@@ -17,4 +18,4 @@ urlpatterns = [
   path('listening-quiz/', views.listening_quiz_question, name='listening_quiz_question'),
   path('quiz-complete/<int:quiz_id>/', views.quiz_complete, name='quiz_complete'),
   path('reset-quiz/<int:quiz_id>/', views.reset_quiz, name='reset_quiz'),
-] 
+]
