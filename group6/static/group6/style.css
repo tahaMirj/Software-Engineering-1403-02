@@ -87,6 +87,7 @@ body {
   border: none;
   cursor: pointer;
   padding: 0;
+ 
 }
 
 .avatar {
@@ -94,6 +95,7 @@ body {
   width: 32px;
   height: 32px;
   display: block;
+  margin-top: 5px;
 }
 
 /* Dropdown Menu */

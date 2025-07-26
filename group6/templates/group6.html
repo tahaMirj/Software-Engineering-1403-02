@@ -12,7 +12,7 @@
 </head>
 <body>
   <header class="top-bar">
-    <div class="logo">Language FlashCard Learning  Page</div>
+    <div class="logo">Language FlashCard Learning  Page</div> 
      <nav>
        
        <a href="{% url 'group6:login' %}" class="nav-link">Log In</a>
@@ -31,8 +31,9 @@
         <img src="{% static 'group6/profile.jpeg' %}" alt="User Avatar" class="avatar" />
       </button>
       <ul class="dropdown-menu" id="dropdownMenu" role="menu" aria-labelledby="profileBtn">
-        <li><a href="#" role="menuitem">Profile</a></li>
-        <li><a href="#" role="menuitem">Level</a></li>
+        <li><a href="{% url 'group6:profile' %}" role="menuitem">Profile</a></li>
+
+        <li><span role="menuitem">Level {{ user_current_level }}</span></li>
         <li><a href="{% url 'group6:logout' %}" role="menuitem">Log out</a></li>
 
       </ul>
@@ -42,8 +43,10 @@
 <main class="hero">
     <div class="container">
       <h1>Flashcard Language Learning</h1>
-      <div class="card">
+      <div class="card"> 
         <!-- Form for Category and Difficulty -->
+      
+      
         <form method="POST" action="{% url 'group6:start_learning_session' %}">
           {% csrf_token %}
           
@@ -68,11 +71,10 @@
               {% endfor %}
             </select>
           </div>
-
-          <div class="button-row">
-            <button type="submit" class="btn">Start Learning</button>
-          </div>
         </form>
+        <div class="button-row">
+          <button type="submit" class="btn" name="action" value="start_learning" onclick="location.href='{% url "group6:second" %}'"> Start Learning</button>
+        </div>
       </div>
     </div>
   </main>

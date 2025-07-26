@@ -78,6 +78,8 @@ body {
   background: #b1e9bf;
   color: rgb(3, 83, 35);
   transition: background 0.3s ease;
+  margin-left: 20%;
+  margin-right: 10%;
 }
 
 .btn:hover {

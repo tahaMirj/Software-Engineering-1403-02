@@ -12,15 +12,29 @@
 </head>
 <body>
   <div class="main-box">
+    {% if feedback_message %}
+     <p class="feedback">{{ feedback_message }}</p>
+    {% endif %}
     <div class="img-box" id="imgBox">
      
-      <img src="{% static 'group6/apple.jpg' %}" alt="Flash Card" class="flashcard" />
+      {% if current_word.image_url %}
+        <img src="{{ current_word.image_url }}" alt="Flash Card" class="flashcard" />
+      {% else %}
+       <p>No image available</p>
+      {% endif %}
     </div>
-    <input type="text" id="feedbackInput" class="feedback-input" placeholder="your guess is not true try again">
-    <div class="button-row">
-      <button class="btn" onclick="location.href='{% url "group6:second" %}'">Next</button> 
-      <button class="btn" onclick="location.href='{% url "group6:endsection" %}'">End section</button> 
-    </div>
+    <form method="POST" action="{% url 'group6:process_guess' %}">
+      {% csrf_token %}
+
+      <input type="text" name="user_guess" id="feedbackInput" class="feedback-input"
+             placeholder="Your guess..." required>
+
+      <!-- دکمه‌های کنترل با name=action -->
+      <div class="button-row">
+        <button class="btn"type="submit" name="action" value="next_word" onclick="location.href='{% url "group6:second" %}'">Next</button> 
+       <button class="btn" type="submit" name="action" value="end_session"  onclick="location.href='{% url "group6:endsection" %}'">End session</button> 
+      </div>
+    </form>
   </div>
 
   <script >
