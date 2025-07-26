@@ -17,13 +17,17 @@ If you're using a **cloud database**, update the values in `.env` with your own 
 
 ---
 
-### 3. Start the MySQL database (via Docker)
+### 3. (Optional) Start the MySQL database with Docker
+
+Once Docker is installed, run:
 
 ```bash
 docker-compose up -d
 ```
 
-This will run a MySQL container using the settings from your `.env`.
+This will run a MySQL container using the settings from your `.env` file.
+
+> Skip this step if you're connecting to a remote or cloud-hosted database.
 
 ---
 
@@ -63,10 +67,3 @@ DATABASE_PASSWORD=password
 MYSQL_ROOT_PASSWORD=password
 DATABASE_PORT=3306
 ```
-
----
-
-## ☁️ Using a Cloud Database?
-
-Just update the `.env` file with your database’s host, name, user, and password.
-No need to run `docker-compose up` if you're not using the local MySQL container.
