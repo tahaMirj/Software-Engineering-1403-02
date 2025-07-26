@@ -4,10 +4,22 @@
 
 {% block content %}
   <style>
+    :root {
+      --light: #b8f2c2;
+      --medium: #70c779;
+      --dark: #2f6a34;
+      --text-dark: #103b0f;
+      --text-light: #e4fbe4;
+      --card-bg: #ffffff;
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
     body {
-      background-color: #f0f2f5;
+      background-color: var(--light);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #333;
+      color: var(--text-dark);
       margin: 0;
       padding: 0;
     }
@@ -15,25 +27,27 @@
     .profile-container {
       max-width: 900px;
       margin: 2rem auto;
-      background-color: #fff;
+      background-color: var(--dark);
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--text-light);
     }
 
     .profile-title {
       text-align: center;
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: bold;
-      margin-bottom: 1.5rem;
-      border-bottom: 2px solid #ddd;
+      color: var(--text-light);
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--medium);
       padding-bottom: 0.5rem;
     }
 
     .attachments {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem;
+      gap: 1.5rem;
       margin-bottom: 2rem;
     }
 
@@ -41,31 +55,32 @@
       width: 100%;
       height: 200px;
       object-fit: cover;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
     }
 
     .video-container video {
       width: 100%;
-      border-radius: 8px;
+      border-radius: var(--radius);
     }
 
     .pdf-container iframe {
       width: 100%;
       height: 300px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      border: 1px solid var(--medium);
+      border-radius: var(--radius);
     }
 
     .file-label {
-      font-size: 0.9rem;
-      color: #555;
+      font-size: 0.95rem;
+      color: var(--text-light);
       margin-bottom: 0.4rem;
     }
 
     .file-link a {
-      color: #1a73e8;
+      color: var(--text-light);
       text-decoration: none;
+      font-weight: 500;
     }
 
     .file-link a:hover {
@@ -74,41 +89,70 @@
 
     .no-attachments {
       font-style: italic;
-      color: #888;
+      color: #ccc;
     }
 
     .profile-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem 2rem;
       margin-top: 2rem;
-      line-height: 1.8;
-      font-size: 1rem;
+      font-size: 1.05rem;
+    }
+
+    .info-row {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--card-bg);
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      color: var(--text-dark);
+    }
+
+    .label {
+      font-weight: bold;
+      color: var(--medium);
+      margin-bottom: 0.4rem;
+    }
+
+    .value {
+      color: var(--text-dark);
+      word-wrap: break-word;
     }
 
     .back-button {
       text-align: center;
-      margin-top: 2rem;
+      margin-top: 2.5rem;
     }
 
     .back-button a {
       text-decoration: none;
-      background-color: #1a73e8;
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
+      background-color: var(--card-bg);
+      color: var(--dark);
+      padding: 0.6rem 1.4rem;
+      border-radius: var(--radius);
       font-weight: bold;
       transition: background 0.3s;
+      box-shadow: var(--shadow-sm);
     }
 
     .back-button a:hover {
-      background-color: #0f5fc2;
+      background-color: var(--medium);
+      color: var(--text-light);
     }
 
     @media (max-width: 600px) {
       .profile-container {
-        padding: 1rem;
+        padding: 1.2rem;
       }
 
       .profile-title {
-        font-size: 1.5rem;
+        font-size: 1.7rem;
+      }
+
+      .profile-info {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -143,12 +187,12 @@
     </div>
 
     <div class="profile-info">
-      <p><strong>👤 Name:</strong> {{ teacher.name }}</p>
-      <p><strong>📧 Email:</strong> {{ teacher.email }}</p>
-      <p><strong>📞 Phone Number:</strong> {{ teacher.phone_number|default:"Not provided" }}</p>
-      <p><strong>📘 Biography:</strong> {{ teacher.biography|default:"No biography yet." }}</p>
-      <p><strong>🈯 Language:</strong> {{ teacher.language }}</p>
-      <p><strong>⭐ Rating:</strong> {{ teacher.rating }}</p>
+      <div class="info-row"><span class="label">👤 Name:</span><span class="value">{{ teacher.name }}</span></div>
+      <div class="info-row"><span class="label">📧 Email:</span><span class="value">{{ teacher.email }}</span></div>
+      <div class="info-row"><span class="label">📞 Phone Number:</span><span class="value">{{ teacher.phone_number|default:"Not provided" }}</span></div>
+      <div class="info-row"><span class="label">📘 Biography:</span><span class="value">{{ teacher.biography|default:"No biography yet." }}</span></div>
+      <div class="info-row"><span class="label">🈯 Language:</span><span class="value">{{ teacher.language }}</span></div>
+      <div class="info-row"><span class="label">⭐ Rating:</span><span class="value">{{ teacher.rating }}</span></div>
     </div>
 
     <div class="back-button">
