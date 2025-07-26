@@ -9,5 +9,10 @@ urlpatterns = [
   path('process_guess/', views.process_guess, name='process_guess'), # process user's guess or navigate session
   path('signup/', views.group6_signup, name='signup'), 
   path('login/', views.group6_login, name='login'),
-  path('logout/', views.group6_logout, name='logout'), 
-] 
+  path('logout/', views.group6_logout, name='logout'),
+  path('second/', views.second_page, name='second'),
+  path('showpage/', views.show_page, name='showpage'),
+  path('endsection/', views.end_section, name='endsection'),
+  path('profile/', views.user_profile, name='profile'),
+
+]

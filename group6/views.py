@@ -135,6 +135,8 @@ def home(request):
         'user_is_authenticated': request.user.is_authenticated, # Boolean checking if the user is logged in
         'user_current_level': user_current_level,
         'session_completed_level': session_completed_level, # Pass the new level for display
+        'difficulties': DifficultyChoices.choices,
+
     })
 
 # start_learning_session view handles the start of a new learning session
@@ -171,6 +173,18 @@ def start_learning_session(request):
         return redirect(reverse('group6:group6'))
     
     return redirect(reverse('group6:group6'))
+    
+def second_page(request):
+    return render(request, 'second.html')
+def show_page(request):
+    return render(request, 'showpage.html')
+def end_section(request):
+    return render(request, 'group6.html')
+
+@login_required(login_url='/registration/login/')
+def user_profile(request):
+    return render(request, 'group6/profile.html')
+
 
 # process_guess handles user interactions during a learning session
 @login_required(login_url='/registration/login/') 
