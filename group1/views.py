@@ -7,6 +7,8 @@ from .models import Quiz, Question, Choice, QuizQuestion
 from django.contrib import messages
 import random
 import string
+from .ai import generate_feedback_from_api
+
 
 # Create your views here.
 
@@ -759,7 +761,7 @@ def listening_quiz_question(request):
     return render(request, 'listening_quiz_question.html', context)
 
 def quiz_complete(request, quiz_id):
-    """View to display quiz completion results"""
+    """View to display quiz completion results with AI-generated personalized feedback"""
     quiz = get_object_or_404(Quiz, id=quiz_id)
     quiz_questions = QuizQuestion.objects.filter(quiz=quiz).select_related('question').prefetch_related('question__choices')
 
@@ -776,25 +778,16 @@ def quiz_complete(request, quiz_id):
             'correct_choice': correct_choice,
         })
 
-    # Determine the session key based on the quiz title and clear it
-    quiz_type_key = None
-    if 'Grammar' in quiz.title:
-        quiz_type_key = 'current_grammar_quiz_id'
-    elif 'Vocabulary' in quiz.title:
-        quiz_type_key = 'current_vocabulary_quiz_id'
-    elif 'Image' in quiz.title:
-        quiz_type_key = 'current_image_quiz_id'
-    elif 'Reading' in quiz.title:
-        quiz_type_key = 'current_reading_quiz_id'
-    elif 'Listening' in quiz.title:
-        quiz_type_key = 'current_listening_quiz_id'
-    elif 'Sentence Building' in quiz.title:
-        quiz_type_key = 'current_sentence_building_quiz_id'
+    # ✅ NEW: Generate AI personalized feedback
+    incorrect_questions = quiz_questions.filter(is_correct=False).prefetch_related('question__choices')
+    api_key = "tpsg-SNfM6e8MEDpLXp7uV8gQbL3QFN8pLYZ"  # Replace with your actual key
 
-    if quiz_type_key and quiz_type_key in request.session:
-        del request.session[quiz_type_key]
-        if 'main_reading_question_id' in request.session:
-            del request.session['main_reading_question_id']
+    personalized_feedback = ""
+    if incorrect_questions.exists():
+        try:
+            personalized_feedback = generate_feedback_from_api(incorrect_questions, api_key)
+        except Exception as e:
+            personalized_feedback = "⚠️ An error occurred while generating feedback."
 
     context = {
         'quiz': quiz,
@@ -802,7 +795,9 @@ def quiz_complete(request, quiz_id):
         'correct_answers': correct_answers,
         'score_percentage': score_percentage,
         'quiz_questions_with_answers': quiz_questions_with_answers,
+        'personalized_feedback': personalized_feedback,
     }
+
     return render(request, 'quiz_complete.html', context)
 
 def reset_quiz(request, quiz_id):
