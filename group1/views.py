@@ -817,3 +817,55 @@ def reset_quiz(request, quiz_id):
     
     messages.success(request, f'{quiz.title} has been reset. You can start over!')
     return redirect('group1:group1')
+
+def review_mistakes(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+
+    # Get only the incorrect questions
+    incorrect_questions = QuizQuestion.objects.filter(
+        quiz=quiz,
+        is_correct=False
+    ).select_related('question').prefetch_related('question__choices')
+
+    context = {
+        'quiz': quiz,
+        'incorrect_questions': incorrect_questions,
+    }
+
+    return render(request, 'review_mistakes.html', context)
+
+
+def retry_mistakes(request, quiz_id):
+    original_quiz = get_object_or_404(Quiz, id=quiz_id)
+
+    # Get the questions the user got wrong
+    incorrect_questions = QuizQuestion.objects.filter(
+        quiz=original_quiz,
+        is_correct=False
+    ).select_related('question')
+
+    if not incorrect_questions.exists():
+        messages.info(request, "You have no mistakes to retry.")
+        return redirect('group1:quiz_complete', quiz_id=quiz_id)
+
+    # Create a new quiz instance
+    new_quiz = Quiz.objects.create(
+        title=f"Retry - {original_quiz.title}",
+        user_id=original_quiz.user_id,
+        status='not_started',
+        current_question_index=0
+    )
+
+    # Copy only the incorrect questions into the new quiz
+    for q in incorrect_questions:
+        QuizQuestion.objects.create(
+            quiz=new_quiz,
+            question=q.question,
+            user_answer=None,
+            is_correct=False
+        )
+
+    # Save new quiz ID in session to continue the flow
+    request.session['current_grammar_quiz_id'] = new_quiz.id
+
+    return redirect('group1:grammar_quiz_question')  # or dynamic based on quiz type

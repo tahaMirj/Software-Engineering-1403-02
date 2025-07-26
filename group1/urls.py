@@ -20,4 +20,6 @@ urlpatterns = [
   path('listening-quiz/', views.listening_quiz_question, name='listening_quiz_question'),
   path('quiz-complete/<int:quiz_id>/', views.quiz_complete, name='quiz_complete'),
   path('reset-quiz/<int:quiz_id>/', views.reset_quiz, name='reset_quiz'),
+  path('quiz/<int:quiz_id>/review/', views.review_mistakes, name='review_mistakes'),
+  path('quiz/<int:quiz_id>/retry/', views.retry_mistakes, name='retry_mistakes'),
 ]

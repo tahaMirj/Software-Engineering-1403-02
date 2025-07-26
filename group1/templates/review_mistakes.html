@@ -1,0 +1,120 @@
+<!-- review_mistakes.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Mistakes - {{ quiz.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #7c5cff;
+            margin-bottom: 2rem;
+        }
+
+        .question-box {
+            background: #1f1f1f;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #EF4444;
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 0.8rem;
+        }
+
+        .answer-info {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .correct {
+            color: #10B981;
+        }
+
+        .incorrect {
+            color: #EF4444;
+        }
+
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #7c5cff;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #6a4ee0;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <h1>📘 Review Your Mistakes - {{ quiz.title }}</h1>
+
+    {% for q in incorrect_questions %}
+        <div class="question-box">
+            <div class="question-text">{{ forloop.counter }}. {{ q.question.text_or_prompt }}</div>
+            <div class="answer-info">
+                <span class="incorrect">Your answer:
+                    {% for choice in q.question.choices.all %}
+                        {% if choice.id|stringformat:"s" == q.user_answer|stringformat:"s" %}
+                            {{ choice.text }}
+                        {% endif %}
+                    {% endfor %}
+                </span><br>
+                <span class="correct">Correct answer:
+                    {% for choice in q.question.choices.all %}
+                        {% if choice.is_correct %}
+                            {{ choice.text }}
+                        {% endif %}
+                    {% endfor %}
+                </span>
+            </div>
+        </div>
+    {% empty %}
+        <p>You got all questions correct! 🎉</p>
+    {% endfor %}
+
+    <div class="actions">
+        <a href="{% url 'group1:group1' %}" class="btn btn-primary">Back to Dashboard</a>
+        <a href="{% url 'group1:retry_mistakes' quiz.id %}" class="btn btn-secondary">Retry Mistakes</a>
+    </div>
+</body>
+</html>
