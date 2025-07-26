@@ -1,28 +1,45 @@
 {% extends "groups/groups_base.html" %}
 {% block title %}Edit TimeSlot{% endblock %}
 
+<style>
+    :root {
+    --light: #b8f2c2;
+    --medium: #70c779;
+    --dark: #2f6a34;
+    --text-dark: #103b0f;
+    --text-light: #e4fbe4;
+    --card-bg: #ffffff;
+    --radius: 12px;
+    --shadow: 0 6px 18px rgba(0,0,0,0.08);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --warn-bg: #fee2e2;
+    --warn-text: #991b1b;
+  }
+
+</style>
+
 {% block content %}
-<h2>Edit TimeSlot</h2>
+<h2 style="margin-bottom: 50px">Edit TimeSlot</h2>
 
 {% if error %}
   <p style="color: red;">{{ error }}</p>
 {% endif %}
 
-<form method="post" id="timeslot-form">
+<form style="background-color: #2f6a34; padding: 40px 30px; border-radius: 10px; overflow: hidden" method="post" id="timeslot-form">
   {% csrf_token %}
 
   <label>Start Time:</label>
-  <input type="datetime-local" name="start_time" id="start_time"
+  <input style="padding: 5px" type="datetime-local" name="start_time" id="start_time"
          value="{{ timeslot.start_time|date:'Y-m-d\\TH:i' }}" required><br><br>
 
   <label>End Time:</label>
-  <input type="datetime-local" name="end_time" id="end_time"
+  <input style="padding: 5px" type="datetime-local" name="end_time" id="end_time"
          value="{{ timeslot.end_time|date:'Y-m-d\\TH:i' }}" required><br><br>
 
   <label>Day of Week (1=Mon, 7=Sun):</label>
-  <input type="number" name="day_of_week" min="1" max="7" value="{{ timeslot.day_of_week }}" required><br><br>
+  <input style="padding: 2px" type="number" name="day_of_week" min="1" max="7" value="{{ timeslot.day_of_week }}" required><br><br>
 
-  <button type="submit">Update TimeSlot</button>
+  <button style="cursor: pointer; padding: 5px 15px;" type="submit">Update TimeSlot</button>
 </form>
 
 <p><a href="{% url 'group3:teacher_landing' %}">Back to Dashboard</a></p>
