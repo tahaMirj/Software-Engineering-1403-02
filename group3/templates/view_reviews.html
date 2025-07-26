@@ -3,30 +3,127 @@
 {% block title %}My Reviews{% endblock %}
 
 {% block content %}
-  <h2 class="text-2xl font-bold mb-4">Reviews for {{ teacher.name }}</h2>
+  <style>
+    :root {
+      --light: #b8f2c2;
+      --medium: #70c779;
+      --dark: #2f6a34;
+      --text-light: #e4fbe4;
+      --text-dark: #103b0f;
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
 
-  {% if reviews %}
-    <div class="space-y-6">
-      {% for review in reviews %}
-        <div class="bg-white shadow rounded-lg p-6">
-          <p class="font-semibold">
-            {{ review.reviewer_name }} 
-            <span class="text-gray-600 text-sm">on {{ review.created_at|date:"Y-m-d H:i" }}</span>
-          </p>
-          <p class="mt-1"><strong>Rating:</strong> {{ review.rating }}/5</p>
-          {% if review.comment %}
-            <p class="mt-2 whitespace-pre-wrap">{{ review.comment }}</p>
-          {% endif %}
-        </div>
-      {% endfor %}
+    .reviews-container {
+      max-width: 800px;
+      margin: 2.5rem auto;
+      padding: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .review-card {
+      background-color: #fff;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border-left: 6px solid var(--medium);
+      transition: transform 0.2s;
+    }
+
+    .review-card:hover {
+      transform: scale(1.01);
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      color: var(--dark);
+    }
+
+    .review-date {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .review-rating {
+      margin-top: 0.5rem;
+      font-weight: bold;
+      color: var(--text-dark);
+    }
+
+    .review-comment {
+      margin-top: 0.8rem;
+      color: #444;
+      white-space: pre-wrap;
+    }
+
+    .no-reviews {
+      color: #555;
+      text-align: center;
+      font-style: italic;
+      margin-top: 3rem;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    .back-link a:hover {
+      color: var(--medium);
+    }
+
+    @media (max-width: 600px) {
+      .page-title {
+        font-size: 1.6rem;
+      }
+
+      .review-card {
+        padding: 1.2rem;
+      }
+    }
+  </style>
+
+  <div class="reviews-container">
+    <h2 class="page-title">Reviews for {{ teacher.name }}</h2>
+
+    {% if reviews %}
+      <div class="review-list space-y-6">
+        {% for review in reviews %}
+          <div class="review-card">
+            <div class="review-header">
+              {{ review.reviewer_name }}
+              <span class="review-date">{{ review.created_at|date:"Y-m-d H:i" }}</span>
+            </div>
+            <div class="review-rating">Rating: {{ review.rating }}/5</div>
+            {% if review.comment %}
+              <div class="review-comment">{{ review.comment }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="no-reviews">You have no reviews yet.</p>
+    {% endif %}
+
+    <div class="back-link">
+      <a href="{% url 'group3:teacher_landing' %}">&larr; Back to Dashboard</a>
     </div>
-  {% else %}
-    <p class="text-gray-600">You have no reviews yet.</p>
-  {% endif %}
-
-  <p class="mt-6">
-    <a href="{% url 'group3:teacher_landing' %}" class="text-blue-500 hover:underline">
-      &larr; Back to Dashboard
-    </a>
-  </p>
+  </div>
 {% endblock %}
