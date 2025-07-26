@@ -1,24 +1,122 @@
-{# groups/templates/groups/edit_profile.html #}
 {% extends "groups/groups_base.html" %}
 
 {% block title %}Edit Profile{% endblock %}
 
 {% block content %}
-  <h2>Edit Your Profile</h2>
+  <style>
+    :root {
+      --light: #b8f2c2;
+      --medium: #70c779;
+      --dark: #2f6a34;
+      --text-dark: #103b0f;
+      --text-light: #e4fbe4;
+      --card-bg: #ffffff;
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
 
-  <form method="post">
-    {% csrf_token %}
-    <label for="biography">Biography:</label><br>
-    <textarea
-      name="biography"
-      id="biography"
-      rows="5"
-      cols="60"
-      required
-    >{{ teacher.biography }}</textarea><br><br>
+    .edit-container {
+      max-width: 700px;
+      margin: 2.5rem auto;
+      background-color: var(--dark);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--text-light);
+    }
 
-    <button type="submit">Save</button>
-  </form>
+    .edit-title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: var(--text-light);
+    }
 
-  <p><a href="{% url 'group3:teacher_profile' %}">Back to Profile</a></p>
+    form label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-light);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--medium);
+      resize: vertical;
+      background-color: var(--card-bg);
+      color: var(--text-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    button[type="submit"] {
+      margin-top: 1.5rem;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background-color: var(--card-bg);
+      color: var(--dark);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: var(--shadow-sm);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      background-color: var(--medium);
+      color: var(--text-light);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .edit-container {
+        padding: 1.2rem;
+      }
+
+      .edit-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+
+  <div class="edit-container">
+    <h2 class="edit-title">Edit Your Profile</h2>
+
+    <form method="post">
+      {% csrf_token %}
+      <label for="biography">Biography:</label>
+      <textarea
+        name="biography"
+        id="biography"
+        rows="6"
+        required
+      >{{ teacher.biography }}</textarea>
+
+      <button type="submit">Save</button>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'group3:teacher_profile' %}">&larr; Back to Profile</a>
+    </div>
+  </div>
 {% endblock %}
