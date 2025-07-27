@@ -265,8 +265,21 @@
             {% endfor %}
         </div>
 
+        {% if personalized_feedback %}
+        <div class="questions-review">
+            <h2>🧠 Personalized Feedback</h2>
+            <div class="question-item" style="border-left-color: #7c5cff;">
+                <div class="answer-info" style="font-size: 1rem; line-height: 1.6;">
+                    {{ personalized_feedback }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+
         <div class="actions">
             <a href="{% url 'group1:group1' %}" class="btn btn-primary">Back to Dashboard</a>
+            <a href="{% url 'group1:review_mistakes' quiz.id %}" class="btn btn-secondary">Review Mistakes</a>
         </div>
     </div>
 </body>
