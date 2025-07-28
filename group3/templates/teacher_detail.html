@@ -3,58 +3,181 @@
 {% block title %}{{ teacher.name }}{% endblock %}
 
 {% block content %}
-  <h2 class="text-2xl font-bold mb-4">{{ teacher.name }}</h2>
+<style>
+  :root {
+    --green-dark: #014421;
+    --green: #027A48;
+    --green-light: #D1FAE5;
+  }
 
-  <div class="mb-6">
-    {% if teacher.profile_picture %}
-      <img
-        src="{{ teacher.profile_picture.url }}"
-        alt="{{ teacher.name }}’s profile picture"
-        class="w-32 h-32 rounded-full object-cover mb-4"
-      >
-    {% endif %}
-    <p class="mb-2"><strong>Language:</strong> {{ teacher.language }}</p>
-    <p class="mb-2"><strong>Rating:</strong> {{ teacher.rating }}</p>
-    <h3 class="text-xl font-semibold mt-4 mb-2">Biography</h3>
-    <p class="whitespace-pre-wrap">{{ teacher.biography }}</p>
+  .teacher-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 30px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 64, 0, 0.07);
+    margin-bottom: 40px;
+  }
+
+  .teacher-profile img {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 16px;
+    border: 3px solid var(--green-light);
+  }
+
+  .teacher-profile h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .teacher-info {
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .bio-section {
+    margin-top: 20px;
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: justify;
+    color: #333;
+    white-space: pre-wrap;
+    background: #f9f9f9;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border-left: 4px solid var(--green);
+  }
+
+  .slots-section h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--green-dark);
+    margin-bottom: 16px;
+  }
+
+  .slots-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .slots-table th, .slots-table td {
+      color: #222222;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-align: left;
+  }
+
+  .slots-table th {
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-weight: 600;
+  }
+
+  .slots-table tr:nth-child(even) {
+    background: #f8f8f8;
+  }
+
+  .book-btn {
+    background: var(--green);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background 0.2s ease;
+    text-decoration: none;
+  }
+
+  .book-btn:hover {
+    background: var(--green-dark);
+  }
+
+  .no-slots {
+    margin-top: 12px;
+    font-size: 15px;
+    color: #555;
+  }
+
+  .back-link {
+    margin-top: 30px;
+    display: block;
+    text-align: center;
+    color: var(--green-dark);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: var(--green);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .slots-table th, .slots-table td {
+      font-size: 13px;
+      padding: 10px;
+    }
+  }
+</style>
+
+<div class="teacher-profile">
+  {% if teacher.profile_picture %}
+    <img src="{{ teacher.profile_picture.url }}" alt="{{ teacher.name }}’s profile picture">
+  {% endif %}
+  <h2>{{ teacher.name }}</h2>
+  <p class="teacher-info"><strong>Language:</strong> {{ teacher.language }}</p>
+  <p class="teacher-info"><strong>Rating:</strong> {{ teacher.rating }}</p>
+
+  <div class="bio-section">
+    <strong>Biography:</strong><br>
+    {{ teacher.biography }}
   </div>
+</div>
 
-  <h3 class="text-xl font-semibold mb-4">Available TimeSlots</h3>
+<div class="slots-section">
+  <h3>Available Time Slots</h3>
+
   {% if available_slots %}
-    <table class="w-full table-auto border-collapse mb-6">
+    <table class="slots-table">
       <thead>
-        <tr class="bg-gray-100">
-          <th class="px-4 py-2 text-left">Start</th>
-          <th class="px-4 py-2 text-left">End</th>
-          <th class="px-4 py-2 text-left">Day</th>
-          <th class="px-4 py-2 text-left">Action</th>
+        <tr>
+          <th>Start</th>
+          <th>End</th>
+          <th>Day</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         {% for slot in available_slots %}
-          <tr class="border-t">
-            <td class="px-4 py-2">{{ slot.start_time|date:"Y-m-d H:i" }}</td>
-            <td class="px-4 py-2">{{ slot.end_time|date:"Y-m-d H:i" }}</td>
-            <td class="px-4 py-2">{{ slot.day_name }}</td>
-            <td class="px-4 py-2">
-              <a
-                href="{% url 'group3:book_timeslot' slot.id %}"
-                class="inline-block px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
-              >
-                Book Session
-              </a>
+          <tr>
+            <td>{{ slot.start_time|date:"Y-m-d H:i" }}</td>
+            <td>{{ slot.end_time|date:"Y-m-d H:i" }}</td>
+            <td>{{ slot.day_name }}</td>
+            <td>
+              <a href="{% url 'group3:book_timeslot' slot.id %}" class="book-btn">Book Session</a>
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   {% else %}
-    <p class="text-gray-600">No available slots at the moment.</p>
+    <p class="no-slots">No available slots at the moment.</p>
   {% endif %}
+</div>
 
-  <p>
-    <a href="{% url 'group3:teacher_list' %}" class="text-blue-500 hover:underline">
-      &larr; Back to Teacher List
-    </a>
-  </p>
+<a href="{% url 'group3:teacher_list' %}" class="back-link">&larr; Back to Teacher List</a>
 {% endblock %}
