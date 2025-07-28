@@ -154,6 +154,7 @@ body {
 .form-group {
   margin-bottom: 15px;
   text-align: left;
+  
 }
 
 .btn {
@@ -165,9 +166,11 @@ body {
   border-radius: 6px;
   background: #b1e9bf;
   color: rgb(3, 83, 35);
-  transition: background 0.3s ease;
+  transition: background 0.9s ease;
+
 }
 
 .btn:hover {
   background: rgb(183, 227, 235);
 }
+

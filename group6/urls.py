@@ -14,5 +14,7 @@ urlpatterns = [
   path('showpage/', views.show_page, name='showpage'),
   path('endsection/', views.end_section, name='endsection'),
   path('profile/', views.user_profile, name='profile'),
+  path('home', views.home, name='home'),
+
 
 ]

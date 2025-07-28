@@ -15,7 +15,9 @@
     <div class="logo">Language FlashCard Learning  Page</div> 
      <nav>
        
-       <a href="{% url 'group6:login' %}" class="nav-link">Log In</a>
+      <a href="{% url 'login' %}?next={% url 'group6:group6' %}" class="nav-link">Log In</a>
+
+
 
      </nav> 
     <div class="notification">
@@ -33,7 +35,8 @@
       <ul class="dropdown-menu" id="dropdownMenu" role="menu" aria-labelledby="profileBtn">
         <li><a href="{% url 'group6:profile' %}" role="menuitem">Profile</a></li>
 
-        <li><span role="menuitem">Level {{ user_current_level }}</span></li>
+       <li> <p>Your level: <strong>{{ user_current_level }}</strong></p></li>
+
         <li><a href="{% url 'group6:logout' %}" role="menuitem">Log out</a></li>
 
       </ul>
@@ -70,12 +73,12 @@
                 <option value="{{ cat.category_id }}">{{ cat.name }}</option>
               {% endfor %}
             </select>
+            <div class="button-row" style="text-align: center; margin-top: 20px; width: auto;">
+              <button type="submit" class="btn" href ="{% url 'group6:second' %}">Start Learning</button>
+            </div>
           </div>
         </form>
-        <div class="button-row">
-          <button type="submit" class="btn" name="action" value="start_learning" onclick="location.href='{% url "group6:second" %}'"> Start Learning</button>
-        </div>
-      </div>
+       
     </div>
   </main>
 
