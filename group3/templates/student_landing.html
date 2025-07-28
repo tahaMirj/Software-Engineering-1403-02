@@ -102,16 +102,17 @@
   }
 
   .slot-teacher {
-    font-size: 15px;
+    font-size: 18px;
     color: #666;
   }
 
   .no-slots {
     text-align: center;
     margin-top: 40px;
-    color: #333;
+    color: #d44141;
+      font-weight: bold;
     font-style: italic;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   @media (max-width: 600px) {
@@ -143,7 +144,7 @@
     </div>
 
     {% if available_slots %}
-      <h3 style="text-align: center; color: white; margin-top: 30px;">Available Time Slots</h3>
+      <h3 style="text-align: center; color: white; margin-top: 60px;">Available Time Slots</h3>
       <div class="slot-list">
         {% for slot in available_slots %}
           <div class="slot-card" onclick="selectSlot('{{ slot.id }}')">

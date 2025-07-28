@@ -25,7 +25,7 @@
   <p style="color: red;">{{ error }}</p>
 {% endif %}
 
-<form style="background-color: #2f6a34; padding: 40px 30px; border-radius: 10px; overflow: hidden" method="post" id="timeslot-form">
+<form style="background-color: #2f6a34; padding: 40px 30px; border-radius: 10px; overflow: hidden;" method="post" id="timeslot-form">
   {% csrf_token %}
 
   <label>Start Time:</label>
@@ -42,7 +42,7 @@
   <button style="cursor: pointer; padding: 5px 15px;" type="submit">Update TimeSlot</button>
 </form>
 
-<p><a href="{% url 'group3:teacher_landing' %}">Back to Dashboard</a></p>
+<p style="margin-top: 20px; color: #2f6a34"><a style="color: #103b0f" href="{% url 'group3:teacher_landing' %}">Back to Dashboard</a></p>
 
 <script>
   document.getElementById('timeslot-form').addEventListener('submit', function(event) {

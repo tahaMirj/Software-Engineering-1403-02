@@ -36,8 +36,8 @@
     }
 
     .label {
-      font-weight: bold;
-      color: #555;
+    color: #70c779 !important;
+        font-weight: bold;
     }
 
     .value {
@@ -77,7 +77,7 @@
     }
 
     .back-link a {
-      color: #0066cc;
+      color: #2f6a34;
       text-decoration: none;
     }
 
@@ -97,7 +97,8 @@
         <a href="{% url 'group3:teacher_detail' timeslot.teacher.id %}">&larr; Back</a>
       </div>
     {% else %}
-      <div class="info-group">
+        <div style="display: grid; align-content: center; grid-template-columns: 1fr 1fr; gap: 16px 36px; margin-top: 30px">
+        <div class="info-group">
         <p class="label">Teacher:</p>
         <p class="value">{{ teacher.name }}</p>
       </div>
@@ -117,6 +118,7 @@
         <p class="value">{{ timeslot.end_time|date:"Y-m-d H:i" }}</p>
       </div>
 
+        </div>
       <form method="post" class="form-box">
         {% csrf_token %}
         <div class="info-group">
