@@ -3,115 +3,168 @@
 {% block title %}Student Portal{% endblock %}
 
 {% block content %}
-  <style>
-    h2 {
-      text-align: center;
-      color: #343a40;
-    }
+<style>
+  :root {
+    --green-dark: #014421; /* فرض: تیره‌ترین سبز */
+    --green: #027A48;       /* فرض: سبز اصلی */
+    --green-light: #D1FAE5; /* فرض: سبز روشن */
+  }
 
-    .welcome {
-      text-align: center;
-      margin-bottom: 20px;
+  body {
+    background-color: var(--green-light);
+  }
+
+  h2 {
+    text-align: center;
+    color: var(--green-dark);
+    margin-bottom: 20px;
+    font-size: 28px;
+  }
+
+  .welcome {
+      display: inline-block;
+    text-align: center;
+      background-color: var(--green);
+      padding: 8px;
+    font-size: 18px;
+      font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .form-container {
+    background-color: var(--green-dark);
+    padding: 30px 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto 30px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    color: white;
+  }
+
+  .nav-links {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 20px;
+  }
+
+  .nav-links a {
+    margin: 0 12px;
+    text-decoration: none;
+    color: var(--green-light);
+    font-weight: bold;
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .slot-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .slot-card {
+    background-color: white;
+    border: 1px solid var(--green);
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 4px 10px rgba(0, 100, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .slot-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 14px rgba(0, 100, 0, 0.2);
+  }
+
+  .slot-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .slot-day {
+    font-size: 16px;
+    color: #444;
+  }
+
+  .slot-time {
+    font-weight: bold;
+    color: var(--green);
+    font-size: 17px;
+  }
+
+  .slot-teacher {
+    font-size: 15px;
+    color: #666;
+  }
+
+  .no-slots {
+    text-align: center;
+    margin-top: 40px;
+    color: #333;
+    font-style: italic;
+    font-size: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .form-container {
+      padding: 20px;
     }
 
     .slot-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
+      grid-template-columns: 1fr;
     }
+  }
+</style>
 
-    .slot-card {
-      background-color: #ffffff;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: pointer;
-    }
+<h2>Student Portal</h2>
 
-    .slot-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .slot-info {
-      margin-bottom: 10px;
-    }
-
-    .slot-time {
-      font-weight: bold;
-      color: #007bff;
-    }
-
-    .slot-teacher {
-      font-size: 14px;
-      color: #555;
-    }
-
-    .no-slots {
-      text-align: center;
-      margin-top: 40px;
-      color: #6c757d;
-    }
-
-    .nav-links {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .nav-links a {
-      margin: 0 10px;
-      text-decoration: none;
-      color: #007bff;
-    }
-
-    .nav-links a:hover {
-      text-decoration: underline;
-    }
-  </style>
-
-  <h2>Student Portal</h2>
-
-  <div class="welcome">
-    {% if not request.user.is_authenticated %}
-      <p><a href="{% url 'group3:student_login' %}">Login</a></p>
-    {% else %}
-      <p>Welcome, {{ request.user.username }}!</p>
-      <div class="nav-links">
-        <a href="{% url 'group3:student_logout' %}">Logout</a> |
-        <a href="{% url 'group3:teacher_list' %}">View Teachers</a> |
-          <a href="{% url 'group3:student_sessions' %}">Booked Sessions</a> |
-        <a href="{% url 'group3:group3' %}">Back to Home</a>
-      </div>
-         {% if available_slots %}
-    <h3>Available Time Slots</h3>
-    <div class="slot-list">
-      {% for slot in available_slots %}
-        <div class="slot-card" onclick="selectSlot('{{ slot.id }}')">
-          <div class="slot-info">
-            <div class="slot-day">📅 {{ slot.day_name }}</div>
-            <div class="slot-time">
-              🕑 {{ slot.start_time|date:"H:i" }} - {{ slot.end_time|date:"H:i" }}
-            </div>
-            <div class="slot-teacher">👨‍🏫 {{ slot.teacher.name }}</div>
-          </div>
-        </div>
-      {% endfor %}
+<div class="form-container">
+  {% if not request.user.is_authenticated %}
+    <div class="welcome">
+      <p><a href="{% url 'group3:student_login' %}">Login</a> or <a href="{% url 'group3:student_signup' %}">Sign up</a> to book sessions.</p>
     </div>
   {% else %}
-    <p>Welcome, {{ request.user.username }}!</p>
-    <div class="no-slots">
-      <p>No available time slots at the moment.</p>
-    </div>
-  {% endif %}
-    {% endif %}
-  </div>
+    <span class="welcome">Welcome, {{ request.user.username }}!</span>
 
-  <script>
-    function selectSlot(slotId) {
-      alert("You selected slot ID: " + slotId);
-      // بعداً اینجا می‌تونی fetch یا فرم برای رزرو بزاری
-    }
-  </script>
+    <div class="nav-links">
+      <a href="{% url 'group3:student_logout' %}">Logout</a>
+      <a href="{% url 'group3:teacher_list' %}">View Teachers</a>
+      <a href="{% url 'group3:student_sessions' %}">Booked Sessions</a>
+      <a href="{% url 'group3:group3' %}">Back to Home</a>
+    </div>
+
+    {% if available_slots %}
+      <h3 style="text-align: center; color: white; margin-top: 30px;">Available Time Slots</h3>
+      <div class="slot-list">
+        {% for slot in available_slots %}
+          <div class="slot-card" onclick="selectSlot('{{ slot.id }}')">
+            <div class="slot-info">
+              <div class="slot-day">📅 {{ slot.day_name }}</div>
+              <div class="slot-time">🕑 {{ slot.start_time|date:"H:i" }} - {{ slot.end_time|date:"H:i" }}</div>
+              <div class="slot-teacher">👨‍🏫 {{ slot.teacher.name }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-slots">No available time slots at the moment.</div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<script>
+  function selectSlot(slotId) {
+    alert("You selected slot ID: " + slotId);
+    // در آینده می‌تونی این بخش رو با فرم رزرو یا fetch کامل کنی
+  }
+</script>
 {% endblock %}
