@@ -1,16 +1,55 @@
-{# groups/templates/groups/already_reviewed.html #}
 {% extends "groups/groups_base.html" %}
 
 {% block title %}Already Reviewed{% endblock %}
 
 {% block content %}
-  <h2 class="text-2xl font-bold mb-4">Already Reviewed</h2>
+<style>
+  .reviewed-container {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+    font-family: sans-serif;
+    text-align: center;
+  }
 
+  .reviewed-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .reviewed-container p {
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 20px;
+  }
+
+  .reviewed-container strong {
+    color: #000;
+  }
+
+  .back-link a {
+    color: #007bff;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  .back-link a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="reviewed-container">
+  <h2>Already Reviewed</h2>
   <p>You’ve already submitted a review for <strong>{{ teacher.name }}</strong>.</p>
 
-  <p class="mt-6">
-    <a href="{% url 'group3:student_sessions' %}" class="text-blue-500 hover:underline">
-      &larr; Back to Sessions
-    </a>
-  </p>
+  <div class="back-link">
+    <a href="{% url 'group3:student_sessions' %}">&larr; Back to Sessions</a>
+  </div>
+</div>
 {% endblock %}
