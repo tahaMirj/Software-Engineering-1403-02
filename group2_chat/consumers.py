@@ -51,6 +51,17 @@ class ChatConsumer(WebsocketConsumer):
 
         self.accept()
 
+        # Send all messages in the chat to the connected user
+        messages = Message.objects.filter(chat=self.chat).order_by('timestamp')
+        for message in messages:
+            self.send(text_data=json.dumps({
+                "type": "chat_message",
+                "message": message.text,
+                "sender_username": message.sender.username,
+                "timestamp": message.timestamp.isoformat(),
+                "message_id": message.id
+            }))
+
         # Mark all messages in this chat as seen
         seen_count = Message.objects.filter(
             chat=self.chat,
@@ -116,7 +127,7 @@ class ChatConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(
             self.chat_room_group_name,
             {
-                "type": "chat.message",
+                "type": "chat_message",
                 "message": message_text,
                 "sender_username": self.user.username,
                 "timestamp": message.timestamp.isoformat(),
@@ -144,9 +155,11 @@ class ChatConsumer(WebsocketConsumer):
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
+            "type": "chat_message",
             "message": event["message"],
             "sender_username": event["sender_username"],
-            "timestamp": event["timestamp"]
+            "timestamp": event["timestamp"],
+            "message_id": event["message_id"]
         }))
 
     def messages_seen(self, event):
