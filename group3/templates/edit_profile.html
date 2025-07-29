@@ -18,7 +18,7 @@
 
     .edit-container {
       max-width: 700px;
-      margin: 2.5rem auto;
+      margin: 7rem auto;
       background-color: var(--dark);
       padding: 2rem;
       border-radius: var(--radius);
@@ -106,6 +106,33 @@
         font-size: 1.6rem;
       }
     }
+
+      input[type="file"] {
+    padding: 10px;
+    border: 2px solid var(--medium);
+    border-radius: 8px;
+    background-color: white;
+    color: var(--text-dark);
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: 0.3s;
+  }
+
+  input[type="file"]::file-selector-button {
+    background-color: var(--dark);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background-color: var(--medium);
+  }
   </style>
 
   <div class="edit-container">
@@ -125,7 +152,7 @@
       {% if teacher.profile_picture %}
         <img src="{{ teacher.profile_picture.url }}" alt="Current Profile Picture" class="current-image">
       {% endif %}
-      <input type="file" name="profile_picture" id="profile_picture">
+      <input type="file" name="profile_picture" id="profile_picture" >
 
       <button type="submit">Save</button>
     </form>

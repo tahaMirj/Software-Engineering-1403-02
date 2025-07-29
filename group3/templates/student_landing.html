@@ -14,6 +14,65 @@
     background-color: var(--green-light);
   }
 
+  .welcome {
+    background: linear-gradient(135deg, #b8f2c2, #7bd389);
+    padding: 1.8rem 2rem;
+    margin: 2.5rem auto;
+    width: fit-content;
+    max-width: 90%;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    animation: fadeInUp 0.7s ease-out;
+  }
+
+  .welcome p {
+    font-size: 1.15rem;
+    color: #103b0f;
+    margin: 0;
+  }
+
+  .welcome a {
+    display: inline-block;
+    background-color: #2f6a34;
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 14px;
+    margin: 0 6px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .welcome a:hover {
+    background-color: #205026;
+    transform: scale(1.05);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(25px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .welcome {
+      padding: 1.5rem 1rem;
+    }
+
+    .welcome a {
+      display: block;
+      margin: 0.5rem auto;
+    }
+  }
+
+
   h2 {
     text-align: center;
     color: var(--green-dark);
@@ -37,7 +96,7 @@
     border-radius: 12px;
     width: 90%;
     max-width: 800px;
-    margin: 0 auto 30px;
+    margin: 4rem auto 30px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     color: white;
   }
@@ -131,8 +190,13 @@
 <div class="form-container">
   {% if not request.user.is_authenticated %}
     <div class="welcome">
-      <p><a href="{% url 'group3:student_login' %}">Login</a> or  <a href="/registration/signup/" class="btn-signup">Go to Registration Signup</a> to book sessions.</p>
-    </div>
+  <p>
+    <a href="{% url 'group3:student_login' %}">Login</a>
+    or
+    <a href="/registration/signup/">Go to Registration Signup</a>
+    to book sessions.
+  </p>
+</div>
   {% else %}
     <span class="welcome">Welcome, {{ request.user.username }}!</span>
 

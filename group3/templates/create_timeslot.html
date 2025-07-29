@@ -22,7 +22,7 @@
 
   .form-container {
     max-width: 500px;
-    margin: 3rem auto;
+    margin: 5rem auto;
     background: var(--light);
     padding: 2rem;
     border-radius: var(--radius);
@@ -90,19 +90,52 @@
   .back-link:hover {
     text-decoration: underline;
   }
+
+   .navbar {
+    background: #b8f2c2;
+    color: #103b0f;
+    padding: 0rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+      position: absolute;
+left: 0;
+      right: 0;
+      top: 0;
+  }
+
+  .site-name {
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+  p.mt-6 a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: text-decoration 0.3s ease;
+}
+
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock %}
 
 {% block content %}
   <div class="form-container">
-    <h2>Create a TimeSlot</h2>
 
+        <header class="navbar">
+        <h1 class="site-name">Teacher Portal</h1>
+        <p class="mt-6" style="border: 1px solid #2f6a34; background-color: #2f6a34; padding: 5px; border-radius: 5px">
+    <a href="{% url 'group3:group3' %}" class="text-white">
+      Back to Home
+    </a>
+  </p>
+
+    </header>
     {% if error %}
       <div class="error">{{ error }}</div>
     {% endif %}
 
-    <form method="post" id="timeslot-form">
+    <form method="post" id="timeslot-form" >
       {% csrf_token %}
       <div class="form-group">
         <label for="start_time">Start Time</label>

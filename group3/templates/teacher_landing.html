@@ -211,11 +211,29 @@
       white-space: nowrap;
     }
   }
+
+  .navbar {
+    background: #b8f2c2;
+    color: #103b0f;
+    padding: 0rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+      position: absolute;
+left: 0;
+      right: 0;
+      top: 0;
+  }
+
+  .site-name {
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
-  <h2 class="text-2xl font-bold mb-4">Teacher Portal</h2>
 
   {% if not request.user.is_authenticated %}
     <div class="action-grid">
@@ -225,7 +243,17 @@
 
   {% else %}
     {% if teacher %}
-      <p class="mb-4">Welcome, <strong>{{ request.user.username }}</strong>!</p>
+        <header class="navbar">
+        <h1 class="site-name">Teacher Portal</h1>
+        <p class="mt-6" style="border: 1px solid #2f6a34; background-color: #2f6a34; padding: 5px; border-radius: 5px">
+    <a href="{% url 'group3:group3' %}" class="text-white hover:underline">
+      Back to Home
+    </a>
+  </p>
+
+    </header>
+
+      <p style="margin-top: 70px" class="mb-4">Welcome, <strong>{{ request.user.username }}</strong>!</p>
 
       <div class="action-grid">
         <a class="action-card" href="{% url 'group3:teacher_profile' %}">View Profile</a>
@@ -283,9 +311,9 @@
     {% endif %}
   {% endif %}
 
-  <p class="mt-6">
-    <a href="{% url 'group3:group3' %}" class="text-white hover:underline">
-      &larr; Back to Home
-    </a>
-  </p>
+{#  <p class="mt-6">#}
+{#    <a href="{% url 'group3:group3' %}" class="text-white hover:underline">#}
+{#      &larr; Back to Home#}
+{#    </a>#}
+{#  </p>#}
 {% endblock %}
