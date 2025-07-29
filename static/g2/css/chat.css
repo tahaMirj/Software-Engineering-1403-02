@@ -24,6 +24,37 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;min-height:100vh;display:flex;flex
   overflow: hidden;
 }
 
+/* Chat header styles */
+.chat-header {
+  padding: 1rem;
+  background: #b8f2c2;
+  border-bottom: 1px solid #70c779;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header-username {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #103b0f;
+}
+
+.block-button {
+  background: #c62828;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.block-button:hover {
+  background: #a12222;
+}
+
 #messages {
   flex: 1;
   list-style: none;
