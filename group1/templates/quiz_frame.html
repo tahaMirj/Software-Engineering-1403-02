@@ -22,7 +22,6 @@ Provides a block 'quiz_content' for injecting the specific question UI.
         width: 100vw;
     }
     .dashboard-container {
-        max-width: 600px;
         margin: 0 auto;
         padding: 0;
         box-sizing: border-box;
@@ -50,7 +49,7 @@ Provides a block 'quiz_content' for injecting the specific question UI.
     }
 </style>
 <div class="quiz-bg">
-  <div class="dashboard-container">
+  <div class="dashboard-container" style="max-width: {{ quiz_width|default:'600px' }};">
     <div class="quiz-card">
         <!-- Header: Title and Progress -->
         <div style="margin-bottom: 2rem;">
