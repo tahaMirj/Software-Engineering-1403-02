@@ -18,29 +18,6 @@
   <main class="main-body">
     <div class="chat-container">
       <ul id="messages">
-        {% regroup previous_messages by timestamp|date:"Y-m-d" as messages_by_date %}
-        {% for date_group in messages_by_date %}
-          {% with first_message=date_group.list.0 %}
-            <li class="date-separator">
-              <span>
-                {% if first_message.timestamp|date:"Y-m-d" == now|date:"Y-m-d" %}
-                  Today
-                {% else %}
-                  {{ first_message.timestamp|date:"F j, Y" }}
-                {% endif %}
-              </span>
-            </li>
-          {% endwith %}
-          {% for message in date_group.list %}
-            <li class="{% if message.sender == user %}sent{% else %}received{% endif %}">
-              <div class="meta">{{ message.sender.username }}</div>
-              <div class="message-content">{{ message.text }}</div>
-              <div class="timestamp" title="{{ message.timestamp|date:'F j, Y g:i A' }}">
-                {{ message.timestamp|date:"g:i A" }}
-              </div>
-            </li>
-          {% endfor %}
-        {% endfor %}
       </ul>
       <form id="chat-form">
         <input id="chat-input" type="text" placeholder="Type a message…" autocomplete="off" required />
@@ -85,10 +62,10 @@
     }
 
     // Scroll to bottom of messages on load
-    document.addEventListener('DOMContentLoaded', () => {
-      const messagesUl = document.getElementById('messages');
-      messagesUl.scrollTop = messagesUl.scrollHeight;
-    });
+    // document.addEventListener('DOMContentLoaded', () => {
+    //   const messagesUl = document.getElementById('messages');
+    //   messagesUl.scrollTop = messagesUl.scrollHeight;
+    // });
   </script>
   <script src="{% static 'g2/js/chat.js' %}"></script>
 </body>
