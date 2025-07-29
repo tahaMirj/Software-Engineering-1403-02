@@ -1,4 +1,5 @@
 {% extends "groups/groups_base.html" %}
+{% load static %}
 
 {% block title %}Available Teachers{% endblock %}
 
@@ -27,13 +28,13 @@
 
   .teacher-card {
     background: white;
-    border: 1px solid var(--green-light);
-    border-radius: 10px;
     border: 5px solid var(--green);
-    padding: 30px 40px;
+    border-radius: 10px;
+    padding: 30px 20px;
     box-shadow: 0 4px 12px rgba(0, 64, 0, 0.08);
     display: flex;
     flex-direction: column;
+    align-items: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
@@ -42,17 +43,28 @@
     box-shadow: 0 6px 16px rgba(0, 64, 0, 0.15);
   }
 
+  .teacher-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--green-light);
+    margin-bottom: 15px;
+  }
+
   .teacher-name {
     font-size: 24px;
-      font-weight: bold;
+    font-weight: bold;
     color: var(--green-dark);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    text-align: center;
   }
 
   .teacher-info {
     font-size: 17px !important;
     color: #444;
     margin-bottom: 6px;
+    text-align: center;
   }
 
   .teacher-info strong {
@@ -64,7 +76,7 @@
     text-align: center;
     background-color: var(--green);
     color: white;
-    padding: 10px;
+    padding: 10px 20px;
     border-radius: 8px;
     font-weight: 500;
     transition: background-color 0.2s ease;
@@ -95,7 +107,7 @@
   .no-teachers {
     text-align: center;
     font-size: 18px;
-      font-weight: bold;
+    font-weight: bold;
     color: #d44141;
     margin-top: 20px;
   }
@@ -113,6 +125,12 @@
   <div class="teacher-grid">
     {% for teacher in teachers %}
       <div class="teacher-card">
+        {% if teacher.profile_picture %}
+          <img src="{{ teacher.profile_picture.url }}" alt="{{ teacher.name }}" class="teacher-avatar">
+        {% else %}
+          <img src="{% static 'images/profile.jpg' %}" alt="Default Avatar" class="teacher-avatar">
+        {% endif %}
+
         <div class="teacher-name">{{ teacher.name }}</div>
         <p class="teacher-info"><strong>Language:</strong> {{ teacher.language }}</p>
         <p class="teacher-info"><strong>Rating:</strong> {{ teacher.rating }}</p>

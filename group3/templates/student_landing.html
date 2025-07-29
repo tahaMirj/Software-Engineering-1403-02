@@ -131,7 +131,7 @@
 <div class="form-container">
   {% if not request.user.is_authenticated %}
     <div class="welcome">
-      <p><a href="{% url 'group3:student_login' %}">Login</a> or <a href="{% url 'group3:student_signup' %}">Sign up</a> to book sessions.</p>
+      <p><a href="{% url 'group3:student_login' %}">Login</a> or  <a href="/registration/signup/" class="btn-signup">Go to Registration Signup</a> to book sessions.</p>
     </div>
   {% else %}
     <span class="welcome">Welcome, {{ request.user.username }}!</span>

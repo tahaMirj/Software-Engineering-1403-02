@@ -9,18 +9,24 @@ from django.db import models
 
 from django.contrib.auth.models import User
 from django.db import models
-
+from .storage_backends import teacher_storage
 
 class Teacher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Link to Django user
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     biography = models.TextField(blank=True, null=True)
     language = models.CharField(max_length=50)
     rating = models.FloatField(default=0.0)
-    # TODO need object storage for storing the teacher images
-    # profile_picture = models.ImageField(upload_to='teacher_profiles/', blank=True, null=True)
+
+    # Image upload, stored under teacher_attachments/profiles/…
+    profile_picture = models.ImageField(
+        upload_to='profiles/%Y/%m/%d/',
+        storage=teacher_storage,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return f"Teacher name: {self.name}"
@@ -110,19 +116,3 @@ class Review(models.Model):
         return f"Review for {self.teacher.name} ({self.rating}/5)"
 
 
-class TeacherAttachment(models.Model):
-    teacher = models.ForeignKey(
-        'Teacher',
-        on_delete=models.CASCADE,
-        related_name='attachments'
-    )
-    upload = models.FileField(
-        upload_to='teacher_attachments/%Y/%m/%d/'
-    )
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    def filename(self):
-        return self.upload.name.rsplit('/', 1)[-1]
-
-    def __str__(self):
-        return self.filename()

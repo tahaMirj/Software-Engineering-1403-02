@@ -126,7 +126,7 @@ button:hover {
     <p class="error-message">{{ error }}</p>
   {% endif %}
 
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data" action="{% url 'group3:teacher_signup' %}">
     {% csrf_token %}
 
     <div class="form-row">
@@ -162,23 +162,19 @@ button:hover {
       </div>
     </div>
 
-    <div class="form-row">
-      <div>
-        <label for="resume">Resume (PDF)</label>
-        <input type="file" id="resume" name="resume" accept="application/pdf">
-      </div>
-      <div>
-        <label for="intro_video">Intro Video</label>
-        <input type="file" id="intro_video" name="intro_video" accept="video/*">
-      </div>
-    </div>
-
     <button type="submit">Confirm</button>
   </form>
 
   <p class="signup-link">
     Don't have an account?
     <a href="{% url 'signup' %}">Signup here</a>
+  </p>
+    <p class="login-link">
+    Already have an account?
+    <a href="{% url 'group3:teacher_login' %}">Login here</a>
+  </p>
+    <p class="teacher-landing">
+    <a href="{% url 'group3:teacher_landing' %}">Teacher Portal</a>
   </p>
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
+import os
 from datetime import datetime
-
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Avg
@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
-from .models import Teacher, TimeSlot, Session, Review, TeacherAttachment
+from .models import Teacher, TimeSlot, Session, Review
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -40,16 +40,17 @@ def teacher_login(request):
 
 def teacher_signup(request):
     if request.method == 'POST':
-        username  = request.POST.get('username')
-        password  = request.POST.get('password')
-        name      = request.POST.get('name')
-        email     = request.POST.get('email')
-        language  = request.POST.get('language')
+        username     = request.POST.get('username')
+        password     = request.POST.get('password')
+        name         = request.POST.get('name')
+        email        = request.POST.get('email')
+        language     = request.POST.get('language')
 
         # Files (optional)
-        pic_file    = request.FILES.get('profile_picture')
-        resume_file = request.FILES.get('resume')
-        video_file  = request.FILES.get('intro_video')
+        pic_file     = request.FILES.get('profile_picture')
+        resume_file  = request.FILES.get('resume')
+        # if you later add intro_video to the model, handle it similarly:
+        # video_file  = request.FILES.get('intro_video')
 
         user = authenticate(request, username=username, password=password)
         if user is None:
@@ -68,6 +69,7 @@ def teacher_signup(request):
             })
 
         with transaction.atomic():
+            # Create the teacher record without files first
             teacher = Teacher.objects.create(
                 user=user,
                 name=name,
@@ -75,13 +77,16 @@ def teacher_signup(request):
                 language=language
             )
 
-            # Create attachments if provided
-            for upload in (pic_file, resume_file, video_file):
-                if upload:
-                    TeacherAttachment.objects.create(
-                        teacher=teacher,
-                        upload=upload
-                    )
+            # Now attach files if provided
+            if pic_file:
+                teacher.profile_picture = pic_file
+            if resume_file:
+                teacher.resume = resume_file
+            # if video_file and you have model field:
+            #     teacher.intro_video = video_file
+
+            # Persist the file assignments
+            teacher.save()
 
         login(request, user)
         messages.success(request, 'Teacher profile created!')
@@ -127,10 +132,22 @@ def edit_profile(request):
     teacher = get_object_or_404(Teacher, user=request.user)
 
     if request.method == 'POST':
+        # Update biography
         bio = request.POST.get('biography', '').strip()
         teacher.biography = bio
+
+        # Update profile picture if uploaded
+        if 'profile_picture' in request.FILES:
+            # Delete old image if exists
+            if teacher.profile_picture:
+                old_path = teacher.profile_picture.path
+                if os.path.isfile(old_path):
+                    os.remove(old_path)
+
+            teacher.profile_picture = request.FILES['profile_picture']
+
         teacher.save()
-        return redirect('group3:teacher_profile')  # adjust this URL name as needed
+        return redirect('group3:teacher_profile')  # adjust this URL name if needed
 
     return render(request, 'edit_profile.html', {
         'teacher': teacher

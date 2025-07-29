@@ -1,7 +1,9 @@
 from . import views
-from django.urls import path, include
+from django.urls import path, re_path
+from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
+import os
 
 app_name = 'group3'
 urlpatterns = [
@@ -26,3 +28,9 @@ urlpatterns = [
 ]
 
 
+# Serve everything under /group3/teacher_attachments/ from the local folder
+if settings.DEBUG:
+    urlpatterns += static(
+        'teacher_attachments/',
+        document_root=settings.BASE_DIR / 'group3' / 'teacher_attachments'
+    )
