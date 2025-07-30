@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Home Learn Without Limits</title>
   <link rel="stylesheet" href="{% static 'group6/style.css' %}" />
-  <script defer src="/static/code.js"></script>
+  <script src="/static/code.js"></script>
 
 </head>
 <body>
@@ -47,38 +47,78 @@
     <div class="container">
       <h1>Flashcard Language Learning</h1>
       <div class="card"> 
-        <!-- Form for Category and Difficulty -->
-      
-      
-        <form method="POST" action="{% url 'group6:start_learning_session' %}">
-          {% csrf_token %}
-          
-          <!-- Difficulty Level Dropdown -->
-          <div class="form-group">
-            <label for="level" style="font-size: 18px; color: black;">Select Level:</label>
-            <select id="level" name="difficulty" style="width: 460px; height: 40px;" required>
-              <option value="">-- Select Level --</option>
-              {% for difficulty in difficulties %}
-                <option value="{{ difficulty.0 }}">{{ difficulty.1 }}</option>
-              {% endfor %}
-            </select>
-          </div>
+        {% if feedback_message %}
+          <p class="feedback">{{ feedback_message }}</p>
+        {% endif %}
 
-          <!-- Category Dropdown -->
-          <div class="form-group">
-            <label for="category" style="font-size: 18px; color: black;">Select Category:</label>
-            <select id="category" name="category" style="width: 460px; height: 40px;" required>
-              <option value="">-- Select Category --</option>
-              {% for cat in categories %}
-                <option value="{{ cat.category_id }}">{{ cat.name }}</option>
-              {% endfor %}
-            </select>
-            <div class="button-row" style="text-align: center; margin-top: 20px; width: auto;">
-              <button type="submit" class="btn" href ="{% url 'group6:second' %}">Start Learning</button>
+        {% if user_is_authenticated %}
+          {% if not session_active %}
+            {# Form for starting a new session #}
+            <form method="POST" action="{% url 'group6:start_learning_session' %}">
+              {% csrf_token %}
+              
+              <!-- Difficulty Level Dropdown -->
+              <div class="form-group">
+                <label for="level" style="font-size: 25px; color: black; margin-left: 17px;">Select  Level :</label>
+                <select id="level" name="difficulty" style="width: 560px; height: 50px; margin-top:45px" required>
+                  <option value=""><h6>-- Select Level --</h6></option> 
+                  {% for difficulty_choice in difficulties %} 
+                    <option value="{{ difficulty_choice.0 }}">{{ difficulty_choice.1 }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Category Dropdown -->
+              <div class="form-group">
+                <label for="category" style="font-size: 25px; color: black;">Select Category</label>
+                <select id="category" name="category" style="width: 550px; height: 50px; margin-top:20px" required>
+                  <option value=""><h6>-- Select Category --</h6></option> {# Added default empty option #}
+                  {% for cat in categories %}
+                    <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+                <div class="button-row" style="text-align: center; margin-top: 70px; width: auto; margin-left:100px">
+                  <button type="submit" class="btn">Start Learning</button> 
+                </div>
+              </div>
+            </form>
+          {% else %}
+            {# Content for active learning session - adapted from second.html and showpage.html #}
+            <div class="main-box">
+              <div class="img-box" id="imgBox">
+                {% if current_word.image_url %}
+                   <img src="{{ current_word.image_url }}" alt="Flash Card" class="flashcard" />
+                {% else %}
+                   <p>No image available</p>
+                {% endif %}
+              </div>
+              <form method="POST" action="{% url 'group6:process_guess' %}" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                {% csrf_token %}
+                {# Display word text if it has been "guessed" (revealed) #}
+                {% if current_word.guessed %}
+                    <p class="word-text">{{ current_word.text }}</p>
+                {% else %}{# Show guess input if not guessed #}
+                    <input type="text" name="user_guess" id="guessInput" class="guess-input" placeholder="Type your guess..." required>
+                {% endif %}
+              
+                <div class="button-row" style="text-align: center; margin-top: 20px; margin-left: 40px; width: auto; display: flex; justify-content: center; gap: 15px;">
+                  {% if not current_word.guessed %}
+                    <button class="btn" type="submit" name="action" value="show_answer"style="margin-right:200px"> Show Answer</button>
+                  {% else %}
+                    <button class="btn" type="submit" name="action" value="next_word" style="margin-right:200px">Next Word</button>
+                  {% endif %}
+                  <button class="btn" type="submit" name="action" value="end_session">End Session</button>
+                </div>
+              </form>
             </div>
-          </div>
-        </form>
-       
+          {% endif %}
+        {% else %}{# Content for unauthenticated users #}
+          <p style="color: red; font-weight: bold;">Please log in to start a learning session.</p>
+          <a href="{% url 'group6:login' %}" class="btn">Log In</a>
+          <a href="{% url 'group6:signup' %}" class="btn">Sign Up</a>
+        {% endif %}
+
+      </div>
     </div>
   </main>
 

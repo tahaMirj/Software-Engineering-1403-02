@@ -10,10 +10,10 @@ urlpatterns = [
   path('signup/', views.group6_signup, name='signup'), 
   path('login/', views.group6_login, name='login'),
   path('logout/', views.group6_logout, name='logout'),
-  path('second/', views.second_page, name='second'),
+ path('second/', views.second_page, name='second'),
   path('showpage/', views.show_page, name='showpage'),
   path('endsection/', views.end_section, name='endsection'),
-  path('profile/', views.user_profile, name='profile'),
+  path('profile/', views.profile, name='profile'),
   path('home', views.home, name='home'),
   path('api/notifications/', views.get_notifications_api, name='api_notifications'),
 
