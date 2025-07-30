@@ -20,13 +20,35 @@
 
 
      </nav> 
-    <div class="notification">
-      <button class="notification-btn" aria-label="Notifications">
-        <span class="bell-icon">🔔</span>
-        <span class="notification-count">1</span>
-        <span class="red-dot"></span>
-      </button>
-    </div>
+     {% if user_is_authenticated %}
+<div class="notification">
+  <button class="notification-btn" aria-label="Notifications">
+    <span class="bell-icon">🔔</span>
+
+    {% if unread_count > 0 %}
+      <span class="notification-count">{{ unread_count }}</span>
+      <span class="red-dot"></span>
+    {% endif %}
+  </button>
+
+  <div class="notification-dropdown">
+    {% if notifications %}
+      <ul>
+        {% for n in notifications %}
+          <li {% if not n.is_read %}style="font-weight: bold;"{% endif %}>
+            {{ n.message }} <br>
+            <small>{{ n.created_at|timesince }} ago</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No new notifications</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+    
 
     <div class="profile-dropdown">
       <button class="profile-btn" id="profileBtn" aria-haspopup="true" aria-expanded="false" aria-label="User Profile">
@@ -60,8 +82,8 @@
               <!-- Difficulty Level Dropdown -->
               <div class="form-group">
                 <label for="level" style="font-size: 25px; color: black; margin-left: 17px;">Select  Level :</label>
-                <select id="level" name="difficulty" style="width: 560px; height: 50px; margin-top:45px" required>
-                  <option value=""><h6>-- Select Level --</h6></option> 
+                <select id="level" name="difficulty" style="width: 660px; height: 50px; margin-top:45px" required>
+                  <option value="" style="text-align:center"><h6>-- Select Level --</h6></option> 
                   {% for difficulty_choice in difficulties %} 
                     <option value="{{ difficulty_choice.0 }}">{{ difficulty_choice.1 }}</option>
                   {% endfor %}
@@ -71,19 +93,19 @@
               <!-- Category Dropdown -->
               <div class="form-group">
                 <label for="category" style="font-size: 25px; color: black;">Select Category</label>
-                <select id="category" name="category" style="width: 550px; height: 50px; margin-top:20px" required>
-                  <option value=""><h6>-- Select Category --</h6></option> {# Added default empty option #}
+                <select id="category" name="category" style="width: 650px; height: 50px; margin-top:20px " required>
+                  <option value="" style="text-align:center"><h6>-- Select Category --</h6></option> 
                   {% for cat in categories %}
                     <option value="{{ cat.category_id }}">{{ cat.name }}</option>
                   {% endfor %}
                 </select>
-                <div class="button-row" style="text-align: center; margin-top: 70px; width: auto; margin-left:100px">
-                  <button type="submit" class="btn">Start Learning</button> 
+                <div class="button-row" style="text-align: center; margin-top: 70px; width: auto; margin-left:100px ">
+                  <button type="submit" class="btn" >Start Learning</button> 
                 </div>
               </div>
             </form>
           {% else %}
-            {# Content for active learning session - adapted from second.html and showpage.html #}
+          
             <div class="main-box">
               <div class="img-box" id="imgBox">
                 {% if current_word.image_url %}

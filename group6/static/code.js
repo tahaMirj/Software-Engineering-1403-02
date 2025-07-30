@@ -18,3 +18,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.querySelector('.notification-btn');
+    const dropdown = document.querySelector('.notification-dropdown');
+
+    if (btn && dropdown) {
+      btn.addEventListener('click', function () {
+        dropdown.classList.toggle('show');
+      });
+    }
+  });
+
