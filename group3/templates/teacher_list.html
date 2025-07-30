@@ -1,0 +1,228 @@
+{% extends "groups/groups_base.html" %}
+{% load static %}
+
+{% block title %}Available Teachers{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --green-dark: #014421;
+    --green: #027A48;
+    --green-light: #D1FAE5;
+  }
+
+  .page-header {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--green-dark);
+    margin-bottom: 30px;
+  }
+
+  /* Controls container */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  #teacher-filter,
+  #teacher-sort {
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 2px solid var(--green-light);
+    border-radius: 6px;
+    max-width: 300px;
+    width: 85%;
+  }
+  #teacher-filter:focus,
+  #teacher-sort:focus {
+    outline: none;
+    border-color: var(--green);
+    background: #f0fff5;
+  }
+
+  .teacher-grid {
+    width: 85%;
+    margin: 3rem auto;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 24px;
+    padding: 0 10px;
+  }
+
+  .teacher-card {
+    background: white;
+    border: 5px solid var(--green);
+    border-radius: 10px;
+    padding: 30px 20px;
+    box-shadow: 0 4px 12px rgba(0, 64, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .teacher-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 64, 0, 0.15);
+  }
+
+  .teacher-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--green-light);
+    margin-bottom: 15px;
+  }
+
+  .teacher-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--green-dark);
+    margin-bottom: 22px;
+    text-align: center;
+  }
+
+  .teacher-info {
+    font-size: 17px !important;
+    color: #444;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .teacher-info strong {
+    color: var(--green);
+  }
+
+  .view-button {
+    margin-top: 15px;
+    text-align: center;
+    background-color: var(--green);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+  }
+
+  .view-button:hover {
+    background-color: var(--green-dark);
+  }
+
+  .back-link {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  .back-link a {
+    color: var(--green-dark);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .back-link a:hover {
+    text-decoration: underline;
+    color: var(--green);
+  }
+
+  .no-teachers {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #d44141;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .page-header {
+      font-size: 22px;
+    }
+    .teacher-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<h2 class="page-header">Available Teachers</h2>
+
+<!-- Controls: Filter + Sort -->
+<div class="controls">
+  <input
+    type="text"
+    id="teacher-filter"
+    placeholder="Filter by name or language…"
+  />
+  <select id="teacher-sort">
+    <option value="default">Sort by Rating</option>
+    <option value="asc">Rating: Low to High</option>
+    <option value="desc">Rating: High to Low</option>
+  </select>
+</div>
+
+{% if teachers %}
+  <div class="teacher-grid" id="teacher-grid">
+    {% for teacher in teachers %}
+      <div class="teacher-card" data-rating="{{ teacher.rating }}">
+        {% if teacher.profile_picture %}
+          <img src="{{ teacher.profile_picture.url }}" alt="{{ teacher.name }}" class="teacher-avatar">
+        {% else %}
+          <img src="{% static 'images/profile.jpg' %}" alt="Default Avatar" class="teacher-avatar">
+        {% endif %}
+
+        <div class="teacher-name">{{ teacher.name }}</div>
+        <p class="teacher-info"><strong>Language:</strong> {{ teacher.language }}</p>
+        <p class="teacher-info"><strong>Rating:</strong> {{ teacher.rating }}</p>
+        <a href="{% url 'group3:teacher_detail' teacher.id %}" class="view-button">
+          View Details
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="no-teachers">No teachers found.</p>
+{% endif %}
+
+<div class="back-link">
+  <a href="{% url 'group3:student_landing' %}">&larr; Back to Student Portal</a>
+</div>
+
+<!-- Inline JS for filtering & sorting -->
+<script>
+  const filterInput = document.getElementById('teacher-filter');
+  const sortSelect  = document.getElementById('teacher-sort');
+  const grid        = document.getElementById('teacher-grid');
+
+  // Filter function
+  filterInput.addEventListener('input', () => {
+    const term = filterInput.value.toLowerCase();
+    document.querySelectorAll('.teacher-card').forEach(card => {
+      const name = card.querySelector('.teacher-name').textContent.toLowerCase();
+      const lang = card.querySelectorAll('.teacher-info')[0].textContent.toLowerCase();
+      card.style.display = (name.includes(term) || lang.includes(term)) ? 'flex' : 'none';
+    });
+  });
+
+  // Sort function
+  sortSelect.addEventListener('change', () => {
+    const cards = Array.from(document.querySelectorAll('.teacher-card'));
+    const direction = sortSelect.value;
+    if (direction === 'default') {
+      // restore original order by DOM (no-op)
+      cards.forEach(card => grid.appendChild(card));
+    } else {
+      cards.sort((a, b) => {
+        const ra = parseFloat(a.dataset.rating);
+        const rb = parseFloat(b.dataset.rating);
+        return direction === 'asc' ? ra - rb : rb - ra;
+      });
+      cards.forEach(card => grid.appendChild(card));
+    }
+  });
+</script>
+{% endblock %}

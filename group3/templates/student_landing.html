@@ -1,0 +1,217 @@
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Student Portal{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --green-dark: #014421; /* فرض: تیره‌ترین سبز */
+    --green: #027A48;       /* فرض: سبز اصلی */
+    --green-light: #D1FAE5; /* فرض: سبز روشن */
+  }
+
+  body {
+    background-color: var(--green-light);
+  }
+
+  .welcome {
+    background: linear-gradient(135deg, #b8f2c2, #7bd389);
+    padding: 1.8rem 2rem;
+    margin: 2.5rem auto;
+    width: fit-content;
+    max-width: 90%;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    animation: fadeInUp 0.7s ease-out;
+  }
+
+  .welcome p {
+    font-size: 1.15rem;
+    color: #103b0f;
+    margin: 0;
+  }
+
+  .welcome a {
+    display: inline-block;
+    background-color: #2f6a34;
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 14px;
+    margin: 0 6px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .welcome a:hover {
+    background-color: #205026;
+    transform: scale(1.05);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(25px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .welcome {
+      padding: 1.5rem 1rem;
+    }
+
+    .welcome a {
+      display: block;
+      margin: 0.5rem auto;
+    }
+  }
+
+
+  h2 {
+    text-align: center;
+    color: var(--green-dark);
+    margin-bottom: 20px;
+    font-size: 28px;
+  }
+
+  .welcome {
+      display: inline-block;
+    text-align: center;
+      background-color: var(--green);
+      padding: 8px;
+    font-size: 18px;
+      font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .form-container {
+    background-color: var(--green-dark);
+    padding: 30px 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    margin: 4rem auto 30px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    color: white;
+  }
+
+  .nav-links {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 20px;
+  }
+
+  .nav-links a {
+    margin: 0 12px;
+    text-decoration: none;
+    color: var(--green-light);
+    font-weight: bold;
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .slot-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .slot-card {
+    background-color: white;
+    border: 1px solid var(--green);
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 4px 10px rgba(0, 100, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .slot-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 14px rgba(0, 100, 0, 0.2);
+  }
+
+  .slot-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .slot-day {
+    font-size: 16px;
+    color: #444;
+  }
+
+  .slot-time {
+    font-weight: bold;
+    color: var(--green);
+    font-size: 17px;
+  }
+
+  .slot-teacher {
+    font-size: 18px;
+    color: #666;
+  }
+
+  .no-slots {
+    text-align: center;
+    margin-top: 40px;
+    color: #d44141;
+      font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
+  }
+
+  @media (max-width: 600px) {
+    .form-container {
+      padding: 20px;
+    }
+
+    .slot-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<h2>Student Portal</h2>
+
+<div class="form-container">
+  {% if not request.user.is_authenticated %}
+    <div class="welcome">
+  <p>
+    <a href="{% url 'group3:student_login' %}">Login</a>
+    or
+    <a href="/registration/signup/">Go to Registration Signup</a>
+    to book sessions.
+  </p>
+</div>
+  {% else %}
+    <span class="welcome">Welcome, {{ request.user.username }}!</span>
+
+    <div class="nav-links">
+      <a href="{% url 'group3:student_logout' %}">Logout</a>
+      <a href="{% url 'group3:teacher_list' %}">View Teachers</a>
+      <a href="{% url 'group3:student_sessions' %}">Booked Sessions</a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  function selectSlot(slotId) {
+    alert("You selected slot ID: " + slotId);
+    // در آینده می‌تونی این بخش رو با فرم رزرو یا fetch کامل کنی
+  }
+</script>
+{% endblock %}

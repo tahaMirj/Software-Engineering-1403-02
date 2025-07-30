@@ -1,0 +1,142 @@
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Book Session{% endblock %}
+
+{% block content %}
+  <style>
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      font-family: sans-serif;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .error-box {
+      background-color: #ffe5e5;
+      border: 1px solid #ff4d4d;
+      color: #cc0000;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .info-group {
+      margin-bottom: 16px;
+    }
+
+    .label {
+    color: #70c779 !important;
+        font-weight: bold;
+    }
+
+    .value {
+      color: #222;
+      margin-top: 4px;
+    }
+
+    .form-box {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .button {
+      display: block;
+      width: 100%;
+      background-color: #2e7d32;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .button:hover {
+      background-color: #1b5e20;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #2f6a34;
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+
+  <div class="container">
+    <h2 class="title">Book a Session</h2>
+
+    {% if error %}
+      <div class="error-box">
+        <p>{{ error }}</p>
+      </div>
+      <div class="back-link">
+        <a href="{% url 'group3:teacher_detail' timeslot.teacher.id %}">&larr; Back</a>
+      </div>
+    {% else %}
+        <div style="display: grid; align-content: center; grid-template-columns: 1fr 1fr; gap: 16px 36px; margin-top: 30px">
+        <div class="info-group">
+        <p class="label">Teacher:</p>
+        <p class="value">{{ teacher.name }}</p>
+      </div>
+
+      <div class="info-group">
+        <p class="label">Language:</p>
+        <p class="value">{{ teacher.language }}</p>
+      </div>
+
+      <div class="info-group">
+        <p class="label">Starts:</p>
+        <p class="value">{{ timeslot.start_time|date:"Y-m-d H:i" }}</p>
+      </div>
+
+      <div class="info-group">
+        <p class="label">Ends:</p>
+        <p class="value">{{ timeslot.end_time|date:"Y-m-d H:i" }}</p>
+      </div>
+
+        </div>
+      <form method="post" class="form-box">
+        {% csrf_token %}
+        <div class="info-group">
+          <p class="label">Student Name:</p>
+          <p class="value">{{ request.user.username }}</p>
+        </div>
+
+        <div class="info-group">
+          <p class="label">Language:</p>
+          <p class="value">{{ teacher.language }}</p>
+        </div>
+
+        <button type="submit" class="button">Confirm Booking</button>
+      </form>
+
+      <div class="back-link">
+        <a href="{% url 'group3:teacher_detail' teacher.id %}">&larr; Back to Teacher</a>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

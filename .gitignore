@@ -193,6 +193,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+group3/teacher_attachments/profiles
+group3/teacher_attachments/resumes
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,windows,pycharm+all,visualstudiocode
 
 .junie
