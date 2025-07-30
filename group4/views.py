@@ -6,11 +6,13 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Avg, Count
 from django.conf import settings
 from .models import Reading, ReadingCategory, Question, Results, AttemptHistory
+import re
 import json
 import edge_tts
 import asyncio
 import io
 import base64
+from pydub import AudioSegment
 
 # =============================================================================
 # MAIN PAGE VIEWS (HTML Templates)
@@ -258,7 +260,105 @@ def generate_audio(request, reading_id):
     Returns:
     JSON with audio_url (data URL) and duration
     """
-    pass
+    # ابتدا محتوای متنی ریدینگ را از دیتابیس دریافت می کنیم
+    reading = get_object_or_404(Reading, id=reading_id)
+    content = reading.content
+
+    # سپس پارامترهای موردنیاز (در صورت وجود) را دریافت می کنیم
+    try:
+        # پارس کردن JSON body
+        body_data = json.loads(request.body.decode('utf-8'))
+        voice = body_data.get('voice', 'en-US-AriaNeural')
+        rate = body_data.get('rate', '0%')
+        pitch = body_data.get('pitch', '0Hz')
+    except (json.JSONDecodeError, AttributeError):
+        # اگر JSON نبود، از POST data استفاده کن
+        voice = request.POST.get('voice', 'en-US-AriaNeural')
+        rate = request.POST.get('rate', '0%')
+        pitch = request.POST.get('pitch', '0Hz')
+
+    # قبل از فرستادن برای تبدیل به صوت متن را به جمله ها تقسیم می کنیم
+    sentences = re.split(r'(?<=[.!?])(?!\d)(?![.!?])\s+(?=[A-Z])', content)
+    
+    # اگر جمله ای بیش از 20 کلمه داشت، آن را به قسمت های کوچکتر تقسیم می کنیم
+    lines = []
+    for sentence in sentences:
+        words = sentence.split()
+        if len(words) > 20:
+            # جمله طولانی را در نقاط مناسب (کاما، و، که) تقسیم می کنیم
+            parts = re.split(r'(\s*,\s*|\s+and\s+|\s+or\s+|\s+but\s+|\s+which\s+|\s+that\s+)', sentence)
+            current_part = ""
+            for part in parts:
+                # اگر قسمت فعلی + قسمت جدید کمتر از 20 کلمه باشد
+                if len((current_part + part).split()) <= 20:
+                    current_part += part
+                else:
+                    # قسمت فعلی را اضافه کن و قسمت جدید را شروع کن
+                    if current_part.strip():
+                        lines.append(current_part.strip())
+                    current_part = part
+            # آخرین قسمت را اضافه کن
+            if current_part.strip():
+                lines.append(current_part.strip())
+        else:
+            lines.append(sentence)
+
+    # تولید صوت با timestamp دقیق و sentence-level با Edge-TTS
+    try:
+        async def generate_audio_with_sentence_timing():
+            # متن کامل را با نقطه و فاصله بین جملات ترکیب کن
+            full_text = '. '.join([line.strip() for line in lines if line.strip()])
+            communicate = edge_tts.Communicate(full_text, voice)
+            audio_data = b""
+            word_boundaries = []
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_data += chunk["data"]
+                elif chunk["type"] == "WordBoundary":
+                    word_boundaries.append({
+                        'text': chunk["text"],
+                        'offset': chunk["offset"] / 10000000.0,  # seconds
+                        'duration': chunk["duration"] / 10000000.0
+                    })
+            # حالا جملات را با word boundaries مچ کن
+            timestamps = []
+            sentence_idx = 0
+            sentence_words = lines[sentence_idx].strip().replace('  ', ' ').split()
+            word_idx = 0
+            sentence_start = None
+            for i, wb in enumerate(word_boundaries):
+                # شروع جمله
+                if word_idx == 0:
+                    sentence_start = wb['offset']
+                word_idx += 1
+                # پایان جمله؟
+                if word_idx == len(sentence_words):
+                    sentence_end = wb['offset'] + wb['duration']
+                    timestamps.append({
+                        'sentence_id': sentence_idx + 1,
+                        'text': lines[sentence_idx].strip(),
+                        'start_time': sentence_start,
+                        'end_time': sentence_end
+                    })
+                    sentence_idx += 1
+                    if sentence_idx < len(lines):
+                        sentence_words = lines[sentence_idx].strip().replace('  ', ' ').split()
+                        word_idx = 0
+            total_duration_seconds = timestamps[-1]['end_time'] if timestamps else 0
+            return audio_data, timestamps, total_duration_seconds
+        # اجرای تولید صوت
+        audio_data, timestamps, total_duration_seconds = asyncio.run(generate_audio_with_sentence_timing())
+        print(f"Generated audio with {len(timestamps)} sentence timestamps")
+        # تبدیل به base64 برای ارسال به فرانت اند
+        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+        audio_url = f"data:audio/mp3;base64,{audio_base64}"
+        return JsonResponse({
+            'audio_url': audio_url,
+            'duration': total_duration_seconds,
+            'timestamps': timestamps
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 # =============================================================================

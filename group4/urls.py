@@ -20,11 +20,6 @@ urlpatterns = [
     # Audio API endpoints
     path('api/readings/<int:reading_id>/generate/', views.generate_audio, name='generate_audio'),
     
-    # Subtitle and timing API endpoints
-    # i HAVE deemed these unnecessary, keeping them here in case they are needed later
-    # path('api/readings/<int:reading_id>/subtitles/', views.get_subtitles, name='get_subtitles'),
-    # path('api/readings/<int:reading_id>/sentences/<int:sentence_id>/timestamp/', views.get_sentence_timestamp, name='sentence_timestamp'),
-    
     # Exercise and progress API endpoints
     path('api/readings/<int:reading_id>/submit/', views.submit_exercise, name='submit_exercise'),
     path('api/user/progress/', views.user_progress, name='user_progress'),

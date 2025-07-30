@@ -26,9 +26,6 @@
       <button class="accent-btn" data-accent="uk">
         🇬🇧 British
       </button>
-      <button class="accent-btn" data-accent="au">
-        🇦🇺 Australian
-      </button>
     </div>
   </div>
   
@@ -209,9 +206,11 @@ async function generateAudio() {
         // Map accent to voice
         const voiceMap = {
             'us': 'en-US-AriaNeural',
-            'uk': 'en-GB-SoniaNeural', 
-            'au': 'en-AU-NatashaNeural'
+            'uk': 'en-GB-SoniaNeural'
         };
+        
+        console.log('Selected accent:', selectedAccent);
+        console.log('Voice to use:', voiceMap[selectedAccent]);
         
         const response = await fetch("{% url 'group4:generate_audio' reading.id %}", {
             method: 'POST',
@@ -226,14 +225,20 @@ async function generateAudio() {
         
         if (response.ok) {
             const data = await response.json();
+            console.log('Received audio data:', data);
+            console.log('Audio duration:', data.duration);
+            console.log('Timestamps length:', data.timestamps?.length);
+            
             audioSource.src = data.audio_url;
             audioPlayer.load();
             
             // Set timer based on audio duration (3x the audio length)
             if (data.duration) {
                 timeLeft = Math.ceil(data.duration * 3); // 3 times audio duration
+                console.log('Timer set to:', timeLeft, 'seconds');
                 updateTimerDisplay();
             } else {
+                console.warn('No duration provided, using fallback');
                 // Fallback to default 4 minutes if no duration provided
                 timeLeft = 240;
                 updateTimerDisplay();
