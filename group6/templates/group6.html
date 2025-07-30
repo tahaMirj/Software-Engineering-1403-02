@@ -1,7 +1,148 @@
-{% extends "groups/groups_base.html" %}
+{% load static %}
 
-{% block title %}Group 6 Dashboard{% endblock %}
-{% block content %}
-    <h2>Welcome to Group 6</h2>
-    <p>This page shows your microservice status.</p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Learn Without Limits</title>
+  <link rel="stylesheet" href="{% static 'group6/style.css' %}" />
+  <script src="/static/code.js"></script>
+
+</head>
+<body>
+  <header class="top-bar">
+    <div class="logo">Language FlashCard Learning  Page</div> 
+     <nav>
+       
+      <a href="{% url 'login' %}?next={% url 'group6:group6' %}" class="nav-link">Log In</a>
+
+
+
+     </nav> 
+     {% if user_is_authenticated %}
+<div class="notification">
+  <button class="notification-btn" aria-label="Notifications">
+    <span class="bell-icon">🔔</span>
+
+    {% if unread_count > 0 %}
+      <span class="notification-count">{{ unread_count }}</span>
+      <span class="red-dot"></span>
+    {% endif %}
+  </button>
+
+  <div class="notification-dropdown">
+    {% if notifications %}
+      <ul>
+        {% for n in notifications %}
+          <li {% if not n.is_read %}style="font-weight: bold;"{% endif %}>
+            {{ n.message }} <br>
+            <small>{{ n.created_at|timesince }} ago</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No new notifications</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+    
+
+    <div class="profile-dropdown">
+      <button class="profile-btn" id="profileBtn" aria-haspopup="true" aria-expanded="false" aria-label="User Profile">
+        <img src="{% static 'group6/profile.jpeg' %}" alt="User Avatar" class="avatar" />
+      </button>
+      <ul class="dropdown-menu" id="dropdownMenu" role="menu" aria-labelledby="profileBtn">
+        <li><a href="{% url 'group6:profile' %}" role="menuitem">Profile</a></li>
+
+       <li> <p>Your level: <strong>{{ user_current_level }}</strong></p></li>
+
+        <li><a href="{% url 'group6:logout' %}" role="menuitem">Log out</a></li>
+
+      </ul>
+    </div>
+  </header>
+
+<main class="hero">
+    <div class="container">
+      <h1>Flashcard Language Learning</h1>
+      <div class="card"> 
+        {% if feedback_message %}
+          <p class="feedback">{{ feedback_message }}</p>
+        {% endif %}
+
+        {% if user_is_authenticated %}
+          {% if not session_active %}
+            {# Form for starting a new session #}
+            <form method="POST" action="{% url 'group6:start_learning_session' %}">
+              {% csrf_token %}
+              
+              <!-- Difficulty Level Dropdown -->
+              <div class="form-group">
+                <label for="level" style="font-size: 25px; color: black; margin-left: 17px;">Select  Level :</label>
+                <select id="level" name="difficulty" style="width: 660px; height: 50px; margin-top:45px" required>
+                  <option value="" style="text-align:center"><h6>-- Select Level --</h6></option> 
+                  {% for difficulty_choice in difficulties %} 
+                    <option value="{{ difficulty_choice.0 }}">{{ difficulty_choice.1 }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Category Dropdown -->
+              <div class="form-group">
+                <label for="category" style="font-size: 25px; color: black;">Select Category</label>
+                <select id="category" name="category" style="width: 650px; height: 50px; margin-top:20px " required>
+                  <option value="" style="text-align:center"><h6>-- Select Category --</h6></option> 
+                  {% for cat in categories %}
+                    <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+                <div class="button-row" style="text-align: center; margin-top: 70px; width: auto; margin-left:100px ">
+                  <button type="submit" class="btn" >Start Learning</button> 
+                </div>
+              </div>
+            </form>
+          {% else %}
+          
+            <div class="main-box">
+              <div class="img-box" id="imgBox">
+                {% if current_word.image_url %}
+                   <img src="{{ current_word.image_url }}" alt="Flash Card" class="flashcard" />
+                {% else %}
+                   <p>No image available</p>
+                {% endif %}
+              </div>
+              <form method="POST" action="{% url 'group6:process_guess' %}" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                {% csrf_token %}
+                {# Display word text if it has been "guessed" (revealed) #}
+                {% if current_word.guessed %}
+                    <p class="word-text">{{ current_word.text }}</p>
+                {% else %}{# Show guess input if not guessed #}
+                    <input type="text" name="user_guess" id="guessInput" class="guess-input" placeholder="Type your guess..." required>
+                {% endif %}
+              
+                <div class="button-row" style="text-align: center; margin-top: 20px; margin-left: 40px; width: auto; display: flex; justify-content: center; gap: 15px;">
+                  {% if not current_word.guessed %}
+                    <button class="btn" type="submit" name="action" value="show_answer"style="margin-right:200px"> Show Answer</button>
+                  {% else %}
+                    <button class="btn" type="submit" name="action" value="next_word" style="margin-right:200px">Next Word</button>
+                  {% endif %}
+                  <button class="btn" type="submit" name="action" value="end_session">End Session</button>
+                </div>
+              </form>
+            </div>
+          {% endif %}
+        {% else %}{# Content for unauthenticated users #}
+          <p style="color: red; font-weight: bold;">Please log in to start a learning session.</p>
+          <a href="{% url 'group6:login' %}" class="btn">Log In</a>
+          <a href="{% url 'group6:signup' %}" class="btn">Sign Up</a>
+        {% endif %}
+
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

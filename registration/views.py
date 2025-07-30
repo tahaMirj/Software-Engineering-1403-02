@@ -40,7 +40,6 @@ def SignupPage(request):
     
     return render(request, 'registration/signup.html')
 
-
 def LoginPage(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -49,11 +48,19 @@ def LoginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('home')  # ریدایرکت به صفحه خانه بعد از ورود
+            # Redirect to `next` if it exists
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('home')  # fallback if next is not set
         else:
             return HttpResponse("Username or Password is incorrect!!!")
 
-    return render(request, 'registration/login.html')
+    # GET request: capture next parameter (if any)
+    next_url = request.GET.get('next', '')
+    return render(request, 'registration/login.html', {'next': next_url})
+
 
 
 def LogoutPage(request):
