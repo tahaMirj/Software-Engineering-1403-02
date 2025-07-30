@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 
 class Chat(models.Model):
     participants = models.ManyToManyField(User, related_name='chats')
+    blocked = models.BooleanField(default=False)
+    blocked_by = models.ForeignKey(to=User, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

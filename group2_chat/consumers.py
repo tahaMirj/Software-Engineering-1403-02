@@ -50,6 +50,8 @@ class ChatConsumer(WebsocketConsumer):
         )
 
         self.accept()
+        if self.chat.blocked:
+            self.send_blocked_state()
 
         # Send all messages in the chat to the connected user
         messages = Message.objects.filter(chat=self.chat).order_by('timestamp')
@@ -114,6 +116,22 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        if text_data_json.get("action") == "refresh_state":
+            async_to_sync(self.channel_layer.group_send)(
+                self.chat_room_group_name,
+                {
+                    "type": "refresh_state",
+                    # "blocked_by": self.user.username
+                }
+            )
+            return
+        
+        # Reject sending if blocked
+        self.chat.refresh_from_db()
+        if self.chat.blocked:
+            return
+
+        
         message_text = text_data_json["message"]
 
         # Create message instance
@@ -167,4 +185,16 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             "type": "messages_seen",
             "user": event["user"]
+        }))
+
+
+    def refresh_state(self, event):
+        self.send_blocked_state()
+
+    def send_blocked_state(self):
+        self.chat.refresh_from_db()
+        self.send(text_data=json.dumps({
+            "type": "update_state",
+            "blocked": self.chat.blocked,
+            "blocked_by": self.chat.blocked_by.username if self.chat.blocked else None
         }))
