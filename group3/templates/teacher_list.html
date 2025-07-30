@@ -19,9 +19,34 @@
     margin-bottom: 30px;
   }
 
+  /* Controls container */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  #teacher-filter,
+  #teacher-sort {
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 2px solid var(--green-light);
+    border-radius: 6px;
+    max-width: 300px;
+    width: 85%;
+  }
+  #teacher-filter:focus,
+  #teacher-sort:focus {
+    outline: none;
+    border-color: var(--green);
+    background: #f0fff5;
+  }
+
   .teacher-grid {
-      width: 85%;
-      margin: 3rem auto;
+    width: 85%;
+    margin: 3rem auto;
     display: grid;
     grid-template-columns: repeat(3,1fr);
     gap: 24px;
@@ -118,15 +143,32 @@
     .page-header {
       font-size: 22px;
     }
+    .teacher-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <h2 class="page-header">Available Teachers</h2>
 
+<!-- Controls: Filter + Sort -->
+<div class="controls">
+  <input
+    type="text"
+    id="teacher-filter"
+    placeholder="Filter by name or language…"
+  />
+  <select id="teacher-sort">
+    <option value="default">Sort by Rating</option>
+    <option value="asc">Rating: Low to High</option>
+    <option value="desc">Rating: High to Low</option>
+  </select>
+</div>
+
 {% if teachers %}
-  <div class="teacher-grid">
+  <div class="teacher-grid" id="teacher-grid">
     {% for teacher in teachers %}
-      <div class="teacher-card">
+      <div class="teacher-card" data-rating="{{ teacher.rating }}">
         {% if teacher.profile_picture %}
           <img src="{{ teacher.profile_picture.url }}" alt="{{ teacher.name }}" class="teacher-avatar">
         {% else %}
@@ -149,4 +191,38 @@
 <div class="back-link">
   <a href="{% url 'group3:student_landing' %}">&larr; Back to Student Portal</a>
 </div>
+
+<!-- Inline JS for filtering & sorting -->
+<script>
+  const filterInput = document.getElementById('teacher-filter');
+  const sortSelect  = document.getElementById('teacher-sort');
+  const grid        = document.getElementById('teacher-grid');
+
+  // Filter function
+  filterInput.addEventListener('input', () => {
+    const term = filterInput.value.toLowerCase();
+    document.querySelectorAll('.teacher-card').forEach(card => {
+      const name = card.querySelector('.teacher-name').textContent.toLowerCase();
+      const lang = card.querySelectorAll('.teacher-info')[0].textContent.toLowerCase();
+      card.style.display = (name.includes(term) || lang.includes(term)) ? 'flex' : 'none';
+    });
+  });
+
+  // Sort function
+  sortSelect.addEventListener('change', () => {
+    const cards = Array.from(document.querySelectorAll('.teacher-card'));
+    const direction = sortSelect.value;
+    if (direction === 'default') {
+      // restore original order by DOM (no-op)
+      cards.forEach(card => grid.appendChild(card));
+    } else {
+      cards.sort((a, b) => {
+        const ra = parseFloat(a.dataset.rating);
+        const rb = parseFloat(b.dataset.rating);
+        return direction === 'asc' ? ra - rb : rb - ra;
+      });
+      cards.forEach(card => grid.appendChild(card));
+    }
+  });
+</script>
 {% endblock %}

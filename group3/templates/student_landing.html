@@ -204,25 +204,7 @@
       <a href="{% url 'group3:student_logout' %}">Logout</a>
       <a href="{% url 'group3:teacher_list' %}">View Teachers</a>
       <a href="{% url 'group3:student_sessions' %}">Booked Sessions</a>
-      <a href="{% url 'group3:group3' %}">Back to Home</a>
     </div>
-
-    {% if available_slots %}
-      <h3 style="text-align: center; color: white; margin-top: 60px;">Available Time Slots</h3>
-      <div class="slot-list">
-        {% for slot in available_slots %}
-          <div class="slot-card" onclick="selectSlot('{{ slot.id }}')">
-            <div class="slot-info">
-              <div class="slot-day">📅 {{ slot.day_name }}</div>
-              <div class="slot-time">🕑 {{ slot.start_time|date:"H:i" }} - {{ slot.end_time|date:"H:i" }}</div>
-              <div class="slot-teacher">👨‍🏫 {{ slot.teacher.name }}</div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="no-slots">No available time slots at the moment.</div>
-    {% endif %}
   {% endif %}
 </div>
 

@@ -76,7 +76,6 @@ class Session(models.Model):
 
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='sessions')
     timeslot = models.ForeignKey(TimeSlot, on_delete=models.SET_NULL, null=True, blank=True)
-    # TODO has to be connected to the actual user
     student_name = models.CharField(max_length=100)
     language = models.CharField(max_length=255)
     start_time = models.DateTimeField()
