@@ -1,0 +1,52 @@
+{% extends "quiz_question_base.html" %}
+
+{% block extra_styles %}
+    .reading-container {
+        display: flex;
+        gap: 2rem;
+        color: #e0e0e0;
+    }
+    .passage-section {
+        flex: 1;
+        background-color: #2a2a3e;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .passage-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+    .passage-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #d1d5db;
+    }
+    .question-section {
+        flex: 1;
+    }
+{% endblock %}
+
+{% block question_content %}
+<div class="reading-container">
+    <!-- Passage Section -->
+    <div class="passage-section">
+        <h4 class="passage-title">Reading Passage</h4>
+        <p class="passage-text">{{ passage_text }}</p>
+    </div>
+
+    <!-- Question Section -->
+    <div class="question-section">
+        <p class="question-text">{{ question.text_or_prompt }}</p>
+
+        <div id="options-container" class="options-container">
+            {% for choice in choices %}
+                <button type="button" class="option-btn" data-choice-id="{{ choice.id }}">{{ choice.text }}</button>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
