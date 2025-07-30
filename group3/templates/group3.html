@@ -1,7 +1,103 @@
-{% extends "groups/groups_base.html" %}
+{# templates/groups/dashboard.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Group 3 Dashboard</title>
+  <style>
+    /* ---------- COLOR PALETTE ---------- */
+    :root {
+      --light: #b8f2c2;      /* light green  */
+      --medium: #70c779;     /* medium green */
+      --dark: #2f6a34;       /* dark green   */
+      --text-dark: #103b0f;  /* deep green text */
+      --text-light: #e4fbe4; /* light text on dark bg */
 
-{% block title %}Group 3 Dashboard{% endblock %}
-{% block content %}
-    <h2>Welcome to Group 3</h2>
-    <p>This page shows your microservice status.</p>
-{% endblock %}
+      --card-bg: #ffffff;
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: var(--medium);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .dashboard {
+      background: var(--light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .dashboard h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .dashboard p {
+      margin-bottom: 2rem;
+      color: var(--text-dark);
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .action-card {
+      background: var(--card-bg);
+      color: var(--text-dark);
+      padding: 1rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      transition: transform .15s ease, box-shadow .15s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .action-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .action-card:first-child { background: var(--dark); color: var(--text-light); }
+    .action-card:first-child:hover { background: #245022; }
+
+    .action-card:last-child { background: var(--card-bg); border: 2px solid var(--dark); }
+    .action-card:last-child:hover { background: #f0f8f0; }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <h1>Welcome to Group 3</h1>
+    <p>Select your path below:</p>
+
+    <div class="action-grid">
+      <a href="{% url 'group3:teacher_landing' %}" class="action-card">
+        I Want To Teach
+      </a>
+      <a href="{% url 'group3:student_landing' %}" class="action-card">
+        I Want To Learn
+      </a>
+    </div>
+  </div>
+</body>
+</html>

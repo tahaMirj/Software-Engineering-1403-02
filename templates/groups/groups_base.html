@@ -8,6 +8,41 @@
 
     <!-- main stylesheet for all groups -->
     <link rel="stylesheet" href="{% static 'groups/groups_style_base.css' %}">
+    <style>
+      .navbar {
+          background: #b8f2c2;
+          color: #103b0f;
+          padding: 1rem 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+      }
+
+      .site-name {
+          font-size: 1.35rem;
+          font-weight: 600;
+      }
+
+      .back-home-button {
+          border: 1px solid #2f6a34;
+          background-color: #2f6a34;
+          padding: 5px 10px;
+          border-radius: 5px;
+      }
+
+      .back-home-button a {
+          color: white;
+          text-decoration: none;
+      }
+
+      .back-home-button a:hover {
+          text-decoration: underline;
+      }
+    </style>
     {% block extra_head %}{% endblock %}
 </head>
 
@@ -16,7 +51,9 @@
     <!-- ─── NAVBAR (light green) ─── -->
     <header class="navbar">
         <h1 class="site-name">{% block site_name %}Group Microservice{% endblock %}</h1>
-        {% block nav_extra %}{% endblock %}
+        <div class="back-home-button">
+            <a href="{% url 'group3:group3' %}">Back to Home</a>
+        </div>
     </header>
 
     <!-- ─── MAIN CONTENT (medium green) ─── -->
