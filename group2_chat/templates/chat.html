@@ -1,19 +1,13 @@
 <!-- templates/chat.html -->
+{% extends "group2.html" %}
 {% load static %}
 {% load tz %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Realtime Chat</title>
-  <link rel="stylesheet" href="{% static 'g2/css/chat.css' %}" />
-</head>
-<body>
-  <nav class="navbar">
-    <div class="site-name">MyChatApp</div>
-    <div class="user-info">Chatting with: {{ other_username }}</div>
-  </nav>
+{% block site_name %}Chat{% endblock %}
+{% block extra_head %}
+    <title>Chat</title>
+    <link rel="stylesheet" href="{% static 'g2/css/chat.css' %}">
+{% endblock %}
+{% block content %}
 
   <main class="main-body">
     <div class="chat-container">
@@ -29,10 +23,6 @@
       </form>
     </div>
   </main>
-
-  <footer class="footer">
-    © {{ now.year }} MyChatApp
-  </footer>
 
   <script>
     // pass the URL route param into JS
@@ -74,5 +64,4 @@
     // });
   </script>
   <script src="{% static 'g2/js/chat.js' %}"></script>
-</body>
-</html>
+{% endblock %}

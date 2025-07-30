@@ -29,6 +29,11 @@
 }
 
 /* ---------- LABELS & TITLES ---------- */
+.profile-title {
+    display: flex; /* Use flexbox to align items */
+    align-items: center; /* Center items vertically */
+}
+
 .profile-section-title {
     font-size: 1rem;
     font-weight: 600;

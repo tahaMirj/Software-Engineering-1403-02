@@ -9,7 +9,7 @@
     <meta charset="UTF-8">
     <!-- <title>{% block title %}Group Portal{% endblock %}</title> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'groups/groups_style_base.css' %}">
+    <link rel="stylesheet" href="{% static 'g2/css/base.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
 
@@ -18,6 +18,22 @@
     <!-- ─── NAVBAR (light green) ─── -->
     <header class="navbar">
         <h1 class="site-name">{% block site_name %}Group Microservice{% endblock %}</h1>
+        <nav class="nav-links">
+            {% block nav_links %}
+                <a href="{% url 'group2:group2_chat:index' %}" class="nav-link">
+                    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-right-dots-fill" viewBox="0 0 16 16">
+                    <path d="M16 2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h9.586a1 1 0 0 1 .707.293l2.853 2.853a.5.5 0 0 0 .854-.353zM5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                    </svg>
+                    Chat
+                </a>
+                <a href="{% url 'group2:api_v1:find_partner' %}" class="nav-link">
+                    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+                    </svg>
+                    Find a Partner
+                </a>
+            {% endblock %}
+        </nav>
         {% block nav_extra %}{% endblock %}
     </header>
 
