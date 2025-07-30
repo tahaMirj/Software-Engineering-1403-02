@@ -139,7 +139,7 @@ def edit_profile(request):
         bio = request.POST.get('biography', '').strip()
         teacher.biography = bio
 
-        # Update profile picture if uploaded
+        # udpate profile picture if uploaded
         if 'profile_picture' in request.FILES:
             # Delete old image if exists
             if teacher.profile_picture:
@@ -150,19 +150,19 @@ def edit_profile(request):
             teacher.profile_picture = request.FILES['profile_picture']
 
         teacher.save()
-        return redirect('group3:teacher_profile')  # adjust this URL name if needed
+        return redirect('group3:teacher_profile')
 
     return render(request, 'edit_profile.html', {
         'teacher': teacher
     })
 
-
+#view the reviews made for the teacher
 @login_required
 def view_reviews(request):
     # Look up the Teacher record for this user
     teacher = get_object_or_404(Teacher, user=request.user)
 
-    # Grab all reviews for that teacher, newest first
+    # get all reviews for that teacher, newest first
     reviews = teacher.reviews.order_by('-created_at')
 
     return render(request, 'view_reviews.html', {
@@ -186,13 +186,12 @@ def create_timeslot(request):
             'end_time': end_time,
             'day_of_week': dow,
         }
-
-        # Basic presence check
+        # check for all the fields
         if not (start_time and end_time and dow):
             context['error'] = 'All fields are required.'
             return render(request, 'create_timeslot.html', context)
 
-        # Parse datetimes
+        # parse datetimes
         try:
             start_dt = datetime.fromisoformat(start_time)
             end_dt = datetime.fromisoformat(end_time)
@@ -200,17 +199,17 @@ def create_timeslot(request):
             context['error'] = 'Invalid date/time format.'
             return render(request, 'create_timeslot.html', context)
 
-        # 1) End must be after start
+        #check if end is before start
         if end_dt <= start_dt:
             context['error'] = 'End time must be after start time.'
             return render(request, 'create_timeslot.html', context)
 
-        # 2) Same calendar year
+        #has to be this year
         if start_dt.year != end_dt.year:
             context['error'] = 'Start and end time must be in the same year.'
             return render(request, 'create_timeslot.html', context)
 
-        # 3) Overlap check
+        # check for overlap
         overlapping = TimeSlot.objects.filter(
             teacher=teacher,
             start_time__lt=end_dt,
@@ -220,7 +219,7 @@ def create_timeslot(request):
             context['error'] = 'This timeslot overlaps with an existing one.'
             return render(request, 'create_timeslot.html', context)
 
-        # Passed all checks — create it
+        #after it was fine then make
         TimeSlot.objects.create(
             teacher=teacher,
             start_time=start_dt,
@@ -232,7 +231,7 @@ def create_timeslot(request):
     # GET
     return render(request, 'create_timeslot.html')
 
-
+#edit the timeslot if the teacher wants to
 @login_required
 def edit_timeslot(request, slot_id):
     teacher = get_object_or_404(Teacher, user=request.user)
@@ -249,7 +248,7 @@ def edit_timeslot(request, slot_id):
         end_time = request.POST.get('end_time')
         day_of_week = request.POST.get('day_of_week')
 
-        # Parse datetimes
+        # arse datetimes
         try:
             start_dt = datetime.fromisoformat(start_time)
             end_dt = datetime.fromisoformat(end_time)
@@ -259,21 +258,21 @@ def edit_timeslot(request, slot_id):
                 'timeslot': timeslot,
             })
 
-        # 1) End must be after start
+        # check the time
         if end_dt <= start_dt:
             return render(request, 'edit_timeslot.html', {
                 'error': 'End time must be after start time.',
                 'timeslot': timeslot,
             })
 
-        # 2) Must be in same calendar year
+        # has to be the same year
         if start_dt.year != end_dt.year:
             return render(request, 'edit_timeslot.html', {
                 'error': 'Start and end time must be in the same year.',
                 'timeslot': timeslot,
             })
 
-        # 3) Overlap check (exclude this slot)
+        #check overlap
         overlapping = TimeSlot.objects.filter(
             teacher=teacher,
             start_time__lt=end_dt,
@@ -286,7 +285,7 @@ def edit_timeslot(request, slot_id):
                 'timeslot': timeslot,
             })
 
-        # Passed all checks — save
+        # save after conditions
         timeslot.start_time = start_dt
         timeslot.end_time = end_dt
         timeslot.day_of_week = int(day_of_week)
@@ -296,7 +295,8 @@ def edit_timeslot(request, slot_id):
 
     return render(request, 'edit_timeslot.html', {'timeslot': timeslot})
 
-
+#login for students
+#well this method gets the user already made in the website earlier
 def student_login(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
@@ -316,32 +316,29 @@ def student_login(request):
     # GET
     return render(request, 'student_login.html')
 
-
+#landing or portal page for the students
 def student_landing(request):
-    # If not logged in, template will render login/signup links
+    # If not logged in, then prompt for login
     if not request.user.is_authenticated:
         return render(request, 'student_landing.html')
 
-    # (Optional) example: list all available (unbooked) timeslots
+    #list all the slots
     available_slots = TimeSlot.objects.filter(is_booked=False).order_by('start_time')
 
     return render(request, 'student_landing.html', {
         'available_slots': available_slots
     })
 
-
+#logout method
 @login_required
 def student_logout(request):
     logout(request)
     return redirect('group3:group3')
 
-
+#login method
 @login_required
 def teacher_list(request):
-    """
-    Display all teachers with name, language, rating,
-    and a 'View Details' link for each.
-    """
+#display all the teachers available for the website
     teachers = Teacher.objects.all()
     return render(request, 'teacher_list.html', {
         'teachers': teachers
@@ -378,7 +375,7 @@ def book_timeslot(request, slot_id):
             'teacher': teacher,
         })
 
-    # Users should not be able to book their own timeslots
+    # users should not be able to book their own timeslots
     if teacher.user == request.user:
         return render(request, 'book_session.html', {
             'error': "Sorry, you can't book your own class.",
@@ -429,7 +426,7 @@ def student_sessions(request):
 def add_review(request, teacher_id):
     teacher = get_object_or_404(Teacher, id=teacher_id)
 
-    # Ensure the student had a session
+    # make sure the student had a session
     had_session = Session.objects.filter(
         teacher=teacher,
         student_name=request.user.username
@@ -438,7 +435,7 @@ def add_review(request, teacher_id):
         messages.error(request, "You can only review teachers you’ve had sessions with.")
         return redirect('group3:teacher_detail', teacher_id=teacher.id)
 
-    # Prevent duplicate reviews — render an “already reviewed” page
+    # stop duplicate reviews — render an “already reviewed” page
     already_reviewed = Review.objects.filter(
         teacher=teacher,
         reviewer_name=request.user.username
@@ -452,7 +449,7 @@ def add_review(request, teacher_id):
         rating  = request.POST.get('rating')
         comment = request.POST.get('comment', '').strip()
 
-        # Validate rating
+        # validate the rating
         error = None
         try:
             rating_val = int(rating)
@@ -490,7 +487,7 @@ def add_review(request, teacher_id):
         'teacher': teacher
     })
 
-
+#method for editing the session already made based on timeslot
 class SessionForm(forms.ModelForm):
     class Meta:
         model = Session
@@ -501,6 +498,7 @@ class SessionForm(forms.ModelForm):
             'notes':      forms.Textarea(attrs={'rows':4}),
         }
 
+#the page for the session detail
 @login_required
 def session_detail(request, session_id):
     session = get_object_or_404(Session, pk=session_id, teacher__user=request.user)
