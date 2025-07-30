@@ -14,7 +14,7 @@ from .ai import generate_feedback_from_api
 # Create your views here.
 
 def home(request):
-    return  render (request , 'group1.html' , {'group_number': '1'})
+    return  render (request , 'group1.html' , {'group_number': '1', 'user': request.user})
 
 @login_required
 def start_grammar_quiz(request):

@@ -309,7 +309,7 @@
 <body>
     <header class="dashboard-header">
         <div class="logo">LinguaLearn</div>
-        <div class="user-greeting">Hello, John!</div>
+        <div class="user-greeting">Hello, {{ user.username }}!</div>
     </header>
 
     {% block content %}
@@ -318,10 +318,10 @@
         <div class="profile-section">
             <div class="profile-header">
                 <div class="profile-avatar">
-                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=7c5cff&color=fff&bold=true" alt="Profile Picture">
+                    <img src="https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=7c5cff&color=fff&bold=true" alt="Profile Picture">
                 </div>
                 <div class="profile-info">
-                    <h2>John Doe</h2>
+                    <h2>{{ user.get_full_name|default:user.username }}</h2>
                     <div class="stats">
                         <div class="stat-item">
                             <span class="stat-label">Health</span>
@@ -462,7 +462,7 @@
                         </tr>
                         <tr class="current-user">
                             <td>3</td>
-                            <td>John Doe</td>
+                            <td>{{ user.get_full_name|default:user.username }}</td>
                             <td>7,450</td>
                             <td>12</td>
                         </tr>
