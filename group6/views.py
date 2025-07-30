@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect 
 from django.urls import reverse # to get URL patterns by name
-from .models import Words, Category, UserWordStats, UserLevel, DifficultyChoices
+from django.http import JsonResponse # for API endpoint
+from .models import Words, Category, UserWordStats, UserLevel, DifficultyChoices, Notification 
 import random # for shuffling word order in learning sessions
 from django.contrib.auth.decorators import login_required # to restrict access to logged-in users
-from django.db.models import Sum, F # F: for referencing model fields in queries
+from django.db import transaction # for atomic operations 
 
-def _calculate_and_update_user_level(user, num_words_for_assessment=50):
+def _calculate_and_update_user_level(user, num_words_for_assessment=20):
     """
     Calculates and updates a user's proficiency level based on their recent performance,
     considering words at or above their current level for promotion, and all words
@@ -73,13 +74,29 @@ def _calculate_and_update_user_level(user, num_words_for_assessment=50):
 
     # update the user's level in the database if it has changed
     if user_level_obj.level != new_level_value:
+        old_level_display = user_level_obj.get_level_display() # get old display before update
         user_level_obj.level = new_level_value
         user_level_obj.save() # also updates the 'updated_at' timestamp
-        print(f"User {user.username}'s level officially changed to {user_level_obj.get_level_display()}")
+        new_level_display = user_level_obj.get_level_display() # get new display after update
+        print(f"User {user.username}'s level changed to {new_level_display}")
+
+        # level Change Notification with dynamic message
+        notification_message = ""
+        if new_level_value > current_level_value: # promotion
+            notification_message = f"Congrats! Your level got promoted from {old_level_display} to {new_level_display}."
+        elif new_level_value < current_level_value: # demotion
+            notification_message = f"Attention! Your level got demoted from {old_level_display} to {new_level_display}. Keep practicing."
+
+        Notification.objects.create(
+            user=user,
+            message=notification_message,
+            notification_type='level_change'
+        )
+        print(f"DEBUG: Created level change notification for {user.username}: {old_level_display} -> {new_level_display}")
     else:
         print(f"User {user.username}'s level remains {user_level_obj.get_level_display()}.")
 
-    return user_level_obj.get_level_display() # Return the final human-readable level
+    return user_level_obj.get_level_display() # return the final human-readable level
 
 
 # renders the main page of group6
@@ -121,8 +138,8 @@ def home(request):
                 'guessed': current_session.get('guessed_current_word', False)
             }
 
-        # Retrieve and remove any feedback message from the session (e.g., "Correct!", "Incorrect!").
-        # Using .pop() ensures the message is shown only once.
+        # retrieve and remove any feedback message from the session (e.g., "Correct!", "Incorrect!").
+        # using .pop() ensures the message is shown only once.
         feedback_message = request.session.pop('feedback_message', None)
 
     # render the group6.html template
@@ -184,6 +201,52 @@ def end_section(request):
 @login_required(login_url='/registration/login/')
 def user_profile(request):
     return render(request, 'group6/profile.html')
+
+@login_required(login_url='/registration/login/') 
+def get_notifications_api(request):
+    """
+    API endpoint to get notifications for the logged-in user.
+    Supports marking notifications as read via POST request.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
+    if request.method == 'GET':
+        # get all notifications for the current user, ordered newest first
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+        
+        # make notifications into a list of dictionaries
+        notification_list = [
+            {
+                'id': notif.id,
+                'message': notif.message,
+                'type': notif.notification_type,
+                'created_at': notif.created_at.isoformat(), 
+                'is_read': notif.is_read 
+            }
+            for notif in notifications
+        ]
+        return JsonResponse({'notifications': notification_list})
+
+    elif request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            notification_ids = data.get('notification_ids', [])
+            
+            with transaction.atomic():
+                Notification.objects.filter(
+                    id__in=notification_ids,
+                    user=request.user
+                ).update(is_read=True)
+            
+            return JsonResponse({'status': 'success', 'message': 'Notifications marked as read.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON in request body.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 # process_guess handles user interactions during a learning session
@@ -278,4 +341,4 @@ def group6_login(request):
 
 # redirects to the main registration logout 
 def group6_logout(request):
-    return redirect(reverse('logout')) 
+    return redirect(reverse('logout'))

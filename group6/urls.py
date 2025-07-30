@@ -15,6 +15,6 @@ urlpatterns = [
   path('endsection/', views.end_section, name='endsection'),
   path('profile/', views.user_profile, name='profile'),
   path('home', views.home, name='home'),
-
+  path('api/notifications/', views.get_notifications_api, name='api_notifications'),
 
 ]
