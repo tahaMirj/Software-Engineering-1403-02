@@ -1,0 +1,160 @@
+{% extends 'base5.html' %}
+
+{% block title %}Edit Profile - Learning English Hub{% endblock %}
+
+{% block style %}
+    /* Custom styles for Crispy Form fields to match the glass theme */
+    .crispy-form-field label {
+        color: #d1d5db; /* Gray 300 */
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    .crispy-form-field input,
+    .crispy-form-field textarea,
+    .crispy-form-field select {
+        background-color: rgba(0, 0, 0, 0.25) !important;
+        border: 1px solid var(--card-border-color) !important;
+        color: white !important;
+        border-radius: 0.5rem !important; /* 8px */
+        padding: 0.75rem 1rem !important; /* 12px 16px */
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .crispy-form-field input:focus,
+    .crispy-form-field textarea:focus,
+    .crispy-form-field select:focus {
+        border-color: #818cf8 !important; /* Indigo-400 */
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5) !important;
+        outline: none !important;
+    }
+
+    /* Helper text styling */
+    .text-muted {
+        color: #9ca3af; /* Gray-400 */
+        font-size: 0.875rem; /* 14px */
+    }
+
+    /* Style for the custom file upload button */
+    #id_avatar {
+        display: none; /* Hide the actual file input */
+    }
+{% endblock %}
+
+{% block profile_image %}
+    {% if user.profile.avatar %}
+        {% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}
+    {% else %}
+        https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="flex items-center justify-center w-full">
+        <div class="w-full max-w-3xl glass-card rounded-2xl p-8">
+            <h1 class="text-3xl font-bold text-white mb-8 text-center">Edit Your Profile</h1>
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                <div class="flex flex-col items-center mb-8 gap-4">
+                    <img id="profileImagePreview" 
+                         src="{% if form.instance.avatar %}{% url 'group5:serve_avatar' form.instance.avatar.name|slice:'21:' %}{% else %}https://placehold.co/144x144/6366f1/FFFFFF?text=User{% endif %}" 
+                         alt="Profile Picture" 
+                         class="w-36 h-36 rounded-full object-cover border-4 border-[var(--card-border-color)] shadow-xl">
+                    <button type="button" id="changePictureBtn"
+                        class="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300">
+                        <i class="fa-solid fa-upload mr-2"></i>Change Picture
+                    </button>
+                    {{ form.avatar }}
+                </div>
+
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="crispy-form-field">
+                            <label for="id_firstname" class="block text-gray-700 text-sm font-bold mb-2">
+                                First Name
+                            </label>
+                            {{ form.firstname }}
+                        </div>
+                        <div class="crispy-form-field">
+                            <label for="id_lastname" class="block text-gray-700 text-sm font-bold mb-2">
+                                Last Name
+                            </label>
+                            {{ form.lastname }}
+                        </div>
+                    </div>
+
+                    <div class="crispy-form-field">
+                        <label for="id_bio" class="block text-gray-700 text-sm font-bold mb-2">
+                            Bio
+                        </label>
+                        {{ form.bio }}
+                    </div>
+                    
+                    <div class="crispy-form-field">
+                        <label for="id_location" class="block text-gray-700 text-sm font-bold mb-2">
+                            Location
+                        </label>
+                        {{ form.location }}
+                    </div>
+
+                    <div class="crispy-form-field">
+                        <label for="" class="block text-gray-700 text-sm font-bold mb-2">
+                            Learning interest
+                        </label>
+                        {{ form.learning_interest }}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="crispy-form-field">
+                            <label for="id_age" class="block text-gray-700 text-sm font-bold mb-2">
+                                Age
+                            </label>
+                            {{ form.age }}
+                        </div>
+                        <div class="crispy-form-field">
+                            <label for="id_gender" class="block text-gray-700 text-sm font-bold mb-2">
+                                Gender
+                            </label>
+                            {{ form.gender }}
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-8 mt-8 border-t border-[var(--card-border-color)]">
+                    <a href="{% url 'group5:my_profile' %}" class="px-6 py-2 border border-gray-400 rounded-lg text-gray-200 hover:bg-white/10 hover:border-gray-200 transition-all duration-300">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-all duration-300">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const changePictureBtn = document.getElementById('changePictureBtn');
+    const avatarInput = document.getElementById('profileImageInput');
+    const profileImage = document.getElementById('profileImagePreview');
+
+    if (changePictureBtn && avatarInput) {
+        changePictureBtn.addEventListener('click', function () {
+            avatarInput.click();
+        });
+
+        avatarInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    profileImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    </script>
+    
+{% endblock %}

@@ -1,0 +1,23 @@
+<h2>امتیازهای {{ partner.username }}</h2>
+
+{% if avg_score %}
+  <p>میانگین امتیاز: {{ avg_score|floatformat:1 }} ⭐</p>
+{% else %}
+  <p>تاکنون امتیازی ثبت نشده است.</p>
+{% endif %}
+
+<ul>
+  {% for rating in ratings %}
+    <li>
+      <strong>{{ rating.rater.username }}</strong>: {{ rating.score }} ⭐
+      {% if rating.comment %}
+        <br>نظر: {{ rating.comment }}
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>امتیازی موجود نیست.</li>
+  {% endfor %}
+</ul>
+
+<p><a href="{% url 'group5:chat_partners' %}">بازگشت به پارتنرها</a></p>
+<p><a href="{% url 'group5:rate_partner' partner.username %}">rate</a></p>

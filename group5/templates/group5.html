@@ -1,7 +1,268 @@
-{% extends "groups/groups_base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning Hub | Dashboard</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-{% block title %}Group 5 Dashboard{% endblock %}
-{% block content %}
-    <h2>Welcome to Group 5</h2>
-    <p>This page shows your microservice status.</p>
-{% endblock %}
+    <style>
+        /* CSS Custom Properties for easy theming */
+        :root {
+            --primary-accent: #4f46e5; /* Indigo */
+            --secondary-accent: #10b981; /* Emerald */
+            --card-bg-color: rgba(255, 255, 255, 0.1);
+            --card-border-color: rgba(255, 255, 255, 0.2);
+            --text-primary: #f9fafb; /* Gray-50 */
+            --text-secondary: #d1d5db; /* Gray-300 */
+            --backdrop-blur: 16px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* A vibrant, dynamic gradient background */
+            background: linear-gradient(135deg, #1e3a8a, #312e81, #4c1d95, #be185d);
+            background-size: 400% 400%;
+            animation: gradient-flow 15s ease infinite;
+        }
+
+        /* Keyframes for the flowing background animation */
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--card-bg-color);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--card-border-color);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: var(--primary-accent);
+            border-radius: 20px;
+            border: 3px solid transparent;
+        }
+
+        /* Staggered entry animation for lesson cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lesson-card {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0; /* Start hidden */
+        }
+        
+        /* Apply delays for the staggered effect */
+        .lesson-card:nth-child(1) { animation-delay: 0.1s; }
+        .lesson-card:nth-child(2) { animation-delay: 0.2s; }
+        .lesson-card:nth-child(3) { animation-delay: 0.3s; }
+        .lesson-card:nth-child(4) { animation-delay: 0.4s; }
+        .lesson-card:nth-child(5) { animation-delay: 0.5s; }
+        .lesson-card:nth-child(6) { animation-delay: 0.6s; }
+        /* Add more if needed */
+
+    </style>
+</head>
+<body class="text-gray-100">
+
+    <div class="container mx-auto p-4 lg:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
+                <i class="fa-solid fa-graduation-cap mr-3 text-emerald-400"></i>English Learning Hub
+            </h1>
+            <p class="text-gray-300 mt-2 text-lg">Your personalized journey to fluency starts here.</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <aside class="lg:col-span-4 xl:col-span-3">
+                <div class="glass-card rounded-2xl p-6 text-center sticky top-8">
+                    <div class="relative w-32 h-32 mx-auto -mt-20">
+                        {% if user.profile.avatar %}
+                            <img src="{% url 'group5:serve_avatar' filename=user.profile.avatar.name|slice:'21:' %}" alt="Avatar" class="rounded-full w-full h-full object-cover border-4 border-[var(--card-border-color)] shadow-xl">
+                        {% else %}
+                            <img src="https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}" class="rounded-full w-full h-full object-cover border-4 border-[var(--card-border-color)] shadow-xl">
+                        {% endif %}
+
+                        <span class="absolute bottom-2 right-2 bg-green-500 rounded-full h-5 w-5 border-2 border-gray-800" title="Online"></span>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mt-4">{{ user.profile.firstname }} {{ user.profile.lastname }}</h2>
+                    <p class="text-sm text-gray-300 font-light">{{user.profile.bio}}</p>
+                    <div class="flex items-center justify-center text-gray-400 text-xs mt-1">
+                        <i class="fas fa-map-marker-alt mr-1.5"></i>
+                        <span>{{user.profile.location}}</span>
+                    </div>
+                    
+                    <section class="flex justify-around w-full mt-6 py-4 border-t border-b border-[var(--card-border-color)]">
+                        <div>
+                            <span class="text-2xl font-bold text-white">122</span>
+                            <span class="block text-xs text-gray-400">Lessons</span>
+                        </div>
+                        <div>
+                            <span class="text-2xl font-bold text-white">B2</span>
+                            <span class="block text-xs text-gray-400">Level</span>
+                        </div>
+                        <div>
+                            <span class="text-2xl font-bold text-white">37K</span>
+                            <span class="block text-xs text-gray-400">Words</span>
+                        </div>
+                    </section>
+
+                    <nav class="mt-6 w-full flex flex-col space-y-2 text-left">
+                        <a href="{% url 'group5:chat_requests'%}" class="flex items-center text-gray-200 hover:bg-white/10 transition-all duration-200 rounded-lg p-3">
+                            <i class="fas fa-book-open-reader text-xl w-8 text-center text-indigo-400"></i>
+                            <span class="ml-3 font-medium">My Requests</span>
+                        </a>
+                        <a href="{% url 'group5:chat_partners' %}" class="flex items-center text-gray-200 hover:bg-white/10 transition-all duration-200 rounded-lg p-3">
+                            <i class="fas fa-comments text-xl w-8 text-center text-emerald-400"></i>
+                            <span class="ml-3 font-medium">Messages</span>
+                        </a>
+                        <a href="{% url 'group5:my_profile' %}" class="flex items-center text-gray-200 hover:bg-white/10 transition-all duration-200 rounded-lg p-3">
+                            <i class="fas fa-cog text-xl w-8 text-center text-rose-400"></i>
+                            <span class="ml-3 font-medium">Settings</span>
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <section class="lg:col-span-8 xl:col-span-9 glass-card rounded-2xl p-6">
+                <div class="flex border-b border-[var(--card-border-color)] mb-6">
+                    <button class="py-3 px-5 text-lg font-semibold text-white bg-white/10 rounded-t-lg focus:outline-none" aria-current="page">
+                        All Lessons
+                    </button>
+                    <button class="py-3 px-5 text-lg font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-t-lg transition-colors focus:outline-none">
+                        Recommended
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-[70vh] overflow-y-auto custom-scrollbar pr-2">
+                    <article class="lesson-card bg-gray-900/40 rounded-xl shadow-lg overflow-hidden group transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1521714161819-15534968fc5f?q=80&w=2070&auto=format&fit=crop" alt="Grammar" class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-2 right-2 bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full">Grammar</span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-white text-lg">Grammar Fundamentals</h3>
+                            <p class="text-sm text-gray-400 mt-1 mb-3">Master the building blocks of English.</p>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-indigo-500 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <p class="text-xs text-right text-gray-400 mt-1">75% Complete</p>
+                        </div>
+                    </article>
+                    
+                    <article class="lesson-card bg-gray-900/40 rounded-xl shadow-lg overflow-hidden group transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div class="relative">
+                             <img src="https://images.unsplash.com/photo-1554159677-226005722354?q=80&w=2070&auto=format&fit=crop" alt="Vocabulary" class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-2 right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">Vocabulary</span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-white text-lg">Vocabulary Expansion</h3>
+                            <p class="text-sm text-gray-400 mt-1 mb-3">Expand your word bank with daily exercises.</p>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-emerald-500 h-2 rounded-full" style="width: 45%"></div>
+                            </div>
+                             <p class="text-xs text-right text-gray-400 mt-1">45% Complete</p>
+                        </div>
+                    </article>
+                    
+                    <article class="lesson-card bg-gray-900/40 rounded-xl shadow-lg overflow-hidden group transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1587145820137-a9dbc8c53116?q=80&w=1932&auto=format&fit=crop" alt="Pronunciation" class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-2 right-2 bg-rose-500 text-white text-xs font-bold px-2 py-1 rounded-full">Speaking</span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-white text-lg">Perfecting Pronunciation</h3>
+                            <p class="text-sm text-gray-400 mt-1 mb-3">Master English sounds and intonation.</p>
+                             <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-rose-500 h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                            <p class="text-xs text-right text-gray-400 mt-1">60% Complete</p>
+                        </div>
+                    </article>
+                    
+                    <article class="lesson-card bg-gray-900/40 rounded-xl shadow-lg overflow-hidden group transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" alt="Conversation" class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-2 right-2 bg-sky-500 text-white text-xs font-bold px-2 py-1 rounded-full">Conversation</span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-white text-lg">Daily Conversation Practice</h3>
+                            <p class="text-sm text-gray-400 mt-1 mb-3">Engage in real-life English dialogues.</p>
+                             <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-sky-500 h-2 rounded-full" style="width: 80%"></div>
+                            </div>
+                            <p class="text-xs text-right text-gray-400 mt-1">80% Complete</p>
+                        </div>
+                    </article>
+
+                    <article class="lesson-card bg-gray-900/40 rounded-xl shadow-lg overflow-hidden group transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1973&auto=format&fit=crop" alt="Reading" class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-2 right-2 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full">Reading</span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-white text-lg">Reading Comprehension</h3>
+                            <p class="text-sm text-gray-400 mt-1 mb-3">Improve your understanding of texts.</p>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-amber-500 h-2 rounded-full" style="width: 30%"></div>
+                            </div>
+                            <p class="text-xs text-right text-gray-400 mt-1">30% Complete</p>
+                        </div>
+                    </article>
+
+                    <article class="lesson-card bg-gray-900/40 rounded-xl shadow-lg overflow-hidden group transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1973&auto=format&fit=crop" alt="Writing" class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <span class="absolute top-2 right-2 bg-lime-500 text-white text-xs font-bold px-2 py-1 rounded-full">Writing</span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-white text-lg">Effective Writing Skills</h3>
+                            <p class="text-sm text-gray-400 mt-1 mb-3">Develop clear and concise writing.</p>
+                             <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-lime-500 h-2 rounded-full" style="width: 55%"></div>
+                            </div>
+                            <p class="text-xs text-right text-gray-400 mt-1">55% Complete</p>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

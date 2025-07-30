@@ -1,0 +1,79 @@
+{% extends 'settings_base.html' %}
+
+{% block settings_title %}Billing Settings{% endblock %}
+
+{% block settings_content %}
+<div class="space-y-8">
+    <div>
+        <h2 class="text-2xl font-bold text-white mb-4">Subscription Plans</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white/5 p-6 rounded-xl border border-white/10 flex flex-col">
+                <h3 class="text-xl font-semibold text-white mb-2">Free</h3>
+                <p class="text-gray-300 mb-4 flex-grow">Limited features for individuals.</p>
+                <button class="w-full mt-2 text-center bg-white/10 hover:bg-white/20 text-white font-semibold py-2 rounded-lg transition-colors">Your Plan</button>
+            </div>
+            <div class="bg-white/10 p-6 rounded-xl border-2 border-indigo-400 flex flex-col relative">
+                <div class="absolute -top-3 right-4 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full">CURRENT</div>
+                <h3 class="text-xl font-semibold text-white mb-2">Basic</h3>
+                <p class="text-white text-3xl font-bold mb-4">$10<span class="text-base font-normal text-gray-300"> / mo</span></p>
+                <p class="text-gray-300 mb-4 flex-grow">Limited users and access to all features.</p>
+                <button class="w-full mt-2 text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition-colors">Manage Plan</button>
+            </div>
+            <div class="bg-white/5 p-6 rounded-xl border border-white/10 flex flex-col">
+                <h3 class="text-xl font-semibold text-white mb-2">Pro</h3>
+                <p class="text-white text-3xl font-bold mb-4">$24<span class="text-base font-normal text-gray-300"> / mo</span></p>
+                <p class="text-gray-300 mb-4 flex-grow">Unlimited users and access to all features.</p>
+                <button class="w-full mt-2 text-center bg-white/10 hover:bg-white/20 text-white font-semibold py-2 rounded-lg transition-colors">Upgrade</button>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-white">Billing History</h2>
+            <button class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                <i class="fa-solid fa-download"></i>
+                <span>Download All</span>
+            </button>
+        </div>
+        <div class="glass-card rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                    <thead class="bg-white/10">
+                        <tr>
+                            <th class="p-4 font-semibold">Invoice</th>
+                            <th class="p-4 font-semibold">Amount</th>
+                            <th class="p-4 font-semibold">Date</th>
+                            <th class="p-4 font-semibold">Status</th>
+                            <th class="p-4 font-semibold text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                        <tr class="hover:bg-white/5">
+                            <td class="p-4">Invoice - Dec 2023</td>
+                            <td class="p-4">$10.00</td>
+                            <td class="p-4">Dec 1, 2023</td>
+                            <td class="p-4"><span class="bg-yellow-500/20 text-yellow-300 py-1 px-3 rounded-full text-xs font-medium">Awaiting</span></td>
+                            <td class="p-4 text-right"><button class="text-gray-300 hover:text-white"><i class="fa-solid fa-download"></i></button></td>
+                        </tr>
+                        <tr class="hover:bg-white/5">
+                            <td class="p-4">Basic Plan - Nov 2023</td>
+                            <td class="p-4">$10.00</td>
+                            <td class="p-4">Nov 1, 2023</td>
+                            <td class="p-4"><span class="bg-green-500/20 text-green-300 py-1 px-3 rounded-full text-xs font-medium">Paid</span></td>
+                            <td class="p-4 text-right"><button class="text-gray-300 hover:text-white"><i class="fa-solid fa-download"></i></button></td>
+                        </tr>
+                         <tr class="hover:bg-white/5">
+                            <td class="p-4">Basic Plan - Oct 2023</td>
+                            <td class="p-4">$10.00</td>
+                            <td class="p-4">Oct 1, 2023</td>
+                            <td class="p-4"><span class="bg-green-500/20 text-green-300 py-1 px-3 rounded-full text-xs font-medium">Paid</span></td>
+                            <td class="p-4 text-right"><button class="text-gray-300 hover:text-white"><i class="fa-solid fa-download"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,239 @@
+{% extends 'base5.html' %}
+{% block style %}
+  /* Define custom properties for theme colors and gradients */
+  :root {
+      --background-start-rgb: 20, 20, 35;
+      --background-end-rgb: 40, 25, 60;
+      --card-bg-rgb: 35, 35, 55;
+      --card-border-rgb: 70, 70, 90;
+      --gradient-start: #8E2DE2;
+      --gradient-end: #4A00E0;
+      --gradient-pink-start: #DA4453;
+      --gradient-pink-end: #89216B;
+  }
+
+  body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+      color: #E0E0E0;
+  }
+
+  /* Glassmorphism Card Style */
+  .glass-card {
+      background: rgba(var(--card-bg-rgb), 0.5);
+      border: 1px solid rgba(var(--card-border-rgb), 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 1.5rem; /* 24px */
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+  }
+
+  /* Interactive Stars */
+  .stars .star-icon {
+      color: #4B5563; /* gray-600 */
+      transition: color 0.2s, transform 0.2s;
+      cursor: pointer;
+  }
+  .stars .star-icon:hover,
+  .stars .star-icon.hovered,
+  .stars .star-icon.selected {
+      color: #FBBF24; /* amber-400 */
+      transform: scale(1.2);
+  }
+
+  /* Custom Textarea */
+  .feedback-textarea {
+      background-color: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(var(--card-border-rgb), 0.7);
+      color: white;
+      border-radius: 0.75rem; /* 12px */
+      transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .feedback-textarea:focus {
+      outline: none;
+      border-color: #818cf8; /* indigo-400 */
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+  }
+{% endblock %}
+
+{% block profile_image %}
+    {% if user.profile.avatar %}
+        {% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}
+    {% else %}
+        https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}
+    {% endif %}
+{% endblock %}
+{% block content%}
+<body class="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
+
+    <main class="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 ">
+        
+        <!-- Left Column: User Profile Card -->
+        <div class="lg:col-span-1">
+            <div class="glass-card overflow-hidden">
+                <!-- Profile Header -->
+                <div class="h-20 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-4 relative"></div>
+                
+                <!-- Profile Avatar -->
+                <div class="flex justify-center -mt-">
+                    <div class="w-28 h-28 rounded-full bg-slate-700 border-4 border-slate-800 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+                      {% if partner.profile.avatar %}
+                        <img src="{% url 'group5:serve_avatar' partner.profile.avatar.name|slice:'21:' %}" class="w-full h-full object-cover rounded-full"></img>
+                      {% else %}
+                      <img src="https://placehold.co/144x144/6366f1/FFFFFF?text={{ partner.profile.firstname|first|upper|default:"User" }}" class="w-full h-full object-cover rounded-full"></img>
+                      {% endif %}
+                    </div>
+                </div>
+
+                <!-- Profile Info -->
+                <div class="text-center p-6">
+                    <h1 class="text-2xl font-bold text-white">{{ partner.profile.firstname }} {{ partner.profile.lastname}}</h1>
+                    <p class="text-indigo-300 font-medium">English Learner</p>
+                    <span class="inline-block bg-green-500/20 text-green-300 text-xs font-semibold mt-3 px-3 py-1 rounded-full">
+                        <i class="fas fa-check-circle mr-1"></i>  {{ partner.profile.gender}}
+                    </span>
+                </div>
+
+                <!-- Profile Details -->
+                <div class="px-6 pb-6 space-y-4 text-gray-300">
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt w-6 text-center text-gray-400"></i>
+                        <span class="ml-3">{{ partner.profile.location }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-envelope w-6 text-center text-gray-400"></i>
+                        <span class="ml-3">{{ partner.username }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt w-6 text-center text-gray-400"></i>
+                        <span class="ml-3">{{ partner.profile.age}} years old</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Feedback Form Card -->
+        <div class="lg:col-span-2">
+            <div class="glass-card flex flex-col h-full">
+                <!-- Form Header -->
+                <div class="p-6 bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] rounded-t-2xl">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-comments text-2xl text-white"></i>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Share Your Feedback</h2>
+                            <p class="text-indigo-200">Help us improve your experience</p>
+                        </div>
+                    </div>
+                </div>
+                <form method="post" novalitate>
+                  {% csrf_token %}
+                  <!-- Form Body -->
+                  <div class="p-8 flex-grow flex flex-col">
+                      <!-- Star Rating Section -->
+                      <div>
+                          <label class="font-semibold text-white text-lg">How would you rate your experience?</label>
+                          <div class="flex items-center gap-4 mt-3">
+                              <div class="stars flex text-3xl space-x-2">
+                                  <i class="fas fa-star star-icon" data-value="1"></i>
+                                  <i class="fas fa-star star-icon" data-value="2"></i>
+                                  <i class="fas fa-star star-icon" data-value="3"></i>
+                                  <i class="fas fa-star star-icon" data-value="4"></i>
+                                  <i class="fas fa-star star-icon" data-value="5"></i>
+                              </div>
+                              <span id="rating-text" class="text-gray-400 font-medium">{{ form.score.value|default:0}} of 5</span>
+                              {{ form.score }}
+                          </div>
+                      </div>
+                      
+                      <!-- Textarea Section -->
+                      <div class="mt-8 flex-grow flex flex-col">
+                          <label for="feedback-text" class="font-semibold text-white text-lg">Tell us more about your experience</label>
+                          <p class="text-gray-400 text-sm mt-1 mb-3">What did you like? What could be improved? We'd love to hear your thoughts...</p>
+                          {{ form.comment }}
+                          <p id="char-counter" class="text-right text-sm text-gray-400 mt-2">0/500 characters</p>
+                      </div>
+                      
+                      <!-- Submit Button -->
+                      <div class="flex justify-center items-center text-center mt-8  mr-2 w-full text-white font-bold py-3 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg transform hover:scale-105">
+                        <input type="submit" value="Submit Feedback" , class="cursor-pointer h-full w-full">
+                        </input>
+                      </div>
+                  </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Star Rating Logic ---
+            const starsContainer = document.querySelector('.stars');
+            const stars = document.querySelectorAll('.star-icon');
+            const ratingText = document.getElementById('rating-text');
+            let currentRating = 0;
+
+            // Function to update star visuals
+            function updateStars(rating) {
+                stars.forEach(star => {
+                    const starValue = parseInt(star.dataset.value);
+                    star.classList.toggle('hovered', starValue <= rating);
+                    star.classList.toggle('selected', starValue <= currentRating);
+                });
+            }
+
+            starsContainer.addEventListener('mouseover', (e) => {
+                if (e.target.classList.contains('star-icon')) {
+                    const hoverValue = parseInt(e.target.dataset.value);
+                    updateStars(hoverValue);
+                }
+            });
+
+            starsContainer.addEventListener('mouseout', () => {
+                updateStars(currentRating);
+            });
+
+            starsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('star-icon')) {
+                    currentRating = parseInt(e.target.dataset.value);
+                    ratingText.textContent = `${currentRating} of 5`;
+                    const scoreinput = document.getElementById('score_input');
+                    scoreinput.value = currentRating;
+                    updateStars(currentRating);
+                }
+            });
+            
+            // Initialize stars on load
+            updateStars({{ form.score.value|default:0}});
+
+            // --- Character Counter Logic ---
+            const textarea = document.getElementById('feedback-text');
+            const charCounter = document.getElementById('char-counter');
+            const maxLength = 500;
+
+            textarea.addEventListener('input', () => {
+                const currentLength = textarea.value.length;
+                charCounter.textContent = `${currentLength}/${maxLength} characters`;
+                
+                // Optional: change color if limit is exceeded
+                if (currentLength > maxLength) {
+                    charCounter.classList.add('text-red-400');
+                    charCounter.classList.remove('text-gray-400');
+                } else {
+                    charCounter.classList.remove('text-red-400');
+                    charCounter.classList.add('text-gray-400');
+                }
+            });
+        });
+    </script>
+{% endblock %}
+</body>

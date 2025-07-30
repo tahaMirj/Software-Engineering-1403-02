@@ -1,0 +1,142 @@
+{% extends 'base5.html' %}
+
+{% block title %}Messenger - Learning English Hub{% endblock %}
+
+{% block style %}
+    /* Custom styles for the search input to match the glass theme */
+    #chatSearchInput {
+        background-color: rgba(0, 0, 0, 0.25) !important;
+        border: 1px solid var(--card-border-color) !important;
+        color: white !important;
+        border-radius: 0.5rem !important; /* 8px */
+        padding-left: 2.5rem !important; /* Make space for the icon */
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    #chatSearchInput:focus {
+        border-color: #818cf8 !important; /* Indigo-400 */
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5) !important;
+        outline: none !important;
+    }
+
+    /* Custom Scrollbar for chat list */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+{% endblock %}
+
+{% block profile_image %}
+    {% if user.profile.avatar %}
+        {% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}
+    {% else %}
+        https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row gap-8 h-[calc(100vh-4rem)]">
+    
+    <div class="glass-card rounded-2xl p-6 flex flex-col w-full md:w-80 lg:w-96">
+        <div class="flex justify-between items-center mb-6 flex-shrink-0">
+            <h2 class="text-2xl font-bold text-white">Chats</h2>
+            <a href="{% url 'group5:search_users' %}" title="Find new partner">
+                <button class="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors duration-200 shadow-lg">
+                    <i class="fas fa-plus text-lg"></i>
+                </button>
+            </a>
+        </div>
+
+        <div class="relative mb-6 flex-shrink-0">
+            <input type="text" id="chatSearchInput" placeholder="Search chats..." class="w-full py-2 pr-4 rounded-lg focus:outline-none">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+
+        <div id="chatListLoader" class="flex flex-col items-center justify-center text-center py-8 flex-grow">
+            <svg class="animate-spin h-8 w-8 text-indigo-400 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            <span class="text-gray-300">Loading chat list...</span>
+        </div>
+        
+        <div id="chatListContainer" class="flex-grow overflow-y-auto space-y-2 custom-scrollbar -mr-2 pr-2 hidden">
+            {% if partners %}
+                {% for partner in partners %}
+                    <a href="{% url 'group5:chat_room' partner.room_name %}" class="chat-item block rounded-xl transition-colors duration-200 hover:bg-white/10">
+                        <div class="flex items-center p-3">
+                            <div class="relative">
+                                {% if partner.user.profile.avatar %}
+                                <img src="{% url 'group5:serve_avatar' partner.user.profile.avatar.name|slice:'21:' %}" alt="Profile Avatar" class="w-12 h-12 rounded-full object-cover mr-4">
+                                {% else %}
+                                <img src="https://placehold.co/144x144/6366f1/FFFFFF?text={{ partner.user.profile.firstname|first|upper|default:"User" }}" class="w-12 h-12 rounded-full mr-4"></img>
+                                {% endif %}
+                                </div>
+                            <div class="flex-grow">
+                                <p class="font-semibold text-white">{{ partner.user.profile.firstname }} {{ partner.user.profile.lastname }}</p>
+                                <p class="text-sm text-gray-400 truncate">{{ partner.last_msg }}</p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="text-gray-400 text-center py-16 flex flex-col items-center">
+                    <i class="fas fa-comment-slash text-4xl mb-4"></i>
+                    <p class="font-medium">No chats yet</p>
+                    <p class="text-sm">Find a partner to start a conversation.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass-card rounded-2xl flex-grow hidden md:flex flex-col items-center justify-center text-center p-8">
+        <i class="fa-solid fa-comments text-7xl text-indigo-400 mb-6"></i>
+        <h1 class="text-4xl font-bold text-white mb-2">Welcome to Messenger</h1>
+        <p class="text-gray-300 text-lg max-w-sm">Select a chat to start messaging. Your personal messages are secure and private.</p>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- Search Functionality ---
+        const searchInput = document.getElementById("chatSearchInput");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                const query = this.value.toLowerCase().trim();
+                const chatItems = document.querySelectorAll(".chat-item");
+                
+                chatItems.forEach(item => {
+                    // It's better to check against a specific element, like the name
+                    const nameElement = item.querySelector('.font-semibold');
+                    const name = nameElement ? nameElement.textContent.toLowerCase() : '';
+                    
+                    if (name.includes(query)) {
+                        item.style.display = "block";
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+            });
+        }
+
+        // --- Loader Functionality ---
+        // Shows the list after a short delay to simulate loading
+        setTimeout(() => {
+            const loader = document.getElementById("chatListLoader");
+            const container = document.getElementById("chatListContainer");
+            if(loader) loader.style.display = "none";
+            if(container) container.classList.remove("hidden");
+        }, 500); // Increased delay slightly for effect
+    });
+</script>
+{% endblock %}

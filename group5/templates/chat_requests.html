@@ -1,0 +1,137 @@
+{% extends 'base5.html' %}
+
+{% block title %}Chat Request Management - Learning English Hub{% endblock %}
+
+{% block profile_image %}
+    {% if user.profile.avatar %}
+        {% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}
+    {% else %}
+        https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}
+    {% endif %}
+{% endblock %}
+{% block style %}
+    .request-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    .request-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .request-list::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+    }
+    .request-list::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .request-message {
+        max-height: 4.5rem; /* ~3 lines of text */
+        overflow: hidden;
+        transition: max-height 0.4s ease-in-out;
+    }
+    .request-message.expanded {
+        max-height: 500px; /* A large enough value to show all content */
+    }
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-full">
+    <h1 class="text-4xl font-bold text-white mb-8 text-center md:text-left">Request Management</h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-grow">
+        
+        <div class="glass-card rounded-2xl p-6 flex flex-col">
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center"><i class="fas fa-arrow-down mr-3 text-blue-400"></i>Incoming Requests</h2>
+            <div class="request-list flex-grow overflow-y-auto pr-2 -mr-4 space-y-6">
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-200 mb-3 border-b border-white/10 pb-2">Pending</h3>
+                    {% for req in received_requests_p %}
+                    <div class="bg-white/5 p-4 rounded-xl space-y-3">
+                        <div class="flex justify-between items-start">
+                            <p class="font-semibold text-white">From: {{ req.from_user.username }}</p>
+                            <span class="text-sm text-yellow-400 font-medium flex items-center"><i class="fas fa-clock mr-1.5"></i>Pending</span>
+                        </div>
+                        <div class="request-message text-gray-300 italic bg-black/10 p-3 rounded-lg border-l-4 border-blue-400">"{{ req.message }}"</div>
+                        <div class="flex justify-end items-center gap-3 pt-2">
+                            <a href="{% url 'group5:respond_to_chat_request' req.id 'reject' %}" class="py-2 px-4 rounded-lg text-white font-semibold bg-red-600 hover:bg-red-700 transition-colors">Reject</a>
+                            <a href="{% url 'group5:respond_to_chat_request' req.id 'accept' %}" class="py-2 px-4 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 transition-colors">Accept</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-400 italic text-center py-4">No pending incoming requests.</p>
+                    {% endfor %}
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-200 mb-3 border-b border-white/10 pb-2">History</h3>
+                    {% for req in received_requests_a %}
+                    <div class="bg-black/10 p-3 rounded-lg mb-2 flex justify-between items-center">
+                        <p class="text-gray-300">Request from <strong class="text-white">{{ req.from_user.username }}</strong></p>
+                        <span class="text-sm text-green-400 font-medium flex items-center"><i class="fas fa-check-circle mr-1.5"></i>Accepted</span>
+                    </div>
+                    {% endfor %}
+                    {% for req in received_requests_r %}
+                    <div class="bg-black/10 p-3 rounded-lg mb-2 flex justify-between items-center">
+                        <p class="text-gray-300">Request from <strong class="text-white">{{ req.from_user.username }}</strong></p>
+                        <span class="text-sm text-red-400 font-medium flex items-center"><i class="fas fa-times-circle mr-1.5"></i>Rejected</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 flex flex-col">
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center"><i class="fas fa-arrow-up mr-3 text-purple-400"></i>Sent Requests</h2>
+            <div class="request-list flex-grow overflow-y-auto pr-2 -mr-4 space-y-6">
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-200 mb-3 border-b border-white/10 pb-2">Pending</h3>
+                    {% for req in sent_requests_p %}
+                    <div class="bg-white/5 p-4 rounded-xl space-y-3">
+                        <div class="flex justify-between items-start">
+                            <p class="font-semibold text-white">To: {{ req.to_user.username }}</p>
+                            <span class="text-sm text-yellow-400 font-medium flex items-center"><i class="fas fa-clock mr-1.5"></i>Pending</span>
+                        </div>
+                        <div class="request-message text-gray-300 italic bg-black/10 p-3 rounded-lg border-l-4 border-purple-400">"{{ req.message }}"</div>
+                        <div class="flex justify-end items-center gap-3 pt-2">
+                             <a href="{% url 'group5:respond_to_chat_request' req.id 'cancel' %}" class="py-2 px-4 rounded-lg text-white font-semibold bg-gray-600 hover:bg-gray-700 transition-colors">Cancel</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-400 italic text-center py-4">No pending sent requests.</p>
+                    {% endfor %}
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg text-gray-200 mb-3 border-b border-white/10 pb-2">History</h3>
+                    {% for req in sent_requests_a %}
+                    <div class="bg-black/10 p-3 rounded-lg mb-2 flex justify-between items-center">
+                        <p class="text-gray-300">Request to <strong class="text-white">{{ req.to_user.username }}</strong></p>
+                        <span class="text-sm text-green-400 font-medium flex items-center"><i class="fas fa-check-circle mr-1.5"></i>Accepted</span>
+                    </div>
+                    {% endfor %}
+                    {% for req in sent_requests_r %}
+                    <div class="bg-black/10 p-3 rounded-lg mb-2 flex justify-between items-center">
+                        <p class="text-gray-300">Request to <strong class="text-white">{{ req.to_user.username }}</strong></p>
+                        <span class="text-sm text-red-400 font-medium flex items-center"><i class="fas fa-times-circle mr-1.5"></i>Rejected</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // This script is optional. The CSS solution above provides a clean "show first 3 lines" effect
+        // which is often enough for request messages. Add this back if you need a "show more" button.
+        
+        // document.querySelectorAll('.toggle-message').forEach(button => {
+        //     button.addEventListener('click', () => {
+        //         const messageBox = button.previousElementSibling;
+        //         const isExpanded = messageBox.classList.toggle('expanded');
+        //         button.textContent = isExpanded ? 'Show Less' : 'Show More';
+        //     });
+        // });
+    });
+</script>
+{% endblock %}

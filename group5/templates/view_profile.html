@@ -1,0 +1,166 @@
+{% extends 'base5.html' %}
+
+{% block title %}{{ target.profile.firstname }}'s Profile - Learning English Hub{% endblock %}
+
+{% block profile_image %}
+    {% if user.profile.avatar %}
+        {% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}
+    {% else %}
+        https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}
+    {% endif %}
+{% endblock %}
+
+{% block style %}
+    .tab-btn {
+        transition: all 0.3s ease;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        color: #d1d5db; /* gray-300 */
+    }
+    .tab-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+    .tab-btn.active {
+        background-color: #4f46e5; /* indigo-600 */
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2);
+    }
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+        animation: fade-in 0.5s ease;
+    }
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+
+    <div class="glass-card rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+        {% if target.profile.avatar %}
+            <img src="{% url 'group5:serve_avatar' target.profile.avatar.name|slice:'21:' %}" alt="Profile Avatar" class="w-32 h-32 rounded-full object-cover border-4 border-white/20 shadow-lg flex-shrink-0">
+        {% else %}
+            <div class="w-32 h-32 rounded-full bg-purple-800 flex items-center justify-center border-4 border-white/20 shadow-lg flex-shrink-0">
+                <span class="text-6xl font-bold text-purple-200">{{ target.username|first|upper|default:"User" }}</span>
+            </div>
+        {% endif %}
+        
+        <div class="flex flex-col items-center md:items-start flex-grow text-center md:text-left">
+            <h1 class="text-4xl font-bold text-white">{{ target.profile.firstname }} {{ target.profile.lastname }}</h1>
+            <p class="text-indigo-200 text-lg mt-1"><i class="fa-solid fa-location-dot mr-2"></i>{{ target.profile.location|default:'Location not set' }}</p>
+            <div class="flex items-center gap-3 mt-4">
+                <a href="{% url 'group5:chat_room' room_name %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-5 rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Send Message</span>
+                </a>
+                <a href="{% url 'group5:send_chat_request' target.id %}" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-5 rounded-lg transition-colors">
+                    Add Partner
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+        <nav class="flex items-center space-x-2 md:space-x-4 mb-6 pb-4 border-b border-white/10">
+            <button class="tab-btn active" data-target="overview">
+                <i class="fa-solid fa-user-check mr-2"></i>Overview
+            </button>
+            <button class="tab-btn" data-target="interests">
+                <i class="fa-solid fa-bullseye mr-2"></i>Interests
+            </button>
+        </nav>
+
+        <div>
+            <div id="overview" class="tab-content active space-y-6">
+                <div>
+                    <h3 class="font-semibold text-xl text-white mb-3">About Me</h3>
+                    <blockquote class="text-gray-200 italic border-l-4 border-indigo-400 pl-4 py-2 bg-black/10 rounded-r-lg">
+                        {{ target.profile.bio|default:'No bio provided.' }}
+                    </blockquote>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                    <div>
+                        <h3 class="font-semibold text-xl text-white mb-4">Information</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4">
+                                <i class="fa-solid fa-envelope text-indigo-300 text-xl w-6 text-center mt-1"></i>
+                                <div>
+                                    <p class="text-sm text-gray-400">Email</p>
+                                    <p class="text-white font-medium">{{ target.email|default:'Email not entered.' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="invisible font-semibold text-xl text-white mb-4">placeholder</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4">
+                                <i class="fa-solid fa-cake-candles text-indigo-300 text-xl w-6 text-center mt-1"></i>
+                                <div>
+                                    <p class="text-sm text-gray-400">Age</p>
+                                    <p class="text-white font-medium">{{ target.profile.age|default:'not set.' }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <i class="fa-solid fa-genderless text-indigo-300 text-xl w-6 text-center mt-1"></i>
+                                <div>
+                                    <p class="text-sm text-gray-400">Gender</p>
+                                    <p class="text-white font-medium">{{ target.profile.gender|default:'not set.' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="interests" class="tab-content">
+                <h3 class="font-semibold text-xl text-white mb-4">Learning Goals</h3>
+                <div class="flex flex-wrap gap-3">
+                    {% for interest in target.profile.learning_interest %}
+                        <span class="bg-purple-500/30 text-purple-200 text-base font-medium px-4 py-2 rounded-full">
+                            {{ interest|capfirst }}
+                        </span>
+                    {% empty %}
+                        <p class="text-gray-400">This user hasn't specified any learning interests yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                
+                // Update button active state
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update content active state
+                tabContents.forEach(content => {
+                    if (content.id === targetId) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
