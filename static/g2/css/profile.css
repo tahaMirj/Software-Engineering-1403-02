@@ -1,0 +1,154 @@
+/* profile.css */
+/* ---------- GLOBAL STRUCTURE & LAYOUT ---------- */
+.profile-container {
+  width: 100%;
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  color: #103b0f;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 2rem;
+}
+
+.profile-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #103b0f;
+}
+
+.profile-section {
+  margin-bottom: 1.5rem;
+}
+
+.profile-section h5,
+.profile-section h6 {
+  color: #2f6a34;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profile-section p {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+.profile-section p.placeholder {
+  color: #888;
+  font-style: italic;
+}
+
+/* ---------- FORM STYLING ---------- */
+/* form label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #2f6a34;
+} */
+
+form textarea,
+form input[type="text"],
+form select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f9fff9;
+  margin-bottom: 1rem;
+}
+
+form textarea:focus,
+form input:focus,
+form select:focus {
+  border-color: #70c779;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(112,199,121,0.3);
+}
+
+form .form-check {
+  margin-bottom: 1rem;
+}
+
+form .form-check-input {
+  margin-right: 0.5rem;
+  accent-color: #2f6a34;
+}
+
+form button {
+  background: #2f6a34;
+  color: #e4fbe4;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+form button:hover {
+  background: #234c26;
+}
+
+/* ---------- ALERTS & STATUS ---------- */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert-warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+/* ---------- RESPONSIVENESS ---------- */
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 1rem;
+    margin: 1rem;
+  }
+}
+
+.main-body {
+    padding: 20px; /* Adjust the value as needed */
+}
+
+/* ---------- HORIZONTAL FORM LAYOUT ---------- */
+.form-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.form-wrapper h5,
+.form-wrapper label {
+  flex: 0 0 150px; /* Fixed width for alignment */
+  margin-right: 1rem;
+  font-weight: 600;
+  color: #2f6a34;
+}
+
+.form-wrapper input,
+.form-wrapper select,
+.form-wrapper textarea {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f9fff9;
+}
+
+
+.profile-item-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #2f6a34;
+}

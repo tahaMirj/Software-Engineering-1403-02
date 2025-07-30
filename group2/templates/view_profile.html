@@ -1,0 +1,37 @@
+<!-- view_profile.html -->
+{% extends "group2.html" %}
+{% load static %}
+{% load tz %}
+{% block site_name %}{{ target_user.username|title }}'s Profile{% endblock %}
+{% block extra_head %}
+    <title>Profile</title>
+    <link rel="stylesheet" href="{% static 'g2/css/profile.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    
+
+    <div class="form-wrapper">
+      <h5>Biography</h5>
+      <p class="text-muted">{{ profile.biography|linebreaksbr|default:"No biography provided." }}</p>
+    </div>
+
+    <div class="form-wrapper">
+        <h5>Native Language</h5>
+        <p>{{ profile.native_language|default:"—" }}</p>
+    </div>
+    <div class="form-wrapper">
+        <h5 >English Proficiency</h5>
+        <p>{{ profile.get_english_level_display|default:"—" }}</p>
+    </div>
+    <div class="form-wrapper">
+    <h5 >Learning Goal</h5>
+    <p>{{ profile.get_learning_goals_display|default:"—" }}</p>
+    </div>
+
+    <div class="form-wrapper">
+      <h5 >Availability</h5>
+      <p>{{ profile.get_availability_display|default:"—" }}</p>
+    </div>
+</div>
+{% endblock %}
