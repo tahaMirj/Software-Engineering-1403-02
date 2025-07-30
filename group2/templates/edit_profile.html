@@ -1,50 +1,51 @@
-<!-- edit_profile.html -->
-
 {% extends "group2.html" %}
 {% load static %}
 {% load tz %}
-{% block site_name %}Edit your profile{% endblock %}
+{% block site_name %}Edit Your Profile{% endblock %}
 {% block extra_head %}
-    <title>Profile</title>
+    <title>Edit Profile</title>
     <link rel="stylesheet" href="{% static 'g2/css/profile.css' %}">
 {% endblock %}
 {% block content %}
-  <div class="container mt-4">
-    <form method="post">
-  {% csrf_token %}
+<div class="profile-container">
+    <h2 class="profile-title">Edit Your Profile</h2>
+    
+    <form method="post" class="profile-form">
+        {% csrf_token %}
+        
+        <div class="profile-section">
+            <label for="{{ form.biography.id_for_label }}" class="profile-section-title">Biography</label>
+            {{ form.biography }}
+        </div>
 
-  <div class="form-wrapper">
-    <label for="{{ form.biography.id_for_label }}">Biography</label>
-    {{ form.biography }}
-  </div>
+        <div class="profile-section">
+            <label for="{{ form.native_language.id_for_label }}" class="profile-section-title">Native Language</label>
+            {{ form.native_language }}
+        </div>
 
-  <div class="form-wrapper">
-    <label for="{{ form.native_language.id_for_label }}">Native Language</label>
-    {{ form.native_language }}
-  </div>
+        <div class="profile-section">
+            <label for="{{ form.english_level.id_for_label }}" class="profile-section-title">English Proficiency</label>
+            {{ form.english_level }}
+        </div>
 
-  <div class="form-wrapper">
-    <label for="{{ form.english_level.id_for_label }}">English Level</label>
-    {{ form.english_level }}
-  </div>
+        <div class="profile-section">
+            <label for="{{ form.learning_goals.id_for_label }}" class="profile-section-title">Learning Goal</label>
+            {{ form.learning_goals }}
+        </div>
 
-  <div class="form-wrapper">
-    <label for="{{ form.learning_goals.id_for_label }}">Learning Goal</label>
-    {{ form.learning_goals }}
-  </div>
+        <div class="profile-section">
+            <label for="{{ form.availability.id_for_label }}" class="profile-section-title">Availability</label>
+            {{ form.availability }}
+        </div>
 
-  <div class="form-wrapper">
-    <label for="{{ form.availability.id_for_label }}">Availability</label>
-    {{ form.availability }}
-  </div>
+        <div class="profile-section">
+            <label for="{{ form.appear_in_search.id_for_label }}" class="profile-section-title">Appear in Search</label>
+            {{ form.appear_in_search }}
+        </div>
 
-  <div class="form-wrapper">
-    <label for="{{ form.appear_in_search.id_for_label }}">Appear in search</label>
-    {{ form.appear_in_search }}
-  </div>
-
-  <button type="submit" class="btn btn-primary">Save Changes</button>
-</form>
-
-  </div>
+        <div class="profile-section">
+            <button type="submit" class="profile-button">Save Changes</button>
+        </div>
+    </form>
+</div>
 {% endblock %}
