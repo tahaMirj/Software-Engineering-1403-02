@@ -25,7 +25,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'english_website.settings')
 django.setup()
 
 from django.contrib.auth.models import User
-from group4.models import Reading, ReadingCategory, ReadingTag, Question, QuestionOption, Results, AttemptHistory
+from group4.models import Reading, ReadingCategory, ReadingTag, Question, QuestionOption
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

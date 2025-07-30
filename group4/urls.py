@@ -19,8 +19,4 @@ urlpatterns = [
     
     # Audio API endpoints
     path('api/readings/<int:reading_id>/generate/', views.generate_audio, name='generate_audio'),
-    
-    # Exercise and progress API endpoints
-    path('api/readings/<int:reading_id>/submit/', views.submit_exercise, name='submit_exercise'),
-    path('api/user/progress/', views.user_progress, name='user_progress'),
 ] 

@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 
 class Reading(models.Model):
@@ -36,41 +35,6 @@ class Reading(models.Model):
         else:
             # Return default image if no category
             return "static/group4/images/base/prac.png"
-
-
-class Results(models.Model):
-    """Stores best results for each user-reading combination"""
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reading_results')
-    reading = models.ForeignKey(Reading, on_delete=models.CASCADE, related_name='user_results')
-    best_score = models.IntegerField(default=0, help_text="Best score achieved (0-100)")
-    total_attempts = models.IntegerField(default=0)
-    last_accessed = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        unique_together = ('user', 'reading')
-        verbose_name = "Reading Result"
-        verbose_name_plural = "Reading Results"
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.reading.title}: {self.best_score}%"
-
-
-class AttemptHistory(models.Model):
-    """Detailed history of every attempt"""
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attempts')
-    reading = models.ForeignKey(Reading, on_delete=models.CASCADE, related_name='attempts')
-    score = models.IntegerField(help_text="Score for this specific attempt (0-100)")
-    attempted_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        ordering = ['-attempted_at']
-        verbose_name = "Attempt"
-        verbose_name_plural = "Attempt History"
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.reading.title} - {self.score}% ({self.attempted_at.date()})"
 
 
 class Question(models.Model):

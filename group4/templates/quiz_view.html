@@ -371,63 +371,11 @@ document.querySelector('button[type="submit"]').addEventListener('click', functi
         return;
     }
 
-    // Submit answers to backend
-    submitExercise(userAnswers);
+    // Use client-side checking only
+    clientSideChecking(userAnswers);
 });
 
-// Submit exercise function
-async function submitExercise(userAnswers) {
-    try {
-        const response = await fetch("{% url 'group4:submit_exercise' reading.id %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                answers: userAnswers,
-                reading_id: readingId
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            displayResults(result);
-        } else {
-            console.error('Failed to submit exercise');
-            // Fallback to client-side checking
-            clientSideChecking(userAnswers);
-        }
-    } catch (error) {
-        console.error('Error submitting exercise:', error);
-        // Fallback to client-side checking
-        clientSideChecking(userAnswers);
-    }
-}
-
-// Display results from server
-function displayResults(result) {
-    // Display overall results
-    document.getElementById('correct-answers').textContent = result.correct_count;
-    document.getElementById('incorrect-answers').textContent = result.incorrect_count;
-
-    // Display detailed results for each question
-    result.question_results.forEach(function(questionResult, index) {
-        document.getElementById(`result-${questionResult.question_id}`).innerHTML = `
-            <strong>Question ${index + 1}: ${questionResult.is_correct ? '✔' : '❌'} </strong><br>
-            Your Choice: ${questionResult.user_answer}<br>
-            Correct Answer: ${questionResult.correct_answer}<br><br>
-        `;
-    });
-
-    // Show results sections
-    document.getElementById('results-sentences').style.display = 'block';
-    document.getElementById('results-box').style.display = 'block';
-    document.getElementById('transcript-section').style.display = 'block';
-    document.getElementById('questions-section').style.display = 'none';
-}
-
-// Fallback client-side checking
+// Client-side checking function
 function clientSideChecking(userAnswers) {
     let correctCount = 0;
     let incorrectCount = 0;
