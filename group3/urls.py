@@ -4,7 +4,7 @@ from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
 import os
-
+#
 app_name = 'group3'
 urlpatterns = [
     path('', views.home, name='group3'),
@@ -25,10 +25,11 @@ urlpatterns = [
     path('student/sessions/', views.student_sessions, name='student_sessions'),
     path('student/teachers/<int:teacher_id>/review/', views.add_review, name='add_review'),
     path('reviews/', views.view_reviews, name='view_reviews'),
+    path('session/<int:session_id>/', views.session_detail, name='session_detail'),
 ]
 
 
-# Serve everything under /group3/teacher_attachments/ from the local folder
+# if the settings are in debug mode the app will be able to show the images
 if settings.DEBUG:
     urlpatterns += static(
         'teacher_attachments/',

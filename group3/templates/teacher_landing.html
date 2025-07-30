@@ -220,15 +220,15 @@
     align-items: center;
     justify-content: space-between;
       position: absolute;
-left: 0;
-      right: 0;
-      top: 0;
+    left: 0;
+    right: 0;
+    top: 0;
   }
 
   .site-name {
     font-size: 1.35rem;
     font-weight: 600;
-}
+  }
 
 </style>
 {% endblock %}
@@ -250,7 +250,6 @@ left: 0;
       Back to Home
     </a>
   </p>
-
     </header>
 
       <p style="margin-top: 70px" class="mb-4">Welcome, <strong>{{ request.user.username }}</strong>!</p>
@@ -275,29 +274,40 @@ left: 0;
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {% for timeslot in timeslots %}
-              <tr>
-                <td data-label="Start Time">{{ timeslot.start_time|date:"Y-m-d H:i" }}</td>
-                <td data-label="End Time">{{ timeslot.end_time|date:"Y-m-d H:i" }}</td>
-                <td data-label="Day">{{ timeslot.day_name }}</td>
-                <td data-label="Status">
-                  {% if timeslot.is_booked %}
-                    <span class="badge badge--warn">Booked</span>
-                  {% else %}
-                    <span class="badge badge--ok">Available</span>
-                  {% endif %}
-                </td>
-                <td data-label="Actions">
-                  {% if not timeslot.is_booked %}
-                    <a href="{% url 'group3:edit_timeslot' timeslot.id %}">Edit</a>
-                  {% else %}
-                    &mdash;
-                  {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
+         <tbody>
+  {% for timeslot in timeslots %}
+    <tr>
+      <td data-label="Start Time">{{ timeslot.start_time|date:"Y-m-d H:i" }}</td>
+      <td data-label="End Time">{{ timeslot.end_time|date:"Y-m-d H:i" }}</td>
+      <td data-label="Day">{{ timeslot.day_name }}</td>
+      <td data-label="Status">
+        {% if timeslot.is_booked %}
+          <span class="badge badge--warn">Booked</span>
+          {% with session=timeslot.session_set.first %}
+            {% if session %}
+              &nbsp;<small>({{ session.get_status_display }})</small>
+            {% endif %}
+          {% endwith %}
+        {% else %}
+          <span class="badge badge--ok">Available</span>
+        {% endif %}
+      </td>
+      <td data-label="Actions">
+        {% if not timeslot.is_booked %}
+          <a href="{% url 'group3:edit_timeslot' timeslot.id %}">Edit</a>
+        {% else %}
+          {% with session=timeslot.session_set.first %}
+            {% if session %}
+              <a href="{% url 'group3:session_detail' session.id %}">View Session</a>
+            {% else %}
+              &mdash;
+            {% endif %}
+          {% endwith %}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+</tbody>
         </table>
       {% else %}
         <p>You have no timeslots yet.</p>
@@ -311,9 +321,4 @@ left: 0;
     {% endif %}
   {% endif %}
 
-{#  <p class="mt-6">#}
-{#    <a href="{% url 'group3:group3' %}" class="text-white hover:underline">#}
-{#      &larr; Back to Home#}
-{#    </a>#}
-{#  </p>#}
 {% endblock %}

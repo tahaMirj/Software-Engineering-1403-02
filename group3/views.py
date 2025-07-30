@@ -1,5 +1,7 @@
 import os
 from datetime import datetime
+
+from django import forms
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Avg
@@ -13,23 +15,26 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
-
+#this function returns us to home
 def home(request):
     return  render (request , 'group3.html' , {'group_number': '3'})
 
 
+#a teacher can also be a student because the entity teacher is made based on a user that already exists in the website
+#used for logging in a teacher
 def teacher_login(request):
     if request.method == 'POST':
+        #get the usernames and the password to check them
         username = request.POST.get('username')
         password = request.POST.get('password')
-
+        #check the user name and the password
         user = authenticate(request, username=username, password=password)
         if user is not None:
             try:
                 user.teacher  # Check for linked Teacher
             except Teacher.DoesNotExist:
                 return render(request, 'teacher_login.html', {'error': 'Account not registered as a teacher.'})
-
+            #use django's already implemented login function
             login(request, user)
             return redirect('group3:teacher_landing')
         else:
@@ -37,7 +42,7 @@ def teacher_login(request):
 
     return render(request, 'teacher_login.html')
 
-
+#method for signup of a teacher
 def teacher_signup(request):
     if request.method == 'POST':
         username     = request.POST.get('username')
@@ -49,9 +54,9 @@ def teacher_signup(request):
         # Files (optional)
         pic_file     = request.FILES.get('profile_picture')
         resume_file  = request.FILES.get('resume')
-        # if you later add intro_video to the model, handle it similarly:
-        # video_file  = request.FILES.get('intro_video')
 
+
+        #the teacher has to already have a user before in the website
         user = authenticate(request, username=username, password=password)
         if user is None:
             return render(request, 'teacher_signup.html', {
@@ -77,15 +82,13 @@ def teacher_signup(request):
                 language=language
             )
 
-            # Now attach files if provided
+            # attach the files the teacher provided
             if pic_file:
                 teacher.profile_picture = pic_file
             if resume_file:
                 teacher.resume = resume_file
-            # if video_file and you have model field:
-            #     teacher.intro_video = video_file
 
-            # Persist the file assignments
+            # save the changes
             teacher.save()
 
         login(request, user)
@@ -105,12 +108,12 @@ def teacher_profile(request):
     context = {'teacher': teacher}
     return render(request, 'teacher_profile.html', context)
 
-
+#logout function for the teacher
 def teacher_logout(request):
     logout(request)
     return redirect('group3:group3')
 
-
+#this is the page for the teacher to do all the things they want
 def teacher_landing(request):
     # If the user is logged in, try to fetch their Teacher profile (or get None)
     teacher = None
@@ -126,7 +129,7 @@ def teacher_landing(request):
         'timeslots': timeslots,
     })
 
-
+#method for editing the profile
 @login_required
 def edit_profile(request):
     teacher = get_object_or_404(Teacher, user=request.user)
@@ -487,5 +490,32 @@ def add_review(request, teacher_id):
         'teacher': teacher
     })
 
+
+class SessionForm(forms.ModelForm):
+    class Meta:
+        model = Session
+        fields = ['start_time', 'end_time', 'class_url', 'status', 'notes']
+        widgets = {
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_time':   forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'notes':      forms.Textarea(attrs={'rows':4}),
+        }
+
+@login_required
+def session_detail(request, session_id):
+    session = get_object_or_404(Session, pk=session_id, teacher__user=request.user)
+
+    if request.method == 'POST':
+        form = SessionForm(request.POST, instance=session)
+        if form.is_valid():
+            form.save()
+            return redirect('group3:teacher_landing')
+    else:
+        form = SessionForm(instance=session)
+
+    return render(request, 'session_detail.html', {
+        'session': session,
+        'form': form,
+    })
 
 
