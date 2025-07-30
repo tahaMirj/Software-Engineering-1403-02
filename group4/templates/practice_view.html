@@ -1,0 +1,644 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ reading.title }} - {{ reading.difficulty }} Listening Practice</title>
+  <link rel="stylesheet" href="{% static 'group4/style/style_quiz.css' %}">
+</head>
+<body>
+  <!-- نوار قرمز رنگ در بالای صفحه -->
+  <header class="yellow-bar">
+    <h1>{{ reading.title }} – {{ reading.difficulty }} English Listening Practice</h1>
+  </header>
+
+  <!-- Timer/Accent/Loading Container - Single position for all states -->
+  <div id="timer-container" class="test-section">
+    <!-- Accent Selection State -->
+    <div id="accent-selection">
+      <h2>لهجه مورد نظر خود را انتخاب کنید</h2>
+      <div class="accent-buttons-container">
+        <button class="accent-btn" data-accent="us">
+          🇺🇸 American
+        </button>
+        <button class="accent-btn" data-accent="uk">
+          🇬🇧 British
+        </button>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div id="loading-state" style="display: none;">
+      <h2>در حال ساختن صوت... لطفا منتظر بمانید</h2>
+      <div id="timer">Loading...</div>
+    </div>
+    
+    <!-- Start State -->
+    <div id="start-state" style="display: none;">
+      <h2>برای شروع تمرین دکمه شروع را بزنید</h2>
+      <button id="startButton">شروع</button>
+    </div>
+  </div>
+
+  <div class="test-container" id="container-section" style="display:none;">
+    <!-- تصویر آزمون -->
+    <header>
+      <img src="{% if reading.category.image_path %}{{ reading.category.image_path }}{% else %}{% static 'group4/images/base/default.png' %}{% endif %}" alt="{{ reading.title }}" class="test-image">
+    </header>
+
+    <div class="test-description">
+      <p>{{ reading.description }}</p>
+    </div>
+    
+    <!-- بخش فایل صوتی -->
+    <div class="test-section" style="display: flex; align-items: center; justify-content: space-between;">
+      <audio id="audio-player" controls style="flex: 1;">
+        <source id="audio-source" src="" type="audio/mp3">
+        Your browser does not support the audio element.
+      </audio>
+      <div style="margin-left: 10px; display: flex; align-items: center;">
+        <button id="replay-btn" style="margin-left: 10px;">🔄 Replay</button>
+        <button id="settings-btn" style="margin-left: 10px;">⚙️ Settings</button>
+      </div>
+    </div>
+
+    <!-- Settings Popup -->
+    <div id="settings-popup" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:1000; padding:20px; min-width:250px;">
+      <h3 style="margin-top:0;">Audio Settings</h3>
+      <div style="margin-bottom:16px;">
+        <label for="audio-speed">Speed:</label>
+        <select id="audio-speed" style="margin-left:10px;">
+          <option value="0.75">0.75x</option>
+          <option value="1" selected>1x (Normal)</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+        </select>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label for="subtitles-toggle">Subtitles:</label>
+        <input type="checkbox" id="subtitles-toggle" checked style="margin-left:10px;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label for="subtitle-size">Subtitle Size:</label>
+        <select id="subtitle-size" style="margin-left:10px;">
+          <option value="14">Small (14px)</option>
+          <option value="18" selected>Medium (18px)</option>
+          <option value="24">Large (24px)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label for="accent-select">Accent:</label>
+        <select id="accent-select" style="margin-left:10px;">
+          <option value="us">🇺🇸 American</option>
+          <option value="uk">🇬🇧 British</option>
+        </select>
+      </div>
+      <div style="text-align:right;">
+        <button id="settings-close" style="padding:6px 12px; background:#ffcc00; color:white; border:none; border-radius:4px; cursor:pointer;">Close</button>
+      </div>
+    </div>
+
+    <!-- Audio Loading Message -->
+    <div id="audio-loading-message" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border:2px solid #007bff; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:1001; padding:20px; text-align:center; min-width:300px;">
+      <div style="margin-bottom:15px;">
+        <div style="display:inline-block; width:20px; height:20px; border:3px solid #f3f3f3; border-top:3px solid #007bff; border-radius:50%; animation:spin 1s linear infinite;"></div>
+      </div>
+      <h3 style="margin:0 0 10px 0; color:#007bff;">...در حال ساختن صوت جدید</h3>
+      <p style="margin:0; color:#666;">لطفا منتظر بمانید تا صوت با لهجه انتخابی شما آماده شود.</p>
+    </div>
+
+    <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Subtitle styles */
+    #subtitle-display {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 1000;
+      max-width: 80%;
+      word-wrap: break-word;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    </style>
+
+    <!-- Subtitle Display -->
+    <div id="subtitle-display" style="display: none;"></div>
+
+    <!-- بخش Transcript (پنهان است) -->
+    <div class="test-section" id="transcript-section" style="display: block;">
+       <button class="dropdown-btn">Transcript</button>
+      <div class="dropdown-content" style="display: none;">
+        <div class="transcript-content" id="transcript-content">
+          <!-- Transcript will be populated dynamically with timestamps -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+// Global variables
+const readingId = {{ reading.id }};
+let selectedAccent = null;
+let audioTimestamps = [];
+let audioElement = null;
+let subtitlesEnabled = true; // Default subtitles enabled
+let subtitleSize = 18; // Default medium size
+
+// Handle accent selection
+document.addEventListener('DOMContentLoaded', function() {
+    const accentButtons = document.querySelectorAll('.accent-btn');
+    
+    accentButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            selectedAccent = this.dataset.accent;
+            
+            // Update button styles
+            accentButtons.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Highlight selected button
+            this.classList.add('selected');
+            
+            // Transition to loading state
+            document.getElementById('accent-selection').style.display = 'none';
+            document.getElementById('loading-state').style.display = 'block';
+            
+            // Generate audio
+            generateAudio();
+        });
+    });
+});
+
+// TTS Audio generation function
+async function generateAudio() {
+    if (!selectedAccent) {
+        console.error('No accent selected');
+        return;
+    }
+    
+    try {
+        const audioSource = document.getElementById('audio-source');
+        audioElement = document.getElementById('audio-player');
+        
+        // Map accent to voice
+        const voiceMap = {
+            'us': 'en-US-AriaNeural',
+            'uk': 'en-GB-SoniaNeural'
+        };
+        
+        console.log('Selected accent:', selectedAccent);
+        console.log('Voice to use:', voiceMap[selectedAccent]);
+        
+        const response = await fetch("{% url 'group4:generate_audio' reading.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                voice: voiceMap[selectedAccent]
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Received audio data:', data);
+            console.log('Audio duration:', data.duration);
+            console.log('Timestamps length:', data.timestamps?.length);
+            
+            audioSource.src = data.audio_url;
+            audioElement.load();
+            
+            // Store timestamps for sentence highlighting
+            audioTimestamps = data.timestamps || [];
+            
+            // Generate transcript with clickable sentences
+            generateTranscript();
+            
+            // Transition to start state
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('start-state').style.display = 'block';
+        } else {
+            console.error('Failed to generate audio');
+            // Show error in loading state
+            document.querySelector('#loading-state h2').innerHTML = 'Failed to generate audio. Please refresh the page.';
+            setTimeout(() => {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('start-state').style.display = 'block';
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Error generating audio:', error);
+        // Show error in loading state
+        document.querySelector('#loading-state h2').innerHTML = 'Error generating audio. Please refresh the page.';
+        setTimeout(() => {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('start-state').style.display = 'block';
+        }, 2000);
+    }
+}
+
+// Generate transcript with clickable sentences using timestamp data directly
+function generateTranscript() {
+    const transcriptContent = document.getElementById('transcript-content');
+    transcriptContent.innerHTML = '';
+    console.log('Generating transcript with', audioTimestamps.length, 'sentences');
+    // Debug: Log all timestamps
+    console.log('=== TIMESTAMP DEBUG ===');
+    audioTimestamps.forEach((timestamp, index) => {
+        console.log(`${index + 1}. [${timestamp.start_time.toFixed(2)}s - ${timestamp.end_time.toFixed(2)}s] "${timestamp.text}"`);
+    });
+    console.log('=====================');
+    if (audioTimestamps.length === 0) {
+        transcriptContent.innerHTML = '<p>No transcript available.</p>';
+        return;
+    }
+
+    // Get the original reading content (preserve \n and spaces)
+    const originalContent = `{{ reading.content|escapejs }}`;
+    // Split by single newline for each speaker/line
+    const lines = originalContent.split(/\n/);
+
+    // Flatten timestamps for easier matching
+    let tsIndex = 0;
+
+    lines.forEach(line => {
+        if (line.trim()) {
+            const lineElement = document.createElement('p');
+            // Optionally, split into sentences if needed (for long monologues)
+            const sentences = line.match(/[^.!?\s][^.!?]*(?:[.!?](?!\d)(?![.!?])|$)/g);
+            if (sentences) {
+                sentences.forEach(sentence => {
+                    if (tsIndex < audioTimestamps.length) {
+                        const timestamp = audioTimestamps[tsIndex];
+                        // Create sentence span
+                        const sentenceSpan = document.createElement('span');
+                        sentenceSpan.id = `sentence_${timestamp.sentence_id}`;
+                        sentenceSpan.textContent = sentence;
+                        sentenceSpan.style.cursor = 'pointer';
+                        // Add click handler for sentence jumping
+                        sentenceSpan.addEventListener('click', () => {
+                            if (audioElement) {
+                                if (audioElement.readyState >= 2) {
+                                    audioElement.currentTime = timestamp.start_time;
+                                    audioElement.play().catch(e => console.error('Play failed:', e));
+                                } else {
+                                    audioElement.addEventListener('loadeddata', () => {
+                                        audioElement.currentTime = timestamp.start_time;
+                                        audioElement.play().catch(e => console.error('Play failed:', e));
+                                    }, { once: true });
+                                }
+                            }
+                        });
+                        // Add hover effects
+                        sentenceSpan.addEventListener('mouseover', function() {
+                            this.style.backgroundColor = '#f0f0f0';
+                            this.style.color = '#007bff';
+                        });
+                        sentenceSpan.addEventListener('mouseout', function() {
+                            this.style.backgroundColor = '';
+                            this.style.color = '';
+                        });
+                        lineElement.appendChild(sentenceSpan);
+                        lineElement.appendChild(document.createTextNode(' '));
+                        tsIndex++;
+                    }
+                });
+            }
+            transcriptContent.appendChild(lineElement);
+        } else {
+            // Preserve empty lines for spacing
+            const emptyLine = document.createElement('p');
+            transcriptContent.appendChild(emptyLine);
+        }
+    });
+    console.log('Transcript generated successfully');
+}
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Start button handler
+document.getElementById('startButton').addEventListener('click', function() {
+    // Hide the timer container and show practice content
+    document.getElementById('timer-container').style.display = 'none';
+    document.getElementById('container-section').style.display = 'block';
+    
+    // Set up audio time update listener for sentence highlighting and subtitles
+    if (audioElement) {
+        audioElement.ontimeupdate = function() {
+            const currentTime = audioElement.currentTime;
+            
+            // Highlight current sentence and show subtitles
+            let currentSubtitle = '';
+            audioTimestamps.forEach((timestamp) => {
+                const sentenceElement = document.getElementById(`sentence_${timestamp.sentence_id}`);
+                if (sentenceElement) {
+                    if (currentTime >= timestamp.start_time && currentTime <= timestamp.end_time) {
+                        sentenceElement.classList.add('bold');
+                        // Debug log for current highlighted sentence (only log once per sentence)
+                        if (!sentenceElement.dataset.logged) {
+                            console.log(`Highlighting sentence ${timestamp.sentence_id} at time ${currentTime.toFixed(2)}s`);
+                            sentenceElement.dataset.logged = 'true';
+                        }
+                        // Set current subtitle text
+                        currentSubtitle = timestamp.text;
+                    } else {
+                        sentenceElement.classList.remove('bold');
+                        sentenceElement.dataset.logged = '';
+                    }
+                }
+            });
+            
+            // Update subtitles
+            updateSubtitles(currentSubtitle);
+        };
+    }
+});
+
+// Replay button handler
+document.getElementById('replay-btn').addEventListener('click', function() {
+    if (audioElement) {
+        audioElement.currentTime = 0;
+        audioElement.play();
+    }
+});
+
+// نمایش / مخفی کردن Transcript
+document.querySelector('.dropdown-btn').addEventListener('click', function() {
+    const transcriptSection = this.nextElementSibling;
+    if (transcriptSection.style.display === 'none' || transcriptSection.style.display === '') {
+        transcriptSection.style.display = 'block';
+    } else {
+        transcriptSection.style.display = 'none';
+    }
+});
+
+// Settings popup logic
+document.getElementById('settings-btn').addEventListener('click', function() {
+    const popup = document.getElementById('settings-popup');
+    const button = this;
+    
+    // Position popup near the settings button
+    const buttonRect = button.getBoundingClientRect();
+    const popupWidth = 250; // min-width from CSS
+    const popupHeight = 200; // estimated height
+    
+    // Calculate position (try to place below button, but adjust if off-screen)
+    let left = buttonRect.left;
+    let top = buttonRect.bottom + 10;
+    
+    // Adjust if popup would go off right edge of screen
+    if (left + popupWidth > window.innerWidth) {
+        left = window.innerWidth - popupWidth - 10;
+    }
+    
+    // Adjust if popup would go off bottom edge of screen
+    if (top + popupHeight > window.innerHeight) {
+        top = buttonRect.top - popupHeight - 10;
+    }
+    
+    // Ensure popup doesn't go off left edge
+    if (left < 10) {
+        left = 10;
+    }
+    
+    // Ensure popup doesn't go off top edge
+    if (top < 10) {
+        top = 10;
+    }
+    
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+    popup.style.display = 'block';
+    
+    // Set current accent in select
+    document.getElementById('accent-select').value = selectedAccent || 'us';
+    // Set current speed
+    document.getElementById('audio-speed').value = audioElement ? audioElement.playbackRate : '1';
+    // Set subtitles toggle
+    document.getElementById('subtitles-toggle').checked = subtitlesEnabled;
+    // Set subtitle size
+    document.getElementById('subtitle-size').value = subtitleSize;
+});
+
+document.getElementById('settings-close').addEventListener('click', function() {
+    document.getElementById('settings-popup').style.display = 'none';
+});
+
+// Close popup when clicking outside
+document.addEventListener('click', function(event) {
+    const popup = document.getElementById('settings-popup');
+    const settingsBtn = document.getElementById('settings-btn');
+    
+    if (popup.style.display === 'block' && 
+        !popup.contains(event.target) && 
+        event.target !== settingsBtn) {
+        popup.style.display = 'none';
+    }
+});
+
+// Change audio speed
+document.getElementById('audio-speed').addEventListener('change', function() {
+    if (audioElement) {
+        audioElement.playbackRate = parseFloat(this.value);
+    }
+});
+
+// Toggle subtitles
+document.getElementById('subtitles-toggle').addEventListener('change', function() {
+    subtitlesEnabled = this.checked;
+    const subtitleDisplay = document.getElementById('subtitle-display');
+    if (!subtitlesEnabled) {
+        subtitleDisplay.style.display = 'none';
+    }
+});
+
+// Change subtitle size
+document.getElementById('subtitle-size').addEventListener('change', function() {
+    subtitleSize = parseInt(this.value);
+    const subtitleDisplay = document.getElementById('subtitle-display');
+    subtitleDisplay.style.fontSize = subtitleSize + 'px';
+});
+
+// Update subtitles display
+function updateSubtitles(text) {
+    const subtitleDisplay = document.getElementById('subtitle-display');
+    
+    if (subtitlesEnabled && text.trim()) {
+        subtitleDisplay.textContent = text;
+        subtitleDisplay.style.fontSize = subtitleSize + 'px';
+        subtitleDisplay.style.display = 'block';
+    } else {
+        subtitleDisplay.style.display = 'none';
+    }
+}
+
+// Change accent mid-listen
+document.getElementById('accent-select').addEventListener('change', function() {
+    const newAccent = this.value;
+    
+    // Only regenerate if accent actually changed
+    if (newAccent === selectedAccent) {
+        return;
+    }
+    
+    selectedAccent = newAccent;
+    
+    // Close settings popup
+    document.getElementById('settings-popup').style.display = 'none';
+    
+    // Show loading message
+    document.getElementById('audio-loading-message').style.display = 'block';
+    
+    // Pause current audio
+    if (audioElement) {
+        audioElement.pause();
+    }
+    
+    // Generate new audio with selected accent
+    generateAudioSilent().then(() => {
+        // Hide loading message and show success
+        document.getElementById('audio-loading-message').style.display = 'none';
+        
+        // Show a brief success message
+        showSuccessMessage('صوت جدید با لهجه ' + (selectedAccent === 'us' ? 'آمریکایی' : 'بریتانیایی') + ' آماده است!');
+        
+        // Regenerate transcript with new timestamps
+        generateTranscript();
+        
+        // Reset audio to beginning
+        if (audioElement) {
+            audioElement.currentTime = 0;
+        }
+    }).catch(error => {
+        console.error('Error generating new audio:', error);
+        document.getElementById('audio-loading-message').style.display = 'none';
+        showErrorMessage('خطا در ساختن صوت جدید. لطفا دوباره تلاش کنید.');
+    });
+});
+
+// Silent audio generation (no UI state changes)
+async function generateAudioSilent() {
+    if (!selectedAccent) {
+        throw new Error('No accent selected');
+    }
+    
+    const audioSource = document.getElementById('audio-source');
+    audioElement = document.getElementById('audio-player');
+    
+    // Map accent to voice
+    const voiceMap = {
+        'us': 'en-US-AriaNeural',
+        'uk': 'en-GB-SoniaNeural'
+    };
+    
+    const response = await fetch("{% url 'group4:generate_audio' reading.id %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            voice: voiceMap[selectedAccent]
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to generate audio');
+    }
+    
+    const data = await response.json();
+    audioSource.src = data.audio_url;
+    audioElement.load();
+    
+    // Store new timestamps
+    audioTimestamps = data.timestamps || [];
+    
+    return data;
+}
+
+// Show success message
+function showSuccessMessage(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 1002;
+        font-weight: bold;
+    `;
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        if (messageDiv.parentNode) {
+            messageDiv.parentNode.removeChild(messageDiv);
+        }
+    }, 3000);
+}
+
+// Show error message
+function showErrorMessage(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #dc3545;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 1002;
+        font-weight: bold;
+    `;
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        if (messageDiv.parentNode) {
+            messageDiv.parentNode.removeChild(messageDiv);
+        }
+    }, 5000);
+}
+
+</script> 
+</body>
+</html>
