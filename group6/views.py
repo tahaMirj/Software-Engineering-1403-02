@@ -174,6 +174,7 @@ def start_learning_session(request):
     
     return redirect(reverse('group6:group6'))
     
+
 def second_page(request):
     return render(request, 'second.html')
 def show_page(request):
@@ -181,9 +182,11 @@ def show_page(request):
 def end_section(request):
     return render(request, 'group6.html')
 
+   
+
 @login_required(login_url='/registration/login/')
-def user_profile(request):
-    return render(request, 'group6/profile.html')
+
+
 
 
 # process_guess handles user interactions during a learning session
@@ -279,3 +282,6 @@ def group6_login(request):
 # redirects to the main registration logout 
 def group6_logout(request):
     return redirect(reverse('logout')) 
+def profile(request):
+    return redirect(reverse('profile')) 
+    
