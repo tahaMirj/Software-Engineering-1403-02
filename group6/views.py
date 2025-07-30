@@ -297,10 +297,10 @@ def process_guess(request):
         if action == 'show_answer':
             learning_session['guessed_current_word'] = True 
             if user_guess.lower() == current_word.text.lower():
-                request.session['feedback_message'] = "حدس شما درست بود!"
+                request.session['feedback_message'] = "Your guess was correct!"
                 user_stat.correct_count += 1
             else:
-                request.session['feedback_message'] = f"حدس شما غلط بود. کلمه درست: {current_word.text}"
+                request.session['feedback_message'] = f"Your guess was incorrect! The correct word is: {current_word.text}"
                 user_stat.incorrect_count += 1 
             user_stat.save() # this will update the timestamp too
             request.session.modified = True 
@@ -312,7 +312,7 @@ def process_guess(request):
 
             # check if all words in the session have been presented
             if learning_session['current_word_index'] >= len(words_in_session):
-                request.session['feedback_message'] = "جلسه یادگیری به پایان رسید!"
+                request.session['feedback_message'] = "Your learning session has finished!"
                 request.session['learning_session'] = None # end the session
                 # --- Trigger Level Calculation at Session End ---
                 # store the new level in session to display on the home page after redirect
@@ -323,7 +323,6 @@ def process_guess(request):
             return redirect(reverse('group6:group6')) 
 
         elif action == 'end_session':
-            request.session['feedback_message'] = "جلسه یادگیری شما به پایان رسید."
             request.session['learning_session'] = None # clear the learning session data
             # --- Trigger Level Calculation at Session End ---
             # store the new level in session to display on the home page after redirect
