@@ -1,29 +1,16 @@
+{% extends "group2.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
+{% load tz %}
+{% block site_name %}Chat{% endblock %}
+{% block extra_head %}
+    
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Chat Lobby</title>
     <link rel="stylesheet" href="{% static 'g2/css/index.css' %}" />
-</head>
-<body>
-    <nav class="navbar">
-        <div class="site-name">Chat Lobby</div>
-        <div class="user-info">Logged in as: {{ user.username }}</div>
-    </nav>
+{% endblock %}
+{% block content %}
 
     <main class="main-body">
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="message {{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
         <div class="lobby-container">
             <form class="new-chat-form" id="new-chat-form">
                 <input type="text" id="username-input" placeholder="Enter username to start a new chat" required>
@@ -54,10 +41,6 @@
         </div>
     </main>
 
-    <footer class="footer">
-        © {% now "Y" %} Chat Application
-    </footer>
-
     <script>
         document.getElementById('new-chat-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -67,5 +50,4 @@
             }
         });
     </script>
-</body>
-</html>
+{% endblock %}
