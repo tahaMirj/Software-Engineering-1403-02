@@ -1,0 +1,113 @@
+{% extends 'base5.html' %}
+
+{% block title %}{% block settings_title %}Settings{% endblock %} - Learning English Hub{% endblock %}
+
+{% block profile_image %}
+    {% if user.profile.avatar %}
+        {% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}
+    {% else %}
+        https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}
+    {% endif %}
+{% endblock %}
+
+{% block style %}
+/* Styles for themed form inputs */
+.form-input-themed {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--card-border-color) !important;
+    color: #f9fafb !important;
+    border-radius: 0.5rem !important; /* 8px */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.form-input-themed:focus {
+    border-color: #818cf8 !important; /* Indigo-400 */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4) !important;
+    outline: none !important;
+}
+
+/* Styles for active nav tab */
+.nav-tab.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-weight: 600;
+}
+
+/* Custom styles for the toggle switch */
+.toggle-switch input:checked + .slider {
+    background-color: #4f46e5; /* Indigo-600 */
+}
+.toggle-switch .slider {
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: .4s;
+    border-radius: 34px;
+}
+.toggle-switch .slider:before {
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <div class="glass-card rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-5">
+            <img src="{% if user.profile.avatar %}{% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}{% else %}https://placehold.co/144x144/a78bfa/FFFFFF?text={{ user.username|first|upper }}{% endif %}" alt="User Avatar" class="w-20 h-20 rounded-full border-2 border-white/20">
+            <div>
+                <h1 class="text-3xl font-bold text-white">{{ user.profile.firstname }} {{user.profile.lastname}}</h1>
+            </div>
+        </div>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full md:w-auto flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Log Out</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="glass-card rounded-2xl flex flex-col lg:flex-row">
+        <nav class="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-white/10 p-4">
+            <ul class="flex flex-row lg:flex-col gap-2">
+                {% with request.resolver_match.url_name as url_name %}
+                <li>
+                    <a href="{% url 'group5:settings_general' %}" class="nav-tab flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors {% if url_name == 'settings_general' %}active{% endif %}">
+                        <i class="fa-solid fa-sliders w-5 text-center"></i>
+                        <span>General</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'group5:my_profile' %}" class="nav-tab flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors {% if url_name == 'settings_account' %}active{% endif %}">
+                        <i class="fa-solid fa-user-circle w-5 text-center"></i>
+                        <span>Account</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'group5:settings_billing' %}" class="nav-tab flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors {% if url_name == 'settings_billing' %}active{% endif %}">
+                        <i class="fa-solid fa-wallet w-5 text-center"></i>
+                        <span>Billing</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-tab flex items-center justify-between gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-bell w-5 text-center"></i>
+                            <span>Notifications</span>
+                        </div>
+                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">2</span>
+                    </a>
+                </li>
+                {% endwith %}
+            </ul>
+        </nav>
+        
+        <div class="flex-grow p-6 md:p-8">
+            {% block settings_content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

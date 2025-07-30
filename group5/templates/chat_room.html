@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Conversation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+       
+        /* Custom scrollbar for chat messages */
+        .chat-messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-messages-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .chat-messages-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .chat-messages-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* CSS Custom Properties for easy theming */
+        :root {
+            --sidebar-width: 100px;
+            --card-bg-color: rgba(255, 255, 255, 0.1);
+            --card-border-color: rgba(255, 255, 255, 0.2);
+            --backdrop-blur: 16px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a, #312e81, #4c1d95, #be185d);
+            background-size: 400% 400%;
+            animation: gradient-flow 15s ease infinite;
+            color: #f9fafb; /* Default text color to light gray */
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--card-bg-color);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--card-border-color);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 0;
+            z-index: 50;
+        }
+    
+        .profile-link img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--card-border-color);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-link:hover img {
+            transform: scale(1.1);
+        }
+    
+        .sidebar-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+    
+        .sidebar-footer a {
+            font-size: 1.5rem; /* 24px */
+            color: #d1d5db; /* gray-300 */
+            padding: 12px;
+            border-radius: 0.75rem; /* 12px */
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+    
+        .sidebar-footer a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Main content area layout */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .glass-chat-input {
+            background-color: rgba(0, 0, 0, 0.25) !important;
+            border: 1px solid var(--card-border-color) !important;
+            color: white !important;
+            border-radius: 9999px !important; /* rounded-full */
+            padding: 0.5rem 1rem !important; /* py-2 px-4 */
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .glass-chat-input:focus {
+            border-color: #818cf8 !important; /* Indigo-400 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5) !important;
+            outline: none !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="flex w-full h-screen shadow-lg overflow-hidden border border-blue-200">
+        <!-- Left Sidebar -->
+        <div id="sidebar" class="sidebar glass-card">
+            <a href="{% url 'group5:my_profile' %}" class="profile-link">
+                {% if user.profile.avatar %}
+                    <img src="{% url 'group5:serve_avatar' user.profile.avatar.name|slice:'21:' %}">
+                {% else %}
+                    <img src="https://placehold.co/144x144/6366f1/FFFFFF?text={{ user.profile.firstname|first|upper|default:"User" }}">
+                {% endif %}
+            </a>
+            
+            <div class="sidebar-footer">
+              <a href="{% url 'group5:chat_partners' %}" title="Chat"><i class="fa-solid fa-comments"></i></a>
+              <a href="{% url 'group5:view_rating' partner.username %}" title="Rating"><i class="fa-solid fa-star"></i></a>
+              <a href="{% url 'group5:group5'%}" title="Home"><i class="fa-solid fa-house"></i></a>
+            </div>
+        </div>
+        <!-- Main Chat Area -->
+        <div class="flex-grow flex flex-col ml-[100px]">
+            <!-- Chat Header -->
+            <div class="flex items-center p-4 border-b  shadow-sm">
+                <button class="md:hidden mr-4 hover:text-gray-800">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <a href = '{% url "group5:user_profile" partner.username %}'>
+                {% if partner.profile.avatar %}
+                    <img src="{% url 'group5:serve_avatar' partner.profile.avatar.name|slice:'21:' %}" alt="my partner" class="w-12 h-12 rounded-full mr-3">
+                {% else %}
+                    <img src="https://placehold.co/144x144/6366f1/FFFFFF?text={{ partner.profile.firstname|first|upper|default:"User" }}" alt="my partner" class="w-12 h-12 rounded-full mr-3">
+                {% endif %}
+                </a>
+                <h2 class="text-xl font-semibold text-white">{{partner.profile.firstname|default:partner.username}}</h2>
+                <div class="ml-auto flex space-x-4">
+                    <button class="text-gray-300 hover:text-indigo-400"><i class="fas fa-phone text-xl"></i></button>
+                    <button class="text-gray-300 hover:text-indigo-400"><i class="fas fa-video text-xl"></i></button>
+                    <button class="text-gray-300 hover:text-indigo-400"><i class="fas fa-ellipsis-v text-xl"></i></button>
+                </div>
+            </div>
+            <!-- Chat Messages Container -->
+            <div id="chat-log" class="flex-grow overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                {% for msg in messages %}
+                    {% if msg.sender.username == user.username %}
+                        <div class="flex justify-end">
+                            <div content = "{{msg.content}}" url = "{{msg.file_url}}" class="message-body bg-indigo-600 text-white p-3 rounded-lg max-w-xs md:max-w-md break-words shadow-lg">
+                                
+                                <span  class="message-time text-xs text-white opacity-70 block mt-1 text-right" data-timestamp="{{ msg.timestamp|date:"c" }}"></span>
+                            </div>
+                        </div>
+                    {% else%}
+                        <div class="flex justify-start items-start">
+                            {% if partner.profile.avatar %}
+                                <img src="{% url 'group5:serve_avatar' partner.profile.avatar.name|slice:'21:' %}" alt="my partner" class="w-12 h-12 rounded-full mr-3">
+                            {% else %}
+                                <img src="https://placehold.co/144x144/6366f1/FFFFFF?text={{ partner.profile.firstname|first|upper|default:"User" }}" alt="my partner" class="w-12 h-12 rounded-full mr-3">
+                            {% endif %}
+                            <div content = "{{msg.content}}" url = "{{msg.file_url}}" class="message-body bg-black/20 text-gray-200 p-3 rounded-lg max-w-xs md:max-w-md break-words shadow-lg">
+                                
+                                <span class="message-time text-xs text-gray-500 block mt-1 text-left" data-timestamp="{{ msg.timestamp|date:"c" }}"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <!-- Message Input Area -->
+            <div class="flex items-center p-4 border-t border-white/10 bg-white/5 rounded-b-2xl">
+                <label for="fileInput" class="cursor-pointer text-gray-300 hover:text-blue-500 mr-3">
+                    <i class="fas fa-paperclip text-xl"></i>
+                </label>
+                <input type="file" id="" class="hidden" />
+                  
+                <input id="chat-message-input" type="text" placeholder="Type here..." class="flex-grow glass-chat-input">
+                <button class="ml-3 text-gray-500 hover:text-blue-500"><i class="fas fa-microphone text-xl"></i></button>
+                <button id="chat-message-submit" class="ml-3 text-blue-500 hover:text-blue-600"><i class="fas fa-paper-plane text-xl"></i></button>
+            </div>
+            
+        </div>
+    </div>
+
+<script>
+    const roomName = "{{ room_name }}";
+    const username = "{{ user.username }}";
+    const chatSocket = new WebSocket(
+    'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+    );
+
+    function getFileIcon(fileName) {
+        const ext = fileName.split('.').pop().toLowerCase();
+        if (ext === 'pdf') return '📄';
+        if (['doc', 'docx'].includes(ext)) return '📃';
+        if (['xls', 'xlsx'].includes(ext)) return '📊';
+        if (['ppt', 'pptx'].includes(ext)) return '📽️';
+        if (['mp3', 'wav' , "ogg" , "m4a"].includes(ext)) return '🎵';
+        if (['mp4', 'mov', 'avi'].includes(ext)) return '🎬';
+        if (['zip', 'rar'].includes(ext)) return '📦';
+        return '📎';
+    }
+    
+    function renderFileCard(fileUrl) {
+        const fileName = fileUrl.split('/').pop();
+        const icon = getFileIcon(fileName);
+        return `
+            <div class="flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg shadow-sm">
+                <div class="text-2xl">${icon}</div>
+                <div class="flex-1 text-sm">
+                    <p class="text-gray-800 font-medium truncate max-w-[200px]" title="${fileName}">
+                        ${fileName}
+                    </p>
+                    <a href="${fileUrl}" target="_blank" class="text-blue-600 hover:underline text-xs">Download File</a>
+                </div>
+            </div>
+        `;
+    }
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const chatLog = document.getElementById('chat-log');
+        const isMe = data.sender === username;
+        let content = ''
+
+        if (data.file_url){
+            if (data.file_url.match(/\.(jpg|jpeg|png|gif)$/)) {
+                content = `<img src="${data.file_url}" class="w-32 h-auto rounded">
+                           <a href ="${data.file_url}">Download Image</a>`;
+              } else {
+                content = renderFileCard(data.file_url);
+              }
+        }else{
+            content = `<p>${data.message}</p>`
+        }
+        const msgHtml = isMe
+            ? `<div class="flex justify-end">
+                    <div class="bg-indigo-600 text-white p-3 rounded-lg max-w-xs md:max-w-md break-words shadow-lg">
+                            ${content}
+                        <span class="text-xs text-white opacity-70 block mt-1 text-right">${formatDateTime(data.timestamp)}</span>
+                    </div>
+               </div>`
+            : `<div class="flex justify-start items-start">
+                    {% if partner.profile.avatar %}
+                        <img src="{% url 'group5:serve_avatar' partner.profile.avatar.name|slice:'21:' %}" alt="my partner" class="w-12 h-12 rounded-full mr-3">
+                    {% else %}
+                        <img src="https://placehold.co/144x144/6366f1/FFFFFF?text={{ partner.profile.firstname|first|upper|default:"User" }}" alt="my partner" class="w-12 h-12 rounded-full mr-3">
+                    {% endif %}
+                    <div class="bg-black/20 text-gray-200 p-3 rounded-lg max-w-xs md:max-w-md break-words shadow-lg">
+                            ${content}
+                        <span class="text-xs text-gray-500 block mt-1 text-left">${formatDateTime(data.timestamp)}</span>
+                    </div>
+               </div>`;
+
+        chatLog.innerHTML += msgHtml;
+        chatLog.scrollTop = chatLog.scrollHeight;
+    };
+
+    function formatDateTime(isoTimestamp) {
+        const date = new Date(isoTimestamp);
+      
+        const datePart = date.toLocaleDateString('en-CA').toLocaleString();
+        const timePart = date.toLocaleTimeString([] , {hour: '2-digit', minute: '2-digit'}).toLocaleString();
+      
+        return `${datePart} | ${timePart}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".message-time").forEach(el => {
+          const ts = el.getAttribute("data-timestamp");
+          el.textContent = formatDateTime(ts);
+        });
+      });
+
+    document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".message-body").forEach(el => {
+        const cont = el.getAttribute("content");
+        const url = el.getAttribute("url");
+        let content = "";
+
+        if (cont){
+            content = `<p>${cont}</p>`;
+        }else{
+            if (url.match(/\.(jpg|jpeg|png|gif)$/)) {
+                content = `<img src="${url}" class="w-32 h-auto rounded">
+                           <a href = "${url}">Download Image</a>`;
+            } else {
+                content = renderFileCard(url)
+            }
+        }
+        el.insertAdjacentHTML("afterbegin", content);
+    });
+    });
+
+    chatSocket.onclose = function(e) {
+        console.error('اتصال WebSocket بسته شد!');
+    };
+
+    chatSocket.onopen = function(e) {
+    console.log("WebSocket connection established!");
+    };
+
+    chatSocket.onerror = function(e) {
+        console.error("WebSocket error:", e);
+        alert("اتصال با مشکل مواجه شد. صفحه را مجددا بارگذاری نمایید.");
+    };
+
+    document.querySelector('#chat-message-input').focus();
+
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.key === 'Enter') {
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const input = document.querySelector('#chat-message-input');
+        const message = input.value.trim();
+    
+        if (!message) return;
+    
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'file_url' : ""
+        }));
+    
+              input.value = '';
+    };
+    
+     file_input = document.getElementById("fileInput")
+     file_input.addEventListener("change", function () {
+        const file = this.files[0];
+        const maxSize = 20 * 1024 * 1024;
+        if (!file) return;
+        
+        if(file.size < maxSize){
+            const formData = new FormData();
+            formData.append("file", file);
+        
+            fetch("{% url 'group5:upload_file' %}", {
+            method: "POST",
+            body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if (data.url) {
+                chatSocket.send(JSON.stringify({
+                    "message": "",
+                    "file_url": data.url
+                }));
+                }
+            });
+        }else{
+            alert("The file must be less than 20 MB in size.")
+            file_input.value = "";
+        }
+      });
+
+</script>
+</body>
+</html>
