@@ -51,15 +51,15 @@ def find_partners(request):
             return redirect('complete_profile')
 
         match_profiles = PartnerProfile.objects.filter(
-            learning_goal=profile.learning_goal,
-            language_proficiency=profile.language_proficiency,
+            learning_goals=profile.learning_goals,
+            english_level=profile.english_level,
             appear_in_search=True
         ).exclude(user=request.user)
 
         match_users = []
 
         for profile in match_profiles:
-            match_users.append(partner(profile.user.username, profile.bio))
+            match_users.append(partner(profile.user.username, profile.biography))
 
         return render(request, 'search.html', {
             'match_users': match_users,
