@@ -101,14 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function needsDateSeparator(newMessageDate) {
-        const dateSeparators = messagesUl.querySelectorAll('li.date-separator');
-        if (dateSeparators.length === 0) return true;
-        
-        const lastDateSeparator = dateSeparators[dateSeparators.length - 1];
-        const lastSeparatorDate = lastDateSeparator.querySelector('span').textContent;
-        
-        return !(lastSeparatorDate === 'Today' && newMessageDate === 'Today');
-    }
+    const dateSeparators = messagesUl.querySelectorAll('li.date-separator');
+    if (dateSeparators.length === 0) return true;
+
+    const lastDateSeparator = dateSeparators[dateSeparators.length - 1];
+    const lastSeparatorDate = lastDateSeparator.querySelector('span').textContent;
+    return lastSeparatorDate !== newMessageDate;
+}
 
     function formatMessageDate(timestamp) {
         const date = new Date(timestamp);
