@@ -5,6 +5,7 @@ from django.db.models import F
 from django.templatetags.static import static
 from .models import Quiz, Question, Choice, QuizQuestion
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 import random
 import string
 from .ai import generate_feedback_from_api
@@ -13,8 +14,9 @@ from .ai import generate_feedback_from_api
 # Create your views here.
 
 def home(request):
-    return  render (request , 'group1.html' , {'group_number': '1'})
+    return  render (request , 'group1.html' , {'group_number': '1', 'user': request.user})
 
+@login_required
 def start_grammar_quiz(request):
     """
     Create a new grammar quiz instance with 10 random grammar questions
@@ -26,7 +28,7 @@ def start_grammar_quiz(request):
     # Create a new quiz instance
     quiz = Quiz.objects.create(
         title='Grammar Quiz',
-        user_id=1,  # Placeholder user ID
+        user_id=request.user.id,
         status='in_progress'
     )
 
@@ -149,6 +151,7 @@ def grammar_quiz_question(request):
     }
     return render(request, 'grammar_quiz_question.html', context)
 
+@login_required
 def start_vocabulary_quiz(request):
     """
     Create a new vocabulary quiz instance with 10 random vocabulary questions
@@ -160,7 +163,7 @@ def start_vocabulary_quiz(request):
     # Create a new quiz instance
     quiz = Quiz.objects.create(
         title='Vocabulary Quiz',
-        user_id=1,  # Placeholder user ID
+        user_id=request.user.id,
         status='in_progress'
     )
     
@@ -275,6 +278,7 @@ def vocabulary_quiz_question(request):
     }
     return render(request, 'vocabulary_quiz_question.html', context)
 
+@login_required
 def start_image_quiz(request):
     """
     Create a new image quiz instance with 10 random image questions
@@ -286,7 +290,7 @@ def start_image_quiz(request):
     # Create a new quiz instance
     quiz = Quiz.objects.create(
         title='Image Quiz',
-        user_id=1,  # Placeholder user ID
+        user_id=request.user.id,
         status='in_progress'
     )
     
@@ -401,6 +405,7 @@ def image_quiz_question(request):
     }
     return render(request, 'image_quiz_question.html', context)
 
+@login_required
 def start_reading_quiz(request):
     """
     Create a new reading quiz instance with a random main reading question and its sub-questions.
@@ -410,7 +415,7 @@ def start_reading_quiz(request):
 
     quiz = Quiz.objects.create(
         title='Reading Quiz',
-        user_id=1,  # Placeholder
+        user_id=request.user.id,
         status='in_progress'
     )
 
@@ -526,6 +531,7 @@ def writing_quiz_question(request):
     }
     return render(request, 'writing_quiz_question.html', context)
 
+@login_required
 def start_sentence_building_quiz(request):
     # Clear any previous quiz session data to ensure a fresh start
     if 'current_sentence_building_quiz_id' in request.session:
@@ -534,7 +540,7 @@ def start_sentence_building_quiz(request):
     # Create a new quiz instance
     quiz = Quiz.objects.create(
         title='Sentence Building Quiz',
-        user_id=1,  # Placeholder user ID
+        user_id=request.user.id,
         status='in_progress'
     )
     
@@ -639,6 +645,7 @@ def sentence_building_question(request):
     }
     return render(request, 'sentence_building_question.html', context)
 
+@login_required
 def start_listening_quiz(request):
     """Create a new listening quiz instance with 10 random listening questions"""
     # Clear any previous quiz session data to ensure a fresh start
@@ -647,7 +654,7 @@ def start_listening_quiz(request):
 
     quiz = Quiz.objects.create(
         title='Listening Quiz',
-        user_id=1,  # Placeholder until auth system
+        user_id=request.user.id,
         status='in_progress'
     )
 
@@ -835,6 +842,7 @@ def review_mistakes(request, quiz_id):
     return render(request, 'review_mistakes.html', context)
 
 
+@login_required
 def retry_mistakes(request, quiz_id):
     original_quiz = get_object_or_404(Quiz, id=quiz_id)
 
@@ -851,7 +859,7 @@ def retry_mistakes(request, quiz_id):
     # Create a new quiz instance
     new_quiz = Quiz.objects.create(
         title=f"Retry - {original_quiz.title}",
-        user_id=original_quiz.user_id,
+        user_id=request.user.id,
         status='not_started',
         current_question_index=0
     )
