@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const chatSocket = new WebSocket(
         (window.location.protocol === "https:" ? "wss" : "ws") + '://' +
-        window.location.host + '/ws/chat/' + otherUsername + '/'
+        window.location.host + '/ws/g2_chat/' + otherUsername + '/'
     );
 
     function getCookie(name) {
