@@ -1,0 +1,141 @@
+{% extends "quiz_frame.html" %}
+{% block quiz_content %}
+<style>
+    .question-text {
+        font-size: 1.2rem;
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+    .drop-zone, .word-bank {
+        border: 2px dashed #4B5563;
+        border-radius: 0.7rem;
+        padding: 1rem;
+        min-height: 60px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        transition: border-color 0.2s;
+    }
+    .word-bank { margin-top: 1.5rem; min-height: 80px; }
+    .drop-zone.over { border-color: #a78bfa; }
+    .word-tile {
+        background-color: #374151;
+        color: #e0e0e0;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: grab;
+        transition: all 0.2s;
+        user-select: none;
+    }
+    .word-tile.dragging { opacity: 0.5; transform: scale(0.95); }
+    #submit-btn, #next-btn {
+        background: #7c5cff; color: #fff; cursor: pointer; font-size: 1rem;
+        padding: 0.8rem 2.2rem; border-radius: 0.5rem; border: none;
+    }
+    #submit-btn:disabled { background-color: #5a4a9c; cursor: not-allowed; }
+    .feedback-correct { color: #4caf50; font-weight: 600; }
+    .feedback-incorrect { color: #ff5252; font-weight: 600; }
+</style>
+
+<p class="question-text">{{ question.text_or_prompt }}</p>
+
+<form method="post" id="quiz-form">
+    {% csrf_token %}
+    <input type="hidden" name="user_answer" id="user-answer-input">
+
+    <div id="drop-zone" class="drop-zone"></div>
+    <div id="word-bank" class="word-bank">
+        {% for word in words_to_scramble %}
+            <div class="word-tile" draggable="true">{{ word }}</div>
+        {% endfor %}
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 2rem; min-height: 40px;">
+        <div id="feedback" style="margin-right: auto;">
+            {% if show_feedback %}
+                {% if is_correct %}
+                    <span class="feedback-correct">Correct! 🎉</span>
+                {% else %}
+                    <span class="feedback-incorrect">Not quite. The correct answer is: <b>{{ correct_sentence }}</b></span>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% if not show_feedback %}
+            <button type="submit" name="submit_answer" id="submit-btn" disabled>Check</button>
+        {% else %}
+            <button type="submit" name="next_question" id="next-btn">Next Question</button>
+        {% endif %}
+    </div>
+</form>
+
+{{ show_feedback|json_script:"show-feedback-data" }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('drop-zone');
+    const wordBank = document.getElementById('word-bank');
+    const submitBtn = document.getElementById('submit-btn');
+    const userAnswerInput = document.getElementById('user-answer-input');
+    const showFeedback = JSON.parse(document.getElementById('show-feedback-data').textContent);
+
+    if (showFeedback) {
+        // Disable further interaction if feedback is shown
+        document.querySelectorAll('.word-tile').forEach(tile => tile.draggable = false);
+        return;
+    }
+
+    let draggedTile = null;
+
+    document.addEventListener('dragstart', e => {
+        if (e.target.classList.contains('word-tile')) {
+            draggedTile = e.target;
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+    });
+
+    document.addEventListener('dragend', e => {
+        if (draggedTile) {
+            draggedTile.classList.remove('dragging');
+            draggedTile = null;
+            updateSentence();
+        }
+    });
+
+    [dropZone, wordBank].forEach(container => {
+        container.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(container, e.clientX);
+            if (draggedTile) {
+                if (afterElement == null) {
+                    container.appendChild(draggedTile);
+                } else {
+                    container.insertBefore(draggedTile, afterElement);
+                }
+            }
+        });
+    });
+
+    function getDragAfterElement(container, x) {
+        const draggableElements = [...container.querySelectorAll('.word-tile:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = x - box.left - box.width / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function updateSentence() {
+        const words = Array.from(dropZone.children).map(tile => tile.textContent.trim());
+        userAnswerInput.value = words.join(' ');
+        if (submitBtn) {
+            submitBtn.disabled = dropZone.children.length === 0;
+        }
+    }
+});
+</script>
+{% endblock %}

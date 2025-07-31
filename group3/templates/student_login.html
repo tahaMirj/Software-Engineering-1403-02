@@ -1,0 +1,121 @@
+{% extends "groups/groups_base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --green-dark: #014421;
+    --green: #027A48;
+    --green-light: #D1FAE5;
+  }
+
+
+  .login-container {
+    background-color: white;
+    padding: 2rem 3rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+    width: 100%;
+    max-width: 400px;
+      margin-top: 2rem;
+  }
+
+  h2 {
+    color: var(--green-dark);
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    color: var(--green);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border: 2px solid var(--green-light);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus,
+  input[type="password"]:focus {
+    outline: none;
+    border-color: var(--green);
+    background-color: #f0fff5;
+  }
+
+  button {
+    width: 100%;
+    background-color: var(--green);
+    color: white;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: 700;
+    margin-top: 1.3rem;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: var(--green-dark);
+  }
+
+  p.error {
+    color: #c53030; /* قرمز مناسب */
+    background-color: #fed7d7;
+    border: 1px solid #f56565;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  p.back-home {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  p.back-home a {
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  p.back-home a:hover {
+    text-decoration: underline;
+    color: var(--green-dark);
+  }
+
+  /* ریسپانسیو */
+  @media (max-width: 480px) {
+    .login-container {
+      padding: 1.5rem 1.8rem;
+      margin: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <h2>Login</h2>
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="{{ username|default:'' }}" required autocomplete="username" autofocus>
+
+    <label for="password" style="margin-top:1rem;">Password:</label>
+    <input type="password" id="password" name="password" required autocomplete="current-password">
+
+    <button type="submit">Login</button>
+  </form>
+</div>
+{% endblock %}

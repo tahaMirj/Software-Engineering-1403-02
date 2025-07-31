@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if mode == 'practice' %}Practice{% else %}Quiz{% endif %} - Reading Materials</title>
+  <link rel="stylesheet" href="{% static 'group4/style/search_style.css' %}">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>{% if mode == 'practice' %}Practice{% else %}Quiz{% endif %} - Reading Materials</h1>
+      <nav>
+        <!-- Filter and Search Controls -->
+        <form method="GET" class="filter-form">
+          <!-- Search Input -->
+          <input type="text" name="search" placeholder="Search readings..." value="{{ current_search }}" class="search-input">
+          
+          <!-- Difficulty Filter -->
+          <select name="level" class="filter-select">
+            <option value="">All Levels</option>
+            {% for level_code, level_name in difficulty_levels %}
+              <option value="{{ level_code }}" {% if current_level == level_code %}selected{% endif %}>
+                {{ level_name }}
+              </option>
+            {% endfor %}
+          </select>
+          
+          <!-- Category Filter -->
+          <select name="category" class="filter-select">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+              <option value="{{ category.name }}" {% if current_category == category.name %}selected{% endif %}>
+                {{ category.name }}
+              </option>
+            {% endfor %}
+          </select>
+          
+          <button type="submit" class="filter-btn">Filter</button>
+        </form>
+      </nav>
+    </div>
+  </header>
+  
+  <div class="container">
+    <!-- Results Count -->
+    <div class="results-info">
+      <p>Showing {{ readings.start_index }}-{{ readings.end_index }} of {{ paginator.count }} results</p>
+    </div>
+
+    <div class="card-container">
+      {% for reading in readings %}
+        <a href="{% if mode == 'practice' %}{% url 'group4:practice_mode' reading.id %}{% else %}{% url 'group4:quiz_mode' reading.id %}{% endif %}" class="card">
+          <!-- Use category image if available, otherwise default -->
+          <img src="{% if reading.category.image_path %}{{ reading.category.image_path }}{% else %}{% static 'group4/images/base/prac.png' %}{% endif %}" alt="{{ reading.title }}">
+          <div class="card-content">
+            <h3>{{ reading.title }}</h3>
+            <p>{{ reading.description|truncatewords:15 }}</p>
+            <div class="card-meta">
+              <span class="difficulty-badge difficulty-{{ reading.difficulty|lower }}">{{ reading.difficulty }}</span>
+              {% if reading.category %}
+                <span class="category-badge">{{ reading.category.name }}</span>
+              {% endif %}
+              <span class="question-count">{{ reading.questions.count }} questions</span>
+            </div>
+          </div>
+        </a>
+      {% empty %}
+        <div class="no-results">
+          <p>No readings found matching your criteria.</p>
+          <a href="{% url 'group4:reading_list_practice' %}" class="btn">Clear filters</a>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if paginator.num_pages > 1 %}
+      <div class="pagination">
+        {% if readings.has_previous %}
+          <a href="?{% if current_search %}search={{ current_search }}&{% endif %}{% if current_level %}level={{ current_level }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}page={{ readings.previous_page_number }}" class="page-link">← Previous</a>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+          {% if num == readings.number %}
+            <span class="page-current">{{ num }}</span>
+          {% elif num == paginator.ELLIPSIS %}
+            <span class="page-ellipsis">…</span>
+          {% else %}
+            <a href="?{% if current_search %}search={{ current_search }}&{% endif %}{% if current_level %}level={{ current_level }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}page={{ num }}" class="page-link">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if readings.has_next %}
+          <a href="?{% if current_search %}search={{ current_search }}&{% endif %}{% if current_level %}level={{ current_level }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}page={{ readings.next_page_number }}" class="page-link">Next →</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+{% extends "groups/groups_base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+  <style>
+    :root {
+      --light: #b8f2c2;
+      --medium: #70c779;
+      --dark: #2f6a34;
+      --text-dark: #103b0f;
+      --text-light: #e4fbe4;
+      --card-bg: #ffffff;
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .edit-container {
+      max-width: 700px;
+      margin: 7rem auto;
+      background-color: var(--dark);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--text-light);
+    }
+
+    .edit-title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: var(--text-light);
+    }
+
+    form label {
+      font-weight: bold;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-light);
+    }
+
+    textarea, input[type="file"] {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--medium);
+      background-color: var(--card-bg);
+      color: var(--text-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .current-image {
+      display: block;
+      margin: 0 auto 1rem auto;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border: 3px solid var(--medium);
+    }
+
+    button[type="submit"] {
+      margin-top: 1.5rem;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background-color: var(--card-bg);
+      color: var(--dark);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: var(--shadow-sm);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      background-color: var(--medium);
+      color: var(--text-light);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .edit-container {
+        padding: 1.2rem;
+      }
+      .edit-title {
+        font-size: 1.6rem;
+      }
+    }
+
+      input[type="file"] {
+    padding: 10px;
+    border: 2px solid var(--medium);
+    border-radius: 8px;
+    background-color: white;
+    color: var(--text-dark);
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: 0.3s;
+  }
+
+  input[type="file"]::file-selector-button {
+    background-color: var(--dark);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background-color: var(--medium);
+  }
+  </style>
+
+  <div class="edit-container">
+    <h2 class="edit-title">Edit Your Profile</h2>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <label for="biography">Biography:</label>
+      <textarea
+        name="biography"
+        id="biography"
+        rows="6"
+      >{{ teacher.biography }}</textarea>
+
+      <label for="profile_picture">Profile Picture:</label>
+      {% if teacher.profile_picture %}
+        <img src="{{ teacher.profile_picture.url }}" alt="Current Profile Picture" class="current-image">
+      {% endif %}
+      <input type="file" name="profile_picture" id="profile_picture" >
+
+      <button type="submit">Save</button>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'group3:teacher_profile' %}">&larr; Back to Profile</a>
+    </div>
+  </div>
+{% endblock %}

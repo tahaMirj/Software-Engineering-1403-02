@@ -1,0 +1,13 @@
+{% extends "quiz_question_base.html" %}
+
+{% block question_content %}
+<!-- Question Text -->
+<p class="question-text">{{ question.text_or_prompt }}</p>
+
+<!-- Answer Options -->
+<div id="options-container" class="options-container">
+    {% for choice in choices %}
+        <button type="button" class="option-btn" data-choice-id="{{ choice.id }}">{{ choice.text }}</button>
+    {% endfor %}
+</div>
+{% endblock %}

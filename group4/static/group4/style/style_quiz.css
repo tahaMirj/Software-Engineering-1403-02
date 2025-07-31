@@ -1,0 +1,252 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #151414;
+}
+
+.yellow-bar {
+  background-color: #ffcc00;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.yellow-bar h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #fff;
+}
+
+.test-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #444242;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.test-image {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.test-description {
+  margin-top: 20px;
+}
+
+.test-description p {
+  font-size: 1.2em;
+  line-height: 1.5;
+  color: #eeebeb;
+}
+
+.test-section {
+  margin-top: 10px;
+}
+
+.dropdown-btn {
+  background-color: #03b739bd;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  width: 100%;
+  text-align: left;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.dropdown-btn:hover {
+  background-color: #028a29;
+}
+
+.dropdown-content {
+
+  background-color: #f1f1f1;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+
+
+
+audio {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+form {
+  margin-top: 20px;
+}
+
+
+
+select {
+  width: 100%;  /* عرض کشویی برای قرار گرفتن در کنار جمله */
+  padding: 5px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  display: inline-block;
+}
+
+button {
+  background-color: #ffcc00;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block;       /* تبدیل دکمه به یک بلوک */
+  margin: 20px auto;    /* مرکز کردن دکمه و ایجاد فاصله از بالا و پایین */
+  text-align: center;   /* اطمینان از اینکه متن داخل دکمه در وسط قرار گیرد */
+}
+
+button:hover {
+  background-color: #ffb300;
+}
+
+.dropdown-container {
+  display: inline-block; /* نمایش در کنار متن */
+  margin: 0 10px;
+}
+#timer-container {
+  position: fixed;          /* تایمر در موقعیت ثابت قرار می‌گیرد */
+  top: 50%;                 /* وسط صفحه از بالا */
+  left: 50%;                /* وسط صفحه از چپ */
+  background-color: rgba(0, 0, 0, 0.7);  /* پس‌زمینه نیمه شفاف */
+  color: #ffcc00;           /* رنگ متن تایمر */
+  text-align: center;
+  font-size: 3em;           /* اندازه بزرگ تایمر */
+  padding: 20px 40px;       /* فاصله داخلی تایمر */
+  z-index: 1000;            /* قرار گرفتن بالاتر از سایر بخش‌ها */
+  transform: translate(-50%, -50%);  /* وسط کردن تایمر */
+  transition: all 1s ease; /* انیمیشن برای تغییر اندازه و موقعیت */
+            /* ارتفاع بزرگ تایمر */
+  border-radius: 10px;      /* گوشه‌های گرد */
+}
+
+#timer {
+  font-size: 2em;
+  margin: 20px 0;
+}
+
+#startButton {
+  padding: 15px 25px;
+  background-color: #ffcc00;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  min-width: 160px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  transition: all 0.3s ease;
+}
+
+#startButton:hover {
+  background-color: #ffb300;
+}
+
+/* Accent Selection Styles */
+.accent-buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.accent-btn {
+  padding: 15px 25px;
+  background-color: #ffcc00;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  min-width: 160px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accent-btn:hover {
+  background-color: #ffb300;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.accent-btn.selected {
+  background-color: #28a745;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+}
+
+.accent-btn.selected:hover {
+  background-color: #218838;
+}
+
+/* Back to Home Button */
+#backToHomeBtn {
+  background-color: #007bff;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+#backToHomeBtn:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive Design for Accent Buttons */
+@media (max-width: 768px) {
+  .accent-buttons-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .accent-btn {
+    width: 200px;
+    min-width: 200px;
+    height: 55px;
+    margin: 5px 0;
+  }
+  
+  #startButton {
+    width: 200px;
+    min-width: 200px;
+    height: 55px;
+  }
+}
+
+/* Small Timer (appears during quiz) */
+.small-timer {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #ffcc00;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 1.2em;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}

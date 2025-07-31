@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
-from .secret import (DB_NAME, DB_USER,
+from english_website.secret import (DB_NAME, DB_USER,
                      DB_PASSWORD,
                      DB_HOST,
                      DB_PORT)
@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'group8',
     'group9',
     'registration',
+    'channels',
 
 ]
 
@@ -114,12 +115,12 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-#DATABASES = {
+# DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.sqlite3',
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
-#}
+# }
 
 
 DATABASES = {
@@ -170,6 +171,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+ASGI_APPLICATION = 'english_website.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

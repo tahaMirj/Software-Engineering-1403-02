@@ -1,0 +1,40 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>guess page Learnnig Without Limits</title>
+ 
+  
+  <link rel="stylesheet" href="{% static 'group6/secondpage.css' %}" />
+
+
+</head>
+<body>
+  <div class="main-box">
+    <div class="img-box" id="imgBox">
+      {% if current_word.image_url %}
+         <img src="{{ current_word.image_url }}" alt="Flash Card" class="flashcard" />
+      {% else %}
+         <p>No image available</p>
+      {% endif %}
+    </div>
+    <form method="POST" action="{% url 'group6:process_guess' %}">
+      {% csrf_token %}
+      <input type="text" name="user_guess" id="guessInput" class="guess-input" placeholder="Type your guess..." required>
+    
+      <!-- دکمه‌ها برای اکشن‌های مختلف -->
+      <div class="button-row">
+              <!--<button class="btn" onclick="showImage()">show</button> -->
+      <button class="btn" type="submit" name="action" value="show_answer"  onclick="location.href='{% url "group6:showpage" %}'"> Show </button> 
+      <button class="btn" type="submit" name="action" value="end_session" onclick="location.href='{% url "group6:endsection" %}'">End Session</button> 
+        
+      </div>
+    </form>
+    
+  </div>
+
+  <script>
+    
+  </script>
+</body>
+</html>

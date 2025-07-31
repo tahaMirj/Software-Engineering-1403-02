@@ -1,0 +1,95 @@
+{% extends "groups/groups_base.html" %}
+{% block title %}Edit TimeSlot{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+  --light: #b8f2c2;
+  --medium: #70c779;
+  --dark: #2f6a34;
+  --text-dark: #103b0f;
+  --text-light: #e4fbe4;
+  --card-bg: #ffffff;
+  --radius: 12px;
+  --shadow: 0 6px 18px rgba(0,0,0,0.08);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --warn-bg: #fee2e2;
+  --warn-text: #991b1b;
+}
+
+button[type="submit"] {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  background-color: var(--card-bg);
+  color: var(--dark);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.3s, color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: var(--light);
+  color: var(--text-dark);
+}
+
+input {
+    background-color: #b8f2c2;
+    padding: 10px 5px;
+    border: none;
+    outline: none;
+    border-radius: 4px;
+}
+
+</style>
+
+<h2 style="margin-bottom: 50px">Edit TimeSlot</h2>
+
+{% if error %}
+  <p style="color: red;">{{ error }}</p>
+{% endif %}
+
+<form style="background-color: #2f6a34; padding: 40px 30px; margin-top: 2rem; width: 40%; border-radius: 10px; overflow: hidden;" method="post" id="timeslot-form">
+  {% csrf_token %}
+
+  <label>Start Time:</label>
+  <input style="padding: 5px" type="datetime-local" name="start_time" id="start_time"
+         value="{{ timeslot.start_time|date:'Y-m-d\\TH:i' }}" required><br><br><br>
+
+  <label>End Time:</label>
+  <input style="padding: 5px" type="datetime-local" name="end_time" id="end_time"
+         value="{{ timeslot.end_time|date:'Y-m-d\\TH:i' }}" required><br><br><br>
+
+  <label>Day of Week (1=Mon, 7=Sun):</label>
+  <input style="padding: 2px" type="number" name="day_of_week" min="1" max="7" value="{{ timeslot.day_of_week }}" required><br><br>
+
+  <button class="submit-btn" type="submit">Update TimeSlot</button>
+</form>
+
+<p style="margin-top: 20px; color: #2f6a34"><a style="color: #103b0f" href="{% url 'group3:teacher_landing' %}">Back to Dashboard</a></p>
+
+<script>
+  document.getElementById('timeslot-form').addEventListener('submit', function(event) {
+    const start = new Date(document.getElementById('start_time').value);
+    const end = new Date(document.getElementById('end_time').value);
+
+    // Check if end time is after start time
+    if (end <= start) {
+      alert('End time must be after start time.');
+      event.preventDefault();
+      return;
+    }
+
+    // Check if start and end years are the same
+    if (start.getFullYear() !== end.getFullYear()) {
+      alert('Start and end time must be in the same year.');
+      event.preventDefault();
+      return;
+    }
+  });
+</script>
+{% endblock %}

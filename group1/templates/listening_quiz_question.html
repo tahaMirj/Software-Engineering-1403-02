@@ -1,0 +1,60 @@
+{% extends "quiz_question_base.html" %}
+
+{% block extra_styles %}
+    .audio-player-wrapper {
+        background-color: #F5F3FF;
+        border-radius: 50px;
+        padding: 0.5rem 1rem;
+        margin-bottom: 2rem;
+    }
+    audio {
+        width: 100%;
+        outline: none;
+        border: none;
+        background: transparent;
+    }
+    audio::-webkit-media-controls-panel {
+        background: transparent;
+    }
+    audio::-webkit-media-controls-play-button,
+    audio::-webkit-media-controls-mute-button {
+        background-color: #7C5CFF;
+        border-radius: 50%;
+    }
+    audio::-webkit-media-controls-timeline {
+        background-color: #DDD6FE;
+        border-radius: 6px;
+        height: 8px;
+        margin: 0 10px;
+    }
+    audio::-webkit-media-controls-volume-slider {
+        background-color: #DDD6FE;
+        border-radius: 6px;
+        height: 8px;
+    }
+    audio::-webkit-media-controls-current-time-display,
+    audio::-webkit-media-controls-time-remaining-display {
+        color: #4C1D95;
+        font-weight: 500;
+    }
+{% endblock %}
+
+{% block question_content %}
+<!-- Question Text -->
+<p class="question-text">{{ question.text_or_prompt }}</p>
+
+<!-- Audio Player -->
+<div class="audio-player-wrapper">
+    <audio controls>
+        <source src="{{ resolved_voice_url }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+</div>
+
+<!-- Answer Options -->
+<div id="options-container" class="options-container">
+    {% for choice in choices %}
+        <button type="button" class="option-btn" data-choice-id="{{ choice.id }}">{{ choice.text }}</button>
+    {% endfor %}
+</div>
+{% endblock %}
