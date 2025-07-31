@@ -25,13 +25,12 @@
   </main>
 
   <script>
-    // pass the URL route param into JS
     const otherUsername = "{{ other_username }}";
     const currentUsername = "{{ user.username }}";
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
     const chatSocket = new WebSocket(
       wsScheme + '://' + window.location.host +
-      '/ws/chat/' + otherUsername + '/'
+      'ws/g2_chat/' + otherUsername + '/'
     );
 
     let chatIsBlocked = false;
@@ -57,11 +56,6 @@
       });
     }
 
-    // Scroll to bottom of messages on load
-    // document.addEventListener('DOMContentLoaded', () => {
-    //   const messagesUl = document.getElementById('messages');
-    //   messagesUl.scrollTop = messagesUl.scrollHeight;
-    // });
   </script>
   <script src="{% static 'g2/js/chat.js' %}"></script>
 {% endblock %}
