@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Chat, Message
+from .models import Chat, ChatMessage
 
 
 @admin.register(Chat)
@@ -15,7 +15,7 @@ class ChatAdmin(admin.ModelAdmin):
     get_participants.short_description = 'Participants'
 
 
-@admin.register(Message)
+@admin.register(ChatMessage)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('id', 'chat', 'sender', 'short_text', 'timestamp')
     list_filter = ('timestamp', 'sender')

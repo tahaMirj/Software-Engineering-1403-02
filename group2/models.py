@@ -28,7 +28,7 @@ class PartnerProfile(models.Model):
         ('flexible', 'Flexible'),
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='partner_profile')
     biography = models.TextField(blank=True, help_text="Tell others about yourself and your learning journey.")
     native_language = models.CharField(max_length=50, blank=True)
     english_level = models.CharField(max_length=2, choices=CEFR_LEVELS, blank=True)

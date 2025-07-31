@@ -8,7 +8,7 @@ from group2_chat.views import chat
 
 
 def home(request):
-    return  render (request , 'group2.html' , {'group_number': '2'})
+    return  redirect('group2:chat:index')
 
 
 @login_required

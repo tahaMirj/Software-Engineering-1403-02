@@ -5,7 +5,7 @@ from channels.generic.websocket import WebsocketConsumer
 from channels.db import database_sync_to_async
 from urllib.parse import quote
 from django.conf import settings
-from .models import Chat, Message
+from .models import Chat, ChatMessage
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -54,7 +54,7 @@ class ChatConsumer(WebsocketConsumer):
             self.send_blocked_state()
 
         # Send all messages in the chat to the connected user
-        messages = Message.objects.filter(chat=self.chat).order_by('timestamp')
+        messages = ChatMessage.objects.filter(chat=self.chat).order_by('timestamp')
         for message in messages:
             self.send(text_data=json.dumps({
                 "type": "chat_message",
@@ -65,7 +65,7 @@ class ChatConsumer(WebsocketConsumer):
             }))
 
         # Mark all messages in this chat as seen
-        seen_count = Message.objects.filter(
+        seen_count = ChatMessage.objects.filter(
             chat=self.chat,
             sender=self.other_user,
             seen=False
@@ -89,7 +89,7 @@ class ChatConsumer(WebsocketConsumer):
             )
 
         # Check if any messages from current user were already seen
-        seen_messages_exist = Message.objects.filter(
+        seen_messages_exist = ChatMessage.objects.filter(
             chat=self.chat,
             sender=self.user,
             seen=True
@@ -135,7 +135,7 @@ class ChatConsumer(WebsocketConsumer):
         message_text = text_data_json["message"]
 
         # Create message instance
-        message = Message.objects.create(
+        message = ChatMessage.objects.create(
             chat=self.chat,
             sender=self.user,
             text=message_text
@@ -156,7 +156,7 @@ class ChatConsumer(WebsocketConsumer):
     def chat_message(self, event):
         # If the other user is the sender and we're connected, mark the message as seen
         if event['sender_username'] != self.user.username:
-            Message.objects.filter(
+            ChatMessage.objects.filter(
                 chat=self.chat,
                 sender__username=event['sender_username'],
                 id=event['message_id']

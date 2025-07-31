@@ -48,9 +48,9 @@ class Chat(models.Model):
         return chat
 
 
-class Message(models.Model):
+class ChatMessage(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_chat_messages')
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     seen = models.BooleanField(default=False)
