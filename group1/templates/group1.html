@@ -49,71 +49,6 @@
             color: #b0b0b0;
         }
 
-        /* Profile Section Styles */
-        .profile-section {
-            background: #1f1f1f; /* Card background */
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid #333;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem; /* Reduced gap */
-        }
-
-        .profile-avatar img {
-            width: 70px; /* Slightly smaller */
-            height: 70px;
-            border-radius: 50%;
-            border: 2px solid #7c5cff; /* Accent border */
-        }
-
-        .profile-info h2 {
-            margin: 0 0 0.5rem 0;
-            color: #ffffff;
-            font-size: 1.5rem; /* Slightly larger */
-        }
-
-        .stats {
-            display: flex;
-            gap: 1.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .stat-item {
-            color: #b0b0b0; /* Lighter grey for stat text */
-        }
-
-        .stat-label {
-            display: block;
-            font-size: 0.8rem; /* Smaller label */
-            color: #888;
-            margin-bottom: 0.25rem;
-        }
-        
-        .stat-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #e0e0e0;
-        }
-
-        .progress-bar {
-            background: #333333; /* Darker progress bar background */
-            border-radius: 0.5rem;
-            height: 0.6rem; /* Slightly thicker */
-            width: 120px; /* Wider */
-            overflow: hidden;
-            margin-top: 0.25rem;
-        }
-
-        .progress {
-            background: #7c5cff; /* Accent color for progress */
-            height: 100%;
-        }
-
         /* General Section & Card Styles */
         h3 {
             color: #ffffff;
@@ -255,6 +190,62 @@
             border-left: 3px solid #7c5cff;
         }
 
+        /* Skill Profile Section */
+        .skill-profile-section {
+            background: #1f1f1f;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #333;
+        }
+
+        .skill-profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .skill-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .skill-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-progress-bar {
+            background: #333;
+            border-radius: 0.5rem;
+            height: 1rem;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-progress {
+            background: #7c5cff;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .skill-score {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            margin-top: 0.25rem;
+        }
+
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -314,33 +305,25 @@
 
     {% block content %}
     <div class="dashboard-container">
-        <!-- Profile Section with Mock Data -->
-        <div class="profile-section">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <img src="https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=7c5cff&color=fff&bold=true" alt="Profile Picture">
-                </div>
-                <div class="profile-info">
-                    <h2>{{ user.get_full_name|default:user.username }}</h2>
-                    <div class="stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Health</span>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 85%"></div>
-                            </div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Level</span>
-                            <span class="stat-value">12</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">XP</span>
-                            <span class="stat-value">2,450</span>
+
+        <!-- Skill Profile Section -->
+        <section class="skill-profile-section">
+            <h3>Your Skill Profile</h3>
+            <div class="skill-profile-grid">
+                {% for score in skill_scores %}
+                <div class="skill-item">
+                    <span class="skill-label">{{ score.type_display }}</span>
+                    <div class="skill-progress-bar">
+                        <div class="skill-progress" style="width: {{ score.percentage }}%;">
                         </div>
                     </div>
+                    <span class="skill-score">{{ score.correct_answers }} / {{ score.total_questions }} ({{ score.percentage|floatformat:0 }}%)</span>
                 </div>
+                {% empty %}
+                <p>No quiz data available yet. Start a quiz to see your skill profile!</p>
+                {% endfor %}
             </div>
-        </div>
+        </section>
 
         <!-- Quiz Types Section -->
         <section class="quiz-types-section">
