@@ -12,7 +12,7 @@ jmespath==1.0.1
 mysql-connector-python==9.3.0
 mysqlclient==2.2.7
 pillow==11.3.0
-psycopg2==2.9.10
+psycopg2-binary==2.9.10
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 python3-pika==0.9.14
