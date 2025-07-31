@@ -1,0 +1,41 @@
+{% extends "group2.html" %}
+{% load static %}
+{% load tz %}
+{% block site_name %}Search{% endblock %}
+{% block extra_head %}
+
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Search for Partners</title>
+    <link rel="stylesheet" href="{% static 'g2/css/search.css' %}" />
+{% endblock %}
+{% block content %}
+
+    <main>
+        <div class="search-container">
+          {% if match_users %}
+            {% for user in match_users %}
+              <div class="match-user">
+                <div class="match-username">{{ user.username }}</div>
+                <div class="match-bio">{{ user.bio }}</div>
+                <button class="send-request" onclick="sendReq('{{ user.username }}')()">Start Chat</button>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="no-results">
+              <p>No partner found for you</p>
+            </div>
+          {% endif %}
+        </div>
+    </main>
+
+    <script>
+        function sendReq(partner_username){
+            return function (){
+                fetch('/group2/search/', {
+                method: 'POST',
+                body: partner_username,
+                })
+            }
+        }
+    </script>
+{% endblock %}

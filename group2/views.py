@@ -1,8 +1,10 @@
+import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PartnerProfileForm
 from .models import PartnerProfile
+from group2_chat.views import chat
 
 
 def home(request):
@@ -39,4 +41,32 @@ def profile_view_or_edit(request, username):
 
 @login_required
 def find_partners(request):
-    return  render (request , 'group2.html' , {'group_number': '2'})
+
+    if request.method == 'POST':
+        return chat(request, json.loads(request.body).get('partner_username'))
+    else:
+        try:
+            profile = PartnerProfile.objects.get(user=request.user)
+        except PartnerProfile.DoesNotExist:
+            return redirect('complete_profile')
+
+        match_profiles = PartnerProfile.objects.filter(
+            learning_goal=profile.learning_goal,
+            language_proficiency=profile.language_proficiency,
+            appear_in_search=True
+        ).exclude(user=request.user)
+
+        match_users = []
+
+        for profile in match_profiles:
+            match_users.append(partner(profile.user.username, profile.bio))
+
+        return render(request, 'search.html', {
+            'match_users': match_users,
+            'user_profile': profile
+        })
+
+class partner:
+    def __init__(self, username, bio):
+        self.username = username
+        self.bio = bio
