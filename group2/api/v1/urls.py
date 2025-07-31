@@ -6,5 +6,4 @@ app_name = 'api_v1'
 urlpatterns = [
     path("block/", views.BlockView.as_view(), name="block"),
     path("unblock/", views.UnblockView.as_view(), name="unblock"),
-    path("find/", views.UnblockView.as_view(), name="find_partner"),
 ] 

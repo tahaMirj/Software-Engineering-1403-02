@@ -46,4 +46,4 @@ class PartnerProfile(models.Model):
         return f"{self.user.username}'s Profile"
 
     def search(self) -> List[User]:
-        pass
+        return User.objects.all().values_list('username', flat=True)

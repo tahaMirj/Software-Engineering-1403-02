@@ -35,3 +35,8 @@ def profile_view_or_edit(request, username):
             'target_user': target_user,
             'is_own_profile': False,
         })
+
+
+@login_required
+def find_partners(request):
+    return  render (request , 'group2.html' , {'group_number': '2'})
