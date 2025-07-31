@@ -42,31 +42,22 @@ def profile_view_or_edit(request, username):
 @login_required
 def find_partners(request):
 
-    if request.method == 'POST':
-        return chat(request, json.loads(request.body).get('partner_username'))
-    else:
-        try:
-            profile = PartnerProfile.objects.get(user=request.user)
-        except PartnerProfile.DoesNotExist:
-            return redirect('complete_profile')
+    profile, _ = PartnerProfile.objects.get_or_create(user=request.user)
 
-        match_profiles = PartnerProfile.objects.filter(
-            learning_goals=profile.learning_goals,
-            english_level=profile.english_level,
-            appear_in_search=True
-        ).exclude(user=request.user)
+    match_profiles = profile.find_partners()
 
-        match_users = []
+    match_users = []
 
-        for profile in match_profiles:
-            match_users.append(partner(profile.user.username, profile.biography))
+    for profile in match_profiles:
+        match_users.append(partner(profile.user.username, profile.biography, profile.learning_goals))
 
-        return render(request, 'search.html', {
-            'match_users': match_users,
-            'user_profile': profile
-        })
+    return render(request, 'search.html', {
+        'match_users': match_users,
+        'user_profile': profile
+    })
 
 class partner:
-    def __init__(self, username, bio):
+    def __init__(self, username, bio, goals):
         self.username = username
         self.bio = bio
+        self.goals = goals

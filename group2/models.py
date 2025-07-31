@@ -45,5 +45,10 @@ class PartnerProfile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
-    def search(self) -> List[User]:
-        return User.objects.all().values_list('username', flat=True)
+    def find_partners(self) -> List['PartnerProfile']:
+        # return PartnerProfile.objects.all()
+        return PartnerProfile.objects.filter(
+            learning_goals=self.learning_goals,
+            english_level=self.english_level,
+            appear_in_search=True
+        ).exclude(id=self.id)
