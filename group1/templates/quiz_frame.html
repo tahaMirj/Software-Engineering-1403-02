@@ -25,6 +25,12 @@ Provides a block 'quiz_content' for injecting the specific question UI.
         margin: 0 auto;
         padding: 0;
         box-sizing: border-box;
+        width: 100%;
+    }
+    @media (min-width: 769px) {
+        .dashboard-container {
+            max-width: var(--quiz-max-width, 600px);
+        }
     }
     .quiz-card {
         background: #23232b;
@@ -33,6 +39,7 @@ Provides a block 'quiz_content' for injecting the specific question UI.
         padding: 2.5rem 2rem 2rem 2rem;
         margin-top: 2rem;
         width: 100%;
+        box-sizing: border-box;
     }
     .progress-bar {
         background: #292933;
@@ -47,9 +54,30 @@ Provides a block 'quiz_content' for injecting the specific question UI.
         height: 100%;
         transition: width 0.3s cubic-bezier(.4,2,.6,1);
     }
+
+    @media (max-width: 768px) {
+        .quiz-bg {
+            padding: 0;
+            align-items: stretch;
+        }
+        .dashboard-container {
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .quiz-card {
+            margin-top: 0;
+            border-radius: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    }
 </style>
 <div class="quiz-bg">
-  <div class="dashboard-container" style="max-width: {{ quiz_width|default:'600px' }};">
+  <div class="dashboard-container" style="--quiz-max-width: {{ quiz_width|default:'600px' }};">
     <div class="quiz-card">
         <!-- Header: Title and Progress -->
         <div style="margin-bottom: 2rem;">
@@ -66,4 +94,4 @@ Provides a block 'quiz_content' for injecting the specific question UI.
         {% endblock %}
     </div>
   </div>
-</div> 
+</div>
