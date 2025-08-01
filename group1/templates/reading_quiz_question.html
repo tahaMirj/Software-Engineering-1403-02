@@ -28,6 +28,15 @@
     .question-section {
         flex: 1;
     }
+
+    @media (max-width: 768px) {
+        .reading-container {
+            flex-direction: column;
+        }
+        .passage-section {
+            max-height: 200px;
+        }
+    }
 {% endblock %}
 
 {% block question_content %}
