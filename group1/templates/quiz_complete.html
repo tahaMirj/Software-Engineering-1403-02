@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Complete - {{ quiz.title }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'group1/css/group1_theme.css' %}">
     <style>
         body {
             background-color: #121212;
@@ -32,7 +34,7 @@
         }
 
         .header h1 {
-            color: #7c5cff;
+            color: var(--primary-color);
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
         }
@@ -92,7 +94,7 @@
         }
 
         .score-item h3 {
-            color: #7c5cff;
+            color: var(--primary-color);
             margin: 0 0 0.5rem 0;
             font-size: 1.8rem;
         }
@@ -171,12 +173,12 @@
         }
 
         .btn-primary {
-            background: #7c5cff;
+            background: var(--primary-color);
             color: #fff;
         }
 
         .btn-primary:hover {
-            background: #6a4ee0;
+            background: var(--primary-color-darker);
             transform: translateY(-2px);
         }
 
@@ -280,7 +282,7 @@
         {% if personalized_feedback %}
         <div class="questions-review">
             <h2>🧠 Personalized Feedback</h2>
-            <div class="question-item" style="border-left-color: #7c5cff;">
+            <div class="question-item" style="border-left-color: var(--primary-color);">
                 <div class="answer-info" style="font-size: 1rem; line-height: 1.6;">
                     {{ personalized_feedback }}
                 </div>

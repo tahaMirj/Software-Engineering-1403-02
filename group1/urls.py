@@ -22,4 +22,6 @@ urlpatterns = [
   path('reset-quiz/<int:quiz_id>/', views.reset_quiz, name='reset_quiz'),
   path('quiz/<int:quiz_id>/review/', views.review_mistakes, name='review_mistakes'),
   path('quiz/<int:quiz_id>/retry/', views.retry_mistakes, name='retry_mistakes'),
+  path('progress/', views.progress_dashboard, name='progress_dashboard'),
+
 ]

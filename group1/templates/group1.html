@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Language Learning Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'group1/css/group1_theme.css' %}">
     <style>
         body {
             background-color: #080808; /* Dark background */
@@ -41,7 +43,7 @@
         .dashboard-header .logo {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #7c5cff; /* Accent color */
+            color: var(--primary-color); /* Accent color */
         }
         
         .dashboard-header .user-greeting {
@@ -54,7 +56,7 @@
             color: #ffffff;
             margin: 2.5rem 0 1.5rem; /* Adjusted margins */
             font-size: 1.75rem; /* Larger section titles */
-            border-bottom: 2px solid #7c5cff;
+            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 0.5rem;
             display: inline-block;
         }
@@ -78,13 +80,13 @@
 
         .quiz-card:hover {
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(124, 92, 255, 0.3); /* Accent shadow on hover */
+            box-shadow: 0 8px 25px var(--primary-color-shadow); /* Accent shadow on hover */
         }
 
         .quiz-icon {
             font-size: 2.25rem; /* Larger icons */
             margin-bottom: 1rem;
-            color: #7c5cff; /* Accent color for icons */
+            color: var(--primary-color); /* Accent color for icons */
         }
 
         .quiz-card h4 {
@@ -102,7 +104,7 @@
 
         .start-btn {
             display: inline-block;
-            background: #7c5cff;
+            background: var(--primary-color);
             color: white;
             padding: 0.75rem 1.25rem; /* Larger button */
             border-radius: 0.5rem;
@@ -113,7 +115,7 @@
         }
 
         .start-btn:hover {
-            background: #6a4ee0; /* Darker shade on hover */
+            background: var(--primary-color-darker); /* Darker shade on hover */
             transform: translateY(-2px);
         }
         
@@ -163,7 +165,7 @@
         }
 
         .skill-progress {
-            background: #7c5cff;
+            background: var(--primary-color);
             height: 100%;
             display: flex;
             align-items: center;
@@ -314,6 +316,12 @@
                     <span class="time-info">~7 mins</span>
                     <a href="{% url 'group1:listening_quiz_question' %}" class="start-btn">Start Quiz</a>
                 </div>
+            </div>
+
+            <div style="text-align:center; margin-top: 40px;">
+                <a href="{% url 'group1:progress_dashboard' %}" class="btn btn-primary" style="font-size:18px; padding:12px 30px;">
+                    📊 View Progress Dashboard
+                </a>
             </div>
         </section>
 

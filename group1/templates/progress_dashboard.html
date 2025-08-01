@@ -1,0 +1,42 @@
+{% extends 'base.html' %}  <!-- or your main layout -->
+{% block content %}
+<h2>User Progress Dashboard</h2>
+
+<canvas id="progressChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const progressLabels = {{ labels|safe }};
+    const grammar = {{ grammar_scores|safe }};
+    const vocab = {{ vocab_scores|safe }};
+    const image = {{ image_scores|safe }};
+    const reading = {{ reading_scores|safe }};
+    const sentence = {{ sentence_scores|safe }};
+    const listening = {{ listening_scores|safe }};
+
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: progressLabels,
+            datasets: [
+                { label: 'Grammar', data: grammar, borderColor: 'blue', spanGaps: true },
+                { label: 'Vocabulary', data: vocab, borderColor: 'green', spanGaps: true },
+                { label: 'Image', data: image, borderColor: 'purple', spanGaps: true },
+                { label: 'Reading', data: reading, borderColor: 'orange', spanGaps: true },
+                { label: 'Sentence', data: sentence, borderColor: 'red', spanGaps: true },
+                { label: 'Listening', data: listening, borderColor: 'brown', spanGaps: true },
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Your Progress Over Time (%)' }
+            },
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            }
+        }
+    });
+</script>
+{% endblock %}

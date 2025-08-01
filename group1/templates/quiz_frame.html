@@ -6,6 +6,8 @@ Reusable quiz frame for all quiz types. Expects:
 - quiz_progress
 Provides a block 'quiz_content' for injecting the specific question UI.
 {% endcomment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'group1/css/group1_theme.css' %}">
 <style>
     body, .quiz-bg {
         background: #18181b !important;
@@ -50,7 +52,7 @@ Provides a block 'quiz_content' for injecting the specific question UI.
         margin-top: 0.25rem;
     }
     .progress {
-        background: #7c5cff;
+        background: var(--primary-color);
         height: 100%;
         transition: width 0.3s cubic-bezier(.4,2,.6,1);
     }

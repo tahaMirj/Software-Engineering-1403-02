@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 import random
 import string
 from .ai import generate_feedback_from_api
+from django.db.models import Q
+from django.utils.timezone import localtime
 
 
 # Create your views here.
@@ -810,14 +812,15 @@ def quiz_complete(request, quiz_id):
 
     # ✅ NEW: Generate AI personalized feedback
     incorrect_questions = quiz_questions.filter(is_correct=False).prefetch_related('question__choices')
-    api_key = "tpsg-SNfM6e8MEDpLXp7uV8gQbL3QFN8pLYZ"  # Replace with your actual key
+    api_key = "tpsg-z2NijAI5tE2pUSLpFFppFPSChCGavaA"  
 
     personalized_feedback = ""
     if incorrect_questions.exists():
         try:
             personalized_feedback = generate_feedback_from_api(incorrect_questions, api_key)
         except Exception as e:
-            personalized_feedback = "⚠️ An error occurred while generating feedback."
+            personalized_feedback = f"⚠️ {type(e).__name__}: {e}"
+
 
     context = {
         'quiz': quiz,
@@ -900,3 +903,84 @@ def retry_mistakes(request, quiz_id):
     request.session['current_grammar_quiz_id'] = new_quiz.id
 
     return redirect('group1:grammar_quiz_question')  # or dynamic based on quiz type
+
+
+@login_required
+def progress_dashboard(request):
+    """Show user's progress over time with charts"""
+    
+    quizzes = Quiz.objects.filter(
+        user_id=request.user.id,
+        status='completed'
+    ).order_by('create_date')
+
+    labels = []  # X-axis labels (dates)
+    grammar_scores = []
+    vocab_scores = []
+    image_scores = []
+    reading_scores = []
+    sentence_scores = []
+    listening_scores = []
+
+    for q in quizzes:
+        questions = QuizQuestion.objects.filter(quiz=q)
+        total = questions.count()
+        correct = questions.filter(is_correct=True).count()
+        score = int((correct / total) * 100) if total > 0 else 0
+        
+        labels.append(localtime(q.create_date).strftime("%Y-%m-%d"))
+
+        if "Grammar" in q.title:
+            grammar_scores.append(score)
+            vocab_scores.append(None)
+            image_scores.append(None)
+            reading_scores.append(None)
+            sentence_scores.append(None)
+            listening_scores.append(None)
+        elif "Vocabulary" in q.title:
+            vocab_scores.append(score)
+            grammar_scores.append(None)
+            image_scores.append(None)
+            reading_scores.append(None)
+            sentence_scores.append(None)
+            listening_scores.append(None)
+        elif "Image" in q.title:
+            image_scores.append(score)
+            grammar_scores.append(None)
+            vocab_scores.append(None)
+            reading_scores.append(None)
+            sentence_scores.append(None)
+            listening_scores.append(None)
+        elif "Reading" in q.title:
+            reading_scores.append(score)
+            grammar_scores.append(None)
+            vocab_scores.append(None)
+            image_scores.append(None)
+            sentence_scores.append(None)
+            listening_scores.append(None)
+        elif "Sentence" in q.title:
+            sentence_scores.append(score)
+            grammar_scores.append(None)
+            vocab_scores.append(None)
+            image_scores.append(None)
+            reading_scores.append(None)
+            listening_scores.append(None)
+        elif "Listening" in q.title:
+            listening_scores.append(score)
+            grammar_scores.append(None)
+            vocab_scores.append(None)
+            image_scores.append(None)
+            reading_scores.append(None)
+            sentence_scores.append(None)
+
+    context = {
+        'labels': labels,
+        'grammar_scores': grammar_scores,
+        'vocab_scores': vocab_scores,
+        'image_scores': image_scores,
+        'reading_scores': reading_scores,
+        'sentence_scores': sentence_scores,
+        'listening_scores': listening_scores,
+    }
+
+    return render(request, 'progress_dashboard.html', context)
