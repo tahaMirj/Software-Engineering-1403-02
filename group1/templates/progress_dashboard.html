@@ -6,7 +6,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const labels = {{ labels|safe }};
+    const progressLabels = {{ labels|safe }};
     const grammar = {{ grammar_scores|safe }};
     const vocab = {{ vocab_scores|safe }};
     const image = {{ image_scores|safe }};
@@ -18,7 +18,7 @@
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
+            labels: progressLabels,
             datasets: [
                 { label: 'Grammar', data: grammar, borderColor: 'blue', spanGaps: true },
                 { label: 'Vocabulary', data: vocab, borderColor: 'green', spanGaps: true },

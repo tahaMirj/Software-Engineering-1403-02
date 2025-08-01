@@ -819,7 +819,8 @@ def quiz_complete(request, quiz_id):
         try:
             personalized_feedback = generate_feedback_from_api(incorrect_questions, api_key)
         except Exception as e:
-            personalized_feedback = "⚠️ An error occurred while generating feedback."
+            personalized_feedback = f"⚠️ {type(e).__name__}: {e}"
+
 
     context = {
         'quiz': quiz,
