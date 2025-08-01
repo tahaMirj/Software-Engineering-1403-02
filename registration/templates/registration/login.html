@@ -141,7 +141,11 @@ button{
     </div>
     <form method="post">
         <h3>Login Here</h3>
-        {% csrf_token %} 
+        {% csrf_token %}
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        
         <label for="username">Username</label>
         <input type="text" placeholder="Enter Username" id="username" name="username">
 
@@ -156,7 +160,11 @@ button{
           <div class="go"><i class="fab fa-google"></i>  Google</div>
           <div class="fb"><i class="fab fa-facebook"></i>  Facebook</div>
         </div> -->
-        <a href="{% url 'signup' %}" >Create a account</a>
+        {% if next %}
+        <a href="{% url 'signup' %}?next={{ next|urlencode }}">Create an account</a>
+        {% else %}
+        <a href="{% url 'signup' %}">Create an account</a>
+        {% endif %}
     </form>
 </body>
 </html>

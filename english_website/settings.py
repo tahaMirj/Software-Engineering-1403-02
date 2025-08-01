@@ -33,6 +33,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Allowed hosts for redirect URLs (used in authentication)
+ALLOWED_REDIRECT_HOSTS = ['localhost', '127.0.0.1']
+
+AUTH_USER_MODEL = "auth.User"
+
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+
+LOGIN_URL = "/registration/login/"
+
+LOGIN_REDIRECT_URL = "/registration/profile/"
+
+LOGOUT_REDIRECT_URL = "/"
 
 # Application definition
 
@@ -46,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'group1',
     'group2',
+    'group2_chat',
     'group3',
     'group4',
     'group5',
@@ -88,7 +101,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'english_website.wsgi.application'
+ASGI_APPLICATION = 'english_website.asgi.application'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

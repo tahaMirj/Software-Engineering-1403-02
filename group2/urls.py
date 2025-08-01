@@ -1,9 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 
 app_name = 'group2'
 urlpatterns = [
-  path('', views.home, name='group2')
-
+  path('user/<str:username>/', views.profile_view_or_edit, name='profile_page'),
+  path("find_partners/", views.find_partners, name="find_partners"),
+  path("chat/", include('group2_chat.urls', namespace="chat")),
+  path('api/v1/', include('group2.api.v1.urls')),
+  path('', views.home, name='group2'),
 ] 

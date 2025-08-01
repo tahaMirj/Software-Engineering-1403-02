@@ -1,0 +1,53 @@
+{% extends "group2.html" %}
+{% load static %}
+{% load tz %}
+{% block site_name %}Chat{% endblock %}
+{% block extra_head %}
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Chat Lobby</title>
+    <link rel="stylesheet" href="{% static 'g2/css/index.css' %}" />
+{% endblock %}
+{% block content %}
+
+    <main class="main-body">
+        <div class="lobby-container">
+            <form class="new-chat-form" id="new-chat-form">
+                <input type="text" id="username-input" placeholder="Enter username to start a new chat" required>
+                <button type="submit">Start Chat</button>
+            </form>
+
+            {% if chat_partners %}
+            <div class="chat-list">
+                {% for partner in chat_partners %}
+                <a href="/group2/chat/{{ partner.username }}/" class="chat-item">
+                    <div class="chat-info">
+                        <div class="chat-username">{{ partner.username }}</div>
+                        <div class="last-message">{{ partner.last_message }}</div>
+                    </div>
+                    {% if partner.last_message_time %}
+                    <div class="timestamp">
+                        {{ partner.last_message_time|date:"M d, Y" }}
+                    </div>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-chats">
+                <p>No chat history yet. Start a new chat above!</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('new-chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username-input').value.trim();
+            if (username) {
+                window.location.pathname = '/group2/chat/' + username + '/';
+            }
+        });
+    </script>
+{% endblock %}

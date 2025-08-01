@@ -1,0 +1,45 @@
+{% extends "group2.html" %}
+{% load static %}
+{% load tz %}
+{% block site_name %}{{ target_user.username|title }}'s Profile{% endblock %}
+{% block extra_head %}
+    <title>{{ target_user.username|title }}'s Profile</title>
+    <link rel="stylesheet" href="{% static 'g2/css/profile.css' %}">
+{% endblock %}
+{% block content %}
+<div class="profile-container">
+    <h2 class="profile-title">
+    {{ target_user.username|title }}'s Profile 
+        <a href="{% url 'group2:group2_chat:chat' other_username=target_user.username %}" class="nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-left-dots-fill" viewBox="0 0 16 16">
+                <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+            </svg>
+        </a>
+    </h2>
+    
+    <div class="profile-section">
+        <h5 class="profile-section-title">Biography</h5>
+        <p class="profile-text">{{ profile.biography|linebreaksbr|default:"No biography provided." }}</p>
+    </div>
+
+    <div class="profile-section">
+        <h5 class="profile-section-title">Native Language</h5>
+        <p class="profile-text">{{ profile.native_language|default:"—" }}</p>
+    </div>
+
+    <div class="profile-section">
+        <h5 class="profile-section-title">English Proficiency</h5>
+        <p class="profile-text">{{ profile.get_english_level_display|default:"—" }}</p>
+    </div>
+
+    <div class="profile-section">
+        <h5 class="profile-section-title">Learning Goal</h5>
+        <p class="profile-text">{{ profile.get_learning_goals_display|default:"—" }}</p>
+    </div>
+
+    <div class="profile-section">
+        <h5 class="profile-section-title">Availability</h5>
+        <p class="profile-text">{{ profile.get_availability_display|default:"—" }}</p>
+    </div>
+</div>
+{% endblock %}

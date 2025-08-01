@@ -139,31 +139,38 @@ button{
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
-    <form action="" method="post">
-        {% csrf_token %} 
-        <h3>Signup Here</h3>
+    <form method="post">
+        <h3>Sign Up Here</h3>
+        {% csrf_token %}
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
 
         <label for="username">Username</label>
-        <input type="text" placeholder="Username" name="username" id="username">
-
-        <label for="name">Name</label>
-        <input type="text" placeholder="Your Name" name="name" id="name">
+        <input type="text" placeholder="Create Username" id="username" name="username">
 
         <label for="email">Email</label>
-        <input type="email" placeholder="Email or Phone" name="email" id="email">
-
-        <label for="age">Age</label>
-        <input type="number" placeholder="Your Age" name="age" id="age">
+        <input type="email" placeholder="Email" id="email" name="email">
 
         <label for="password1">Password</label>
         <input type="password" placeholder="Password" id="password1" name="password1">
 
+        <label for="password2">Confirm Password</label>
+        <input type="password" placeholder="Confirm Password" id="password2" name="password2">
 
-        <label for="password2">Confrom Password</label>
-        <input type="password" placeholder="Confrom Password" id="password2" name="password2">
-        <button type="submit">Signup</button>
+        <label for="name">Name</label>
+        <input type="text" placeholder="Your Name" id="name" name="name">
+
+        <label for="age">Age</label>
+        <input type="number" placeholder="Your Age" id="age" name="age">
+
+        <button type="submit">Sign Up</button>
         
-        <a href="{% url 'login' %}" >i have already account</a>
+        {% if next %}
+        <a href="{% url 'login' %}?next={{ next|urlencode }}">Already have an account? Login</a>
+        {% else %}
+        <a href="{% url 'login' %}">Already have an account? Login</a>
+        {% endif %}
     </form>
 </body>
 </html>
