@@ -59,14 +59,14 @@
             display: inline-block;
         }
 
-        .quiz-grid, .review-cards {
+        .quiz-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* Slightly larger min card width */
             gap: 1.5rem;
             margin-top: 1rem;
         }
 
-        .quiz-card, .review-card, .ranking-section {
+        .quiz-card, .ranking-section {
             background: #1f1f1f; /* Card background */
             border-radius: 1rem;
             padding: 1.75rem; /* Increased padding */
@@ -76,7 +76,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .quiz-card:hover, .review-card:hover {
+        .quiz-card:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 8px 25px rgba(124, 92, 255, 0.3); /* Accent shadow on hover */
         }
@@ -125,36 +125,6 @@
         }
 
 
-        /* Review Section Styles */
-        .question-type {
-            color: #7c5cff; /* Accent color */
-            font-weight: 600; /* Bolder */
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .question-text {
-            margin: 0.5rem 0 1rem 0; /* Adjusted margins */
-            line-height: 1.5;
-        }
-
-        .correct-answer {
-            color: #4caf50; /* Green for correct */
-            margin: 0.5rem 0;
-            font-weight: 500;
-        }
-
-        .your-answer {
-            color: #ff5252; /* Red for incorrect */
-            font-weight: 500;
-        }
-
-        .no-reviews {
-            color: #888;
-            text-align: center;
-            padding: 2rem;
-            font-style: italic;
-        }
 
         /* Skill Profile Section */
         .skill-profile-section {
@@ -241,7 +211,7 @@
                 font-size: 1.5rem;
             }
 
-            .quiz-card, .review-card, .ranking-section {
+            .quiz-card, .ranking-section {
                 padding: 1.25rem;
             }
             .ranking-table {
@@ -251,7 +221,7 @@
         }
 
          @media (max-width: 480px) {
-            .quiz-grid, .review-cards {
+            .quiz-grid {
                 grid-template-columns: 1fr; /* Single column on very small screens */
             }
             .start-btn {
@@ -347,41 +317,6 @@
             </div>
         </section>
 
-        <!-- Review Section with Mock Data -->
-        <section class="review-section">
-            <h3>Review Missed Questions</h3>
-            <div class="review-cards">
-                <div class="review-card">
-                    <div class="question-type">Grammar</div>
-                    <p class="question-text">Choose the correct form of the verb: "She ___ to the store yesterday."</p>
-                    <div class="correct-answer">Correct: went</div>
-                    <div class="your-answer">Your answer: goed</div>
-                </div>
-                <div class="review-card">
-                    <div class="question-type">Vocabulary</div>
-                    <p class="question-text">What is the meaning of 'ubiquitous'?</p>
-                    <div class="correct-answer">Correct: Present everywhere</div>
-                    <div class="your-answer">Your answer: Unique</div>
-                </div>
-                <div class="review-card">
-                    <div class="question-type">Listening</div>
-                    <p class="question-text">What did the speaker say about climate change?</p>
-                    <div class="correct-answer">Correct: It requires immediate action</div>
-                    <div class="your-answer">Your answer: It's not important</div>
-                </div>
-                 <div class="review-card">
-                    <div class="question-type">Writing</div>
-                    <p class="question-text">"Describe your favorite holiday." (Feedback on clarity and grammar)</p>
-                    <div class="correct-answer">Review: Focus on varied sentence structure.</div>
-                    <div class="your-answer">Your attempt: "My favorite holiday is fun. I like it. We eat food."</div>
-                </div>
-                {% if not missed_questions %}
-                <div class="no-reviews-container" style="grid-column: 1 / -1;"> <!-- Spans full width if no reviews -->
-                     <p class="no-reviews">🎉 Great job! No questions to review at the moment!</p>
-                </div>
-                {% endif %}
-            </div>
-        </section>
 
     </div>
     {% endblock %}
