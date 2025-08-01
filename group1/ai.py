@@ -2,7 +2,12 @@ import requests
 import json
 
 def generate_feedback_from_api(incorrect_questions, api_key):
-    prompt = "You are an English teacher. Analyze the student's mistakes and give them feedback.\n\n"
+    prompt = (
+    "You are an English teacher. Analyze the student's mistakes and provide:\n"
+    "1. Personalized explanations for each wrong answer.\n"
+    "2. Suggestions for review or extra practice.\n"
+    "3. A short learning path to improve in their weak areas.\n\n"
+)
 
     for i, q in enumerate(incorrect_questions, start=1):
         question = q.question
