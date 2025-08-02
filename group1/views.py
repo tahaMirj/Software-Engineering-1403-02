@@ -809,7 +809,7 @@ def quiz_complete(request, quiz_id):
 
     # ✅ NEW: Generate AI personalized feedback
     incorrect_questions = quiz_questions.filter(is_correct=False).prefetch_related('question__choices')
-    api_key = "tpsg-z2NijAI5tE2pUSLpFFppFPSChCGavaA"  
+    api_key = ''
 
     personalized_feedback = ""
     if incorrect_questions.exists():
