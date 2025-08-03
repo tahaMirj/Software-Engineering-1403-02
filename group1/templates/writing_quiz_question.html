@@ -20,11 +20,11 @@
         outline: none;
     }
     .writing-textarea:focus {
-        border-color: #a78bfa;
-        box-shadow: 0 0 0 2px #7c5cff33;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px var(--primary-color-shadow);
     }
     #submit-btn {
-        background: #7c5cff;
+        background: var(--primary-color);
         color: #fff;
         cursor: pointer;
         font-size: 1rem;
@@ -59,10 +59,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     writingAnswer.addEventListener('input', function() {
         // Enable submit button only if there is some text
-        if (writingAnswer.value.trim() !== '') {
-            submitBtn.disabled = false;
-        } else {
+        if (writingAnswer.value.trim() == '') {
             submitBtn.disabled = true;
+        } else {
+            submitBtn.disabled = false;
         }
     });
 

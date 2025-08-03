@@ -1,0 +1,5 @@
+:root {
+    --primary-color: #22c55e; /* A nice, modern green */
+    --primary-color-darker: #1a9e4a;
+    --primary-color-shadow: rgba(34, 197, 94, 0.3);
+}

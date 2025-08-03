@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.templatetags.static import static
-from django.db.models import F
+from django.db.models import F, Count, Case, When, IntegerField
 from django.templatetags.static import static
 from .models import Quiz, Question, Choice, QuizQuestion
 from django.contrib import messages
@@ -10,11 +10,33 @@ import random
 import string
 from .ai import generate_feedback_from_api
 
-
 # Create your views here.
 
+@login_required
 def home(request):
-    return  render (request , 'group1.html' , {'group_number': '1', 'user': request.user})
+    # Calculate user's score for each quiz type
+    skill_scores = QuizQuestion.objects.filter(
+        quiz__user_id=request.user.id
+    ).values(
+        'question__type'
+    ).annotate(
+        total_questions=Count('id'),
+        correct_answers=Count(Case(When(is_correct=True, then=1), output_field=IntegerField()))
+    ).order_by('question__type')
+
+    # Calculate percentage and prepare data for the template
+    for score in skill_scores:
+        score['percentage'] = (score['correct_answers'] * 100) / score['total_questions'] if score['total_questions'] > 0 else 0
+        # Get the display name for the question type
+        score['type_display'] = dict(Question.QUESTION_TYPES).get(score['question__type'], score['question__type'])
+
+
+    context = {
+        'group_number': '1',
+        'user': request.user,
+        'skill_scores': skill_scores,
+    }
+    return render(request, 'group1.html', context)
 
 @login_required
 def start_grammar_quiz(request):
@@ -787,14 +809,15 @@ def quiz_complete(request, quiz_id):
 
     # ✅ NEW: Generate AI personalized feedback
     incorrect_questions = quiz_questions.filter(is_correct=False).prefetch_related('question__choices')
-    api_key = "tpsg-SNfM6e8MEDpLXp7uV8gQbL3QFN8pLYZ"  # Replace with your actual key
+    api_key = ''
 
     personalized_feedback = ""
     if incorrect_questions.exists():
         try:
             personalized_feedback = generate_feedback_from_api(incorrect_questions, api_key)
         except Exception as e:
-            personalized_feedback = "⚠️ An error occurred while generating feedback."
+            personalized_feedback = f"⚠️ {type(e).__name__}: {e}"
+
 
     context = {
         'quiz': quiz,

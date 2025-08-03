@@ -2,7 +2,12 @@ import requests
 import json
 
 def generate_feedback_from_api(incorrect_questions, api_key):
-    prompt = "You are an English teacher. Analyze the student's mistakes and give them feedback.\n\n"
+    prompt = (
+    "You are an English teacher. Analyze the student's mistakes and provide:\n"
+    "1. Personalized explanations for each wrong answer.\n"
+    "2. Suggestions for review or extra practice.\n"
+    "3. A short learning path to improve in their weak areas.\n\n"
+)
 
     for i, q in enumerate(incorrect_questions, start=1):
         question = q.question
@@ -10,15 +15,15 @@ def generate_feedback_from_api(incorrect_questions, api_key):
         correct_choice = next((c for c in choices if c.is_correct), None)
         selected_choice = next((c for c in choices if str(c.id) == str(q.user_answer)), None)
 
-        prompt += f"{i}. Question: {question.text}\n"
+        prompt += f"{i}. Question: {question.text_or_prompt}\n"
         prompt += "   Choices:\n"
         for c in choices:
-            prompt += f"     {c.label}. {c.text}"
+            prompt += f"     - {c.text}"
             if c.is_correct:
                 prompt += " ✅"
             prompt += "\n"
         if selected_choice:
-            prompt += f"   Student answered: {selected_choice.label}. {selected_choice.text} ❌\n\n"
+            prompt += f"   Student answered: {selected_choice.text} ❌\n\n"
         else:
             prompt += "   Student did not answer.\n\n"
 

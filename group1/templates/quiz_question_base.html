@@ -31,7 +31,7 @@
     }
     .option-btn.selected {
         background-color: #4a4a68;
-        border-color: #7C5CFF;
+        border-color: var(--primary-color);
     }
     .option-btn.correct {
         background-color: #164b35;
@@ -40,7 +40,7 @@
     }
     .option-btn.incorrect {
         background-color: #451a24;
-        border-color: #ef4444;
+        border-color: #e62a2a;
         color: #fff;
     }
     .action-buttons {
@@ -48,7 +48,7 @@
         justify-content: flex-end;
     }
     .submit-btn, .next-btn {
-        background-color: #7C5CFF;
+        background-color: var(--primary-color);
         color: white;
         border: none;
         border-radius: 0.5rem;
@@ -64,6 +64,24 @@
 
     /* Additional styles for specific quiz types can be added here or in their own blocks */
     {% block extra_styles %}{% endblock %}
+
+    @media (max-width: 768px) {
+        .question-text {
+            font-size: 1rem;
+        }
+        .option-btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+        .submit-btn, .next-btn {
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            width: 100%;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
 </style>
 
 <form method="post" action="">
