@@ -1,0 +1,47 @@
+services:
+  g2_db:
+    image: mysql:latest
+    container_name: g2_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - ${DATABASE_PORT}:3306
+    volumes:
+      - db:/var/lib/mysql
+    env_file:
+      - ./.env
+
+  g2_redis:
+    container_name: g2_redis
+    image: redis:5.0.8
+    restart: unless-stopped
+    command:
+      [
+        "redis-server",
+        "--requirepass",
+        "${REDIS_PASS}",
+      ]
+    env_file:
+      - ./.env
+
+  english_website:
+    container_name: english_website
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - g2_db
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    command: ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
+    env_file:
+      - ./.env
+
+
+volumes:
+  db:
